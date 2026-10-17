@@ -1,0 +1,456 @@
+{
+  "schema_version": "0.1.0",
+  "report_type": "gradle_model_probe_acceptance_bundle",
+  "production_qualified": false,
+  "reports": [
+    {
+      "authority": "local_unverified",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "gradle_bundle_sha256": null,
+      "init_script_sha256": "f84431ce09fcb594c7f00ba89a2118fe054d865ca8e4fea6312668ba5443453a",
+      "input_files": [],
+      "input_scope": "selected_project_files",
+      "java_entry_sha256": null,
+      "jdk_closure_verified": false,
+      "jdk_release_sha256": null,
+      "model": null,
+      "native_report_sha256": null,
+      "native_status": "incomplete",
+      "project_sources_complete": false,
+      "reason": "request_cancelled",
+      "report_type": "gradle_model_probe",
+      "schema_version": "0.1.0",
+      "source_snapshot_sha256": null
+    },
+    {
+      "authority": "local_unverified",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "gradle_bundle_sha256": null,
+      "init_script_sha256": "f84431ce09fcb594c7f00ba89a2118fe054d865ca8e4fea6312668ba5443453a",
+      "input_files": [],
+      "input_scope": "selected_project_files",
+      "java_entry_sha256": null,
+      "jdk_closure_verified": false,
+      "jdk_release_sha256": null,
+      "model": null,
+      "native_report_sha256": null,
+      "native_status": "incomplete",
+      "project_sources_complete": false,
+      "reason": "request_deadline_exceeded",
+      "report_type": "gradle_model_probe",
+      "schema_version": "0.1.0",
+      "source_snapshot_sha256": null
+    },
+    {
+      "authority": "local_unverified",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "gradle_bundle_sha256": null,
+      "init_script_sha256": "f84431ce09fcb594c7f00ba89a2118fe054d865ca8e4fea6312668ba5443453a",
+      "input_files": [],
+      "input_scope": "selected_project_files",
+      "java_entry_sha256": null,
+      "jdk_closure_verified": false,
+      "jdk_release_sha256": null,
+      "model": null,
+      "native_report_sha256": null,
+      "native_status": "incomplete",
+      "project_sources_complete": false,
+      "reason": "root_build_inputs_missing",
+      "report_type": "gradle_model_probe",
+      "schema_version": "0.1.0",
+      "source_snapshot_sha256": null
+    },
+    {
+      "authority": "local_unverified",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "gradle_bundle_sha256": "af23312b8c97d3674bbdfdef8d7b9dcca3aeb3415892af185a5241fe300cf345",
+      "init_script_sha256": "f84431ce09fcb594c7f00ba89a2118fe054d865ca8e4fea6312668ba5443453a",
+      "input_files": [
+        {
+          "path": "build.gradle",
+          "sha256": "6e0f149b48e56ac4352b780924aec782b775cb7181fd3d7937185f6e847bf3e1"
+        },
+        {
+          "path": "settings.gradle",
+          "sha256": "64527a18f1aaec8fefd72fea73faf5c778333c4ca6e0e3d50b09486c68d73c07"
+        }
+      ],
+      "input_scope": "selected_project_files",
+      "java_entry_sha256": "f16d05ec6b29248d2c61adb1e9263f78e4f7bace1b955014a2d17872cfe4064d",
+      "jdk_closure_verified": false,
+      "jdk_release_sha256": "e2069654862fbf6ba95b156b752e8e229943ca8016ff7d4e065e5fdf57134e3a",
+      "model": null,
+      "native_report_sha256": null,
+      "native_status": "incomplete",
+      "project_sources_complete": false,
+      "reason": "native_model_missing",
+      "report_type": "gradle_model_probe",
+      "schema_version": "0.1.0",
+      "source_snapshot_sha256": "43fb6c6f4b304734b0a1dc8c3284e8d57cf6b32ecf692b4d691261342ce22f97"
+    },
+    {
+      "authority": "local_unverified",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "gradle_bundle_sha256": "febf115f9d1b2c9e1facd4cd9965b04f95c9a9b586efbd2d1d5c085978412783",
+      "init_script_sha256": "f84431ce09fcb594c7f00ba89a2118fe054d865ca8e4fea6312668ba5443453a",
+      "input_files": [
+        {
+          "path": "build.gradle",
+          "sha256": "6e0f149b48e56ac4352b780924aec782b775cb7181fd3d7937185f6e847bf3e1"
+        },
+        {
+          "path": "settings.gradle",
+          "sha256": "64527a18f1aaec8fefd72fea73faf5c778333c4ca6e0e3d50b09486c68d73c07"
+        }
+      ],
+      "input_scope": "selected_project_files",
+      "java_entry_sha256": "f16d05ec6b29248d2c61adb1e9263f78e4f7bace1b955014a2d17872cfe4064d",
+      "jdk_closure_verified": false,
+      "jdk_release_sha256": "e2069654862fbf6ba95b156b752e8e229943ca8016ff7d4e065e5fdf57134e3a",
+      "model": {
+        "gradle_version": "8.10.2",
+        "included_build_count": 0,
+        "projects": [
+          {
+            "build_dir": "build",
+            "path": ":",
+            "plugins": [
+              "java"
+            ],
+            "project_dir": ".",
+            "tasks": []
+          }
+        ],
+        "report_type": "gradle_checker_model",
+        "schema_version": "0.1.0"
+      },
+      "native_report_sha256": "693e62739cd003b3eeab5cb48f5b4e4dc25babccb03134a2165b6b4ee01fa606",
+      "native_status": "model_observed_unverified",
+      "project_sources_complete": false,
+      "reason": "selected_inputs_and_jdk_closure_unverified",
+      "report_type": "gradle_model_probe",
+      "schema_version": "0.1.0",
+      "source_snapshot_sha256": "43fb6c6f4b304734b0a1dc8c3284e8d57cf6b32ecf692b4d691261342ce22f97"
+    },
+    {
+      "authority": "local_unverified",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "gradle_bundle_sha256": "40dbf93c55b018cd6018446d9474765061933d1d0fecbdd57427abb129046a72",
+      "init_script_sha256": "f84431ce09fcb594c7f00ba89a2118fe054d865ca8e4fea6312668ba5443453a",
+      "input_files": [
+        {
+          "path": "build.gradle",
+          "sha256": "6e0f149b48e56ac4352b780924aec782b775cb7181fd3d7937185f6e847bf3e1"
+        },
+        {
+          "path": "settings.gradle",
+          "sha256": "64527a18f1aaec8fefd72fea73faf5c778333c4ca6e0e3d50b09486c68d73c07"
+        }
+      ],
+      "input_scope": "selected_project_files",
+      "java_entry_sha256": "f16d05ec6b29248d2c61adb1e9263f78e4f7bace1b955014a2d17872cfe4064d",
+      "jdk_closure_verified": false,
+      "jdk_release_sha256": "e2069654862fbf6ba95b156b752e8e229943ca8016ff7d4e065e5fdf57134e3a",
+      "model": null,
+      "native_report_sha256": null,
+      "native_status": "incomplete",
+      "project_sources_complete": false,
+      "reason": "native_execution_incomplete",
+      "report_type": "gradle_model_probe",
+      "schema_version": "0.1.0",
+      "source_snapshot_sha256": "43fb6c6f4b304734b0a1dc8c3284e8d57cf6b32ecf692b4d691261342ce22f97"
+    },
+    {
+      "authority": "local_unverified",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "gradle_bundle_sha256": "f5dea2d503ba81c85add07535fbe649fef62168b0c8052df40e0c525e0f0acfd",
+      "init_script_sha256": "f84431ce09fcb594c7f00ba89a2118fe054d865ca8e4fea6312668ba5443453a",
+      "input_files": [
+        {
+          "path": "build.gradle",
+          "sha256": "6e0f149b48e56ac4352b780924aec782b775cb7181fd3d7937185f6e847bf3e1"
+        },
+        {
+          "path": "settings.gradle",
+          "sha256": "64527a18f1aaec8fefd72fea73faf5c778333c4ca6e0e3d50b09486c68d73c07"
+        }
+      ],
+      "input_scope": "selected_project_files",
+      "java_entry_sha256": "f16d05ec6b29248d2c61adb1e9263f78e4f7bace1b955014a2d17872cfe4064d",
+      "jdk_closure_verified": false,
+      "jdk_release_sha256": "e2069654862fbf6ba95b156b752e8e229943ca8016ff7d4e065e5fdf57134e3a",
+      "model": null,
+      "native_report_sha256": null,
+      "native_status": "incomplete",
+      "project_sources_complete": false,
+      "reason": "request_deadline_exceeded",
+      "report_type": "gradle_model_probe",
+      "schema_version": "0.1.0",
+      "source_snapshot_sha256": "43fb6c6f4b304734b0a1dc8c3284e8d57cf6b32ecf692b4d691261342ce22f97"
+    },
+    {
+      "authority": "local_unverified",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "gradle_bundle_sha256": "3308a09d730a081e8105be9eec4a9edb5c01f07801310dfe8980dbc28bb6762c",
+      "init_script_sha256": "f84431ce09fcb594c7f00ba89a2118fe054d865ca8e4fea6312668ba5443453a",
+      "input_files": [
+        {
+          "path": "build.gradle",
+          "sha256": "6e0f149b48e56ac4352b780924aec782b775cb7181fd3d7937185f6e847bf3e1"
+        },
+        {
+          "path": "settings.gradle",
+          "sha256": "64527a18f1aaec8fefd72fea73faf5c778333c4ca6e0e3d50b09486c68d73c07"
+        }
+      ],
+      "input_scope": "selected_project_files",
+      "java_entry_sha256": "f16d05ec6b29248d2c61adb1e9263f78e4f7bace1b955014a2d17872cfe4064d",
+      "jdk_closure_verified": false,
+      "jdk_release_sha256": "e2069654862fbf6ba95b156b752e8e229943ca8016ff7d4e065e5fdf57134e3a",
+      "model": null,
+      "native_report_sha256": null,
+      "native_status": "incomplete",
+      "project_sources_complete": false,
+      "reason": "native_model_invalid_or_incomplete",
+      "report_type": "gradle_model_probe",
+      "schema_version": "0.1.0",
+      "source_snapshot_sha256": "43fb6c6f4b304734b0a1dc8c3284e8d57cf6b32ecf692b4d691261342ce22f97"
+    },
+    {
+      "authority": "local_unverified",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "gradle_bundle_sha256": "595483f90e06e450f7bc7fbe4aeeb53cd72d52e62927e853516dd66c5fd58072",
+      "init_script_sha256": "f84431ce09fcb594c7f00ba89a2118fe054d865ca8e4fea6312668ba5443453a",
+      "input_files": [
+        {
+          "path": "build.gradle",
+          "sha256": "6e0f149b48e56ac4352b780924aec782b775cb7181fd3d7937185f6e847bf3e1"
+        },
+        {
+          "path": "settings.gradle",
+          "sha256": "64527a18f1aaec8fefd72fea73faf5c778333c4ca6e0e3d50b09486c68d73c07"
+        }
+      ],
+      "input_scope": "selected_project_files",
+      "java_entry_sha256": "f16d05ec6b29248d2c61adb1e9263f78e4f7bace1b955014a2d17872cfe4064d",
+      "jdk_closure_verified": false,
+      "jdk_release_sha256": "e2069654862fbf6ba95b156b752e8e229943ca8016ff7d4e065e5fdf57134e3a",
+      "model": null,
+      "native_report_sha256": null,
+      "native_status": "incomplete",
+      "project_sources_complete": false,
+      "reason": "native_model_invalid_or_incomplete",
+      "report_type": "gradle_model_probe",
+      "schema_version": "0.1.0",
+      "source_snapshot_sha256": "43fb6c6f4b304734b0a1dc8c3284e8d57cf6b32ecf692b4d691261342ce22f97"
+    },
+    {
+      "authority": "local_unverified",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "gradle_bundle_sha256": "b77045b128c2cbca7bef98d4da9ae5b94c067a85c0f90a2a5f4cfc42bca78245",
+      "init_script_sha256": "f84431ce09fcb594c7f00ba89a2118fe054d865ca8e4fea6312668ba5443453a",
+      "input_files": [
+        {
+          "path": "build.gradle",
+          "sha256": "6e0f149b48e56ac4352b780924aec782b775cb7181fd3d7937185f6e847bf3e1"
+        },
+        {
+          "path": "settings.gradle",
+          "sha256": "64527a18f1aaec8fefd72fea73faf5c778333c4ca6e0e3d50b09486c68d73c07"
+        }
+      ],
+      "input_scope": "selected_project_files",
+      "java_entry_sha256": "f16d05ec6b29248d2c61adb1e9263f78e4f7bace1b955014a2d17872cfe4064d",
+      "jdk_closure_verified": false,
+      "jdk_release_sha256": "e2069654862fbf6ba95b156b752e8e229943ca8016ff7d4e065e5fdf57134e3a",
+      "model": null,
+      "native_report_sha256": null,
+      "native_status": "incomplete",
+      "project_sources_complete": false,
+      "reason": "native_inputs_changed_during_probe",
+      "report_type": "gradle_model_probe",
+      "schema_version": "0.1.0",
+      "source_snapshot_sha256": "43fb6c6f4b304734b0a1dc8c3284e8d57cf6b32ecf692b4d691261342ce22f97"
+    },
+    {
+      "authority": "local_unverified",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "gradle_bundle_sha256": "915f28e8fd4f7133e51321c688bf59dbc4c18da8748a297913010d245ddd3651",
+      "init_script_sha256": "f84431ce09fcb594c7f00ba89a2118fe054d865ca8e4fea6312668ba5443453a",
+      "input_files": [
+        {
+          "path": "app/build.gradle",
+          "sha256": "c1393d7e41f3c35229d4407c52881b0aea2cc69ce0f3135e4dd1d8b2d4764b21"
+        },
+        {
+          "path": "build.gradle",
+          "sha256": "c36297375bdf475400ccacea28f595d1efb23435c4d48c2b180da6ce3c394633"
+        },
+        {
+          "path": "settings.gradle",
+          "sha256": "f3ec71dd3c4da3448e5a12d86dc5d16845ed531dc7751f6dab942ea1597b275e"
+        }
+      ],
+      "input_scope": "selected_project_files",
+      "java_entry_sha256": "e820b09ad7e80bf14ec6803d9ade8abc02dfbfe9d0540f9b0e8c6d334706bc5e",
+      "jdk_closure_verified": false,
+      "jdk_release_sha256": "9e5f483cd7a0b0bd3524139fb7e08dae750bd9b60336004fa70cd2d00bcc0583",
+      "model": {
+        "gradle_version": "8.10.2",
+        "included_build_count": 0,
+        "projects": [
+          {
+            "build_dir": "build",
+            "path": ":",
+            "plugins": [
+              "java"
+            ],
+            "project_dir": ".",
+            "tasks": [
+              {
+                "enabled": true,
+                "implementation": "org.gradle.api.DefaultTask_Decorated",
+                "name": "dependencyCheckAnalyze"
+              },
+              {
+                "enabled": true,
+                "implementation": "org.gradle.api.tasks.javadoc.Javadoc",
+                "name": "javadoc"
+              }
+            ]
+          },
+          {
+            "build_dir": "app/build",
+            "path": ":app",
+            "plugins": [
+              "java",
+              "checkstyle",
+              "pmd"
+            ],
+            "project_dir": "app",
+            "tasks": [
+              {
+                "enabled": true,
+                "implementation": "org.gradle.api.plugins.quality.Checkstyle",
+                "name": "checkstyleMain"
+              },
+              {
+                "enabled": true,
+                "implementation": "org.gradle.api.plugins.quality.Checkstyle",
+                "name": "checkstyleTest"
+              },
+              {
+                "enabled": true,
+                "implementation": "org.gradle.api.tasks.javadoc.Javadoc",
+                "name": "javadoc"
+              },
+              {
+                "enabled": false,
+                "implementation": "org.gradle.api.plugins.quality.Pmd",
+                "name": "pmdMain"
+              },
+              {
+                "enabled": true,
+                "implementation": "org.gradle.api.plugins.quality.Pmd",
+                "name": "pmdTest"
+              }
+            ]
+          }
+        ],
+        "report_type": "gradle_checker_model",
+        "schema_version": "0.1.0"
+      },
+      "native_report_sha256": "1fd7f3d0ae1ecb54f3d4aa21034db11f7ca9dbc23e491f7c163bd093dcf2593a",
+      "native_status": "model_observed_unverified",
+      "project_sources_complete": false,
+      "reason": "selected_inputs_and_jdk_closure_unverified",
+      "report_type": "gradle_model_probe",
+      "schema_version": "0.1.0",
+      "source_snapshot_sha256": "6e8f6c3056f26885052e776b487cc7d83a5961ec1ff79d6d1b30f0bbc20619d7"
+    },
+    {
+      "authority": "local_unverified",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "gradle_bundle_sha256": "915f28e8fd4f7133e51321c688bf59dbc4c18da8748a297913010d245ddd3651",
+      "init_script_sha256": "f84431ce09fcb594c7f00ba89a2118fe054d865ca8e4fea6312668ba5443453a",
+      "input_files": [
+        {
+          "path": "build.gradle.kts",
+          "sha256": "c4697047b50b9795d4fb456cc5d21e32257f4cc65aa45469cdd45ad17f00217c"
+        },
+        {
+          "path": "settings.gradle.kts",
+          "sha256": "a309a17ea76b4bb5999ce8552a7f15dff58170eb677d5a7eeadc6242d6377510"
+        }
+      ],
+      "input_scope": "selected_project_files",
+      "java_entry_sha256": "e820b09ad7e80bf14ec6803d9ade8abc02dfbfe9d0540f9b0e8c6d334706bc5e",
+      "jdk_closure_verified": false,
+      "jdk_release_sha256": "9e5f483cd7a0b0bd3524139fb7e08dae750bd9b60336004fa70cd2d00bcc0583",
+      "model": {
+        "gradle_version": "8.10.2",
+        "included_build_count": 0,
+        "projects": [
+          {
+            "build_dir": "build",
+            "path": ":",
+            "plugins": [
+              "java",
+              "checkstyle",
+              "pmd"
+            ],
+            "project_dir": ".",
+            "tasks": [
+              {
+                "enabled": true,
+                "implementation": "org.gradle.api.plugins.quality.Checkstyle",
+                "name": "checkstyleMain"
+              },
+              {
+                "enabled": true,
+                "implementation": "org.gradle.api.plugins.quality.Checkstyle",
+                "name": "checkstyleTest"
+              },
+              {
+                "enabled": true,
+                "implementation": "org.gradle.api.tasks.javadoc.Javadoc",
+                "name": "javadoc"
+              },
+              {
+                "enabled": false,
+                "implementation": "org.gradle.api.plugins.quality.Pmd",
+                "name": "pmdMain"
+              },
+              {
+                "enabled": true,
+                "implementation": "org.gradle.api.plugins.quality.Pmd",
+                "name": "pmdTest"
+              }
+            ]
+          }
+        ],
+        "report_type": "gradle_checker_model",
+        "schema_version": "0.1.0"
+      },
+      "native_report_sha256": "2b1880772df391fb6dc25e9a31bcf740f4189c92ce6f2410661e1361cff126f8",
+      "native_status": "model_observed_unverified",
+      "project_sources_complete": false,
+      "reason": "selected_inputs_and_jdk_closure_unverified",
+      "report_type": "gradle_model_probe",
+      "schema_version": "0.1.0",
+      "source_snapshot_sha256": "986a58bd3a132ecee56929a5a0403d3e1d4a00b4fb07fd6e16d51334ec120230"
+    }
+  ]
+}

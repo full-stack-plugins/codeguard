@@ -1,0 +1,81 @@
+{
+  "clean": {
+    "authority": "local_unverified",
+    "checker_id": "rust.cargo_audit",
+    "command_status": "incomplete",
+    "coverage_proven": false,
+    "database_advisory_count": 1280,
+    "database_freshness": "unverified",
+    "database_last_commit": null,
+    "database_last_updated": null,
+    "delivery_decision": "not_evaluated",
+    "dependency_count": 1,
+    "execution_budget": {
+      "enforcement": "native_execution_only",
+      "source": "builtin_default",
+      "timeout_ms": 1800000
+    },
+    "exit_code": 3,
+    "findings": [],
+    "language": "rust",
+    "local_scan_complete": true,
+    "lock_sha256": "b05a9ffb42e27cb689bca6d219e18317db0466cce4febdb674181c11f2884e6d",
+    "manifest_sha256": "1854e6670f1fdb5357ed3da931aa518f4d85eb3735d940768520434fcc305ba8",
+    "native_warnings_present": false,
+    "next_actions": [
+      "核对原生漏洞库来源、提交与时效；零漏洞不能证明安全",
+      "复核解析依赖及原生 advisory 后修复或提出精确误报候选"
+    ],
+    "operation": "cve",
+    "reason": "database_freshness_unverified",
+    "report_type": "rust_cve_local_observation",
+    "schema_version": "0.1.0",
+    "tool_sha256": "9ae8935b86669f69d13525d16371d3f706772cc3e4d254d47ac32ddefc8ee53e"
+  },
+  "vulnerable": {
+    "authority": "local_unverified",
+    "checker_id": "rust.cargo_audit",
+    "command_status": "incomplete",
+    "coverage_proven": false,
+    "database_advisory_count": 1280,
+    "database_freshness": "unverified",
+    "database_last_commit": null,
+    "database_last_updated": null,
+    "delivery_decision": "not_evaluated",
+    "dependency_count": 1,
+    "execution_budget": {
+      "enforcement": "native_execution_only",
+      "source": "builtin_default",
+      "timeout_ms": 1800000
+    },
+    "exit_code": 3,
+    "findings": [
+      {
+        "advisory_id": "RUSTSEC-2020-0071",
+        "cve_aliases": [
+          "CVE-2020-26235"
+        ],
+        "cvss_vector": "CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+        "package_checksum": "0000000000000000000000000000000000000000000000000000000000000000",
+        "package_name": "time",
+        "package_source_sha256": "c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0",
+        "package_version": "0.1.40",
+        "severity": "unverified"
+      }
+    ],
+    "language": "rust",
+    "local_scan_complete": true,
+    "lock_sha256": "7c9a5cb7320bd0a565a37961d3d282285f10d802cea2b5c6338761b5ae46b04f",
+    "manifest_sha256": "1854e6670f1fdb5357ed3da931aa518f4d85eb3735d940768520434fcc305ba8",
+    "native_warnings_present": false,
+    "next_actions": [
+      "核对原生漏洞库来源、提交与时效；零漏洞不能证明安全",
+      "复核解析依赖及原生 advisory 后修复或提出精确误报候选"
+    ],
+    "operation": "cve",
+    "reason": "database_freshness_unverified",
+    "report_type": "rust_cve_local_observation",
+    "schema_version": "0.1.0",
+    "tool_sha256": "9ae8935b86669f69d13525d16371d3f706772cc3e4d254d47ac32ddefc8ee53e"
+  }
+}

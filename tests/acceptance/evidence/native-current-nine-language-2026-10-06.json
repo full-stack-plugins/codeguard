@@ -1,0 +1,133 @@
+{
+  "date": "2026-10-06",
+  "source_base": "dd4e992ad6c1c09630f2b467cd2b2818463260fa",
+  "native_targets": 9,
+  "native_tests": {
+    "passed": 12,
+    "failed": 0,
+    "ignored": 0,
+    "exit_code": 0
+  },
+  "ordinary_related": {
+    "passed": 7,
+    "failed": 0,
+    "ignored": 5
+  },
+  "tools": [
+    {
+      "name": "javac",
+      "path": "/Users/wandl/Library/Java/JavaVirtualMachines/ms-21.0.12.1/Contents/Home/bin/javac",
+      "resolved_path": "/Users/wandl/Library/Java/JavaVirtualMachines/ms-21.0.12.1/Contents/Home/bin/javac",
+      "sha256": "f9b046eb45d522f6e41d0b7eef03d4a1d0f898e0b54f1eac0a1b254be81d0e36"
+    },
+    {
+      "name": "node",
+      "path": "/Users/wandl/.nvm/versions/node/v24.18.0/bin/node",
+      "resolved_path": "/Users/wandl/.nvm/versions/node/v24.18.0/bin/node",
+      "sha256": "ee6fb0e015284d83a91e8ec5213f43a157f8a392b58555301682892ba928c04a"
+    },
+    {
+      "name": "clang",
+      "path": "/usr/bin/clang",
+      "resolved_path": "/usr/bin/clang",
+      "sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2"
+    },
+    {
+      "name": "swiftc",
+      "path": "/usr/bin/swiftc",
+      "resolved_path": "/usr/bin/swiftc",
+      "sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2"
+    },
+    {
+      "name": "ruby",
+      "path": "/usr/bin/ruby",
+      "resolved_path": "/usr/bin/ruby",
+      "sha256": "8404c9d5fd2200e82c2520c8d9c1badf2a164c0da7c350b54e86cb0025ad9b50"
+    },
+    {
+      "name": "rustfmt",
+      "path": "/Users/wandl/.rustup/toolchains/stable-aarch64-apple-darwin/bin/rustfmt",
+      "resolved_path": "/Users/wandl/.rustup/toolchains/stable-aarch64-apple-darwin/bin/rustfmt",
+      "sha256": "98e8da71078a8b5710f1818c98da25d92de162a122bd9a6db222ca929e545468"
+    },
+    {
+      "name": "zig",
+      "path": "/opt/homebrew/bin/zig",
+      "resolved_path": "/opt/homebrew/Cellar/zig/0.16.0_1/bin/zig",
+      "sha256": "71cc3995a7586753ebf82c66dfb8bef43df446517550678781834586a960f8c9"
+    },
+    {
+      "name": "kotlinc",
+      "path": "/opt/homebrew/bin/kotlinc",
+      "resolved_path": "/opt/homebrew/Cellar/kotlin/2.4.10/bin/kotlinc",
+      "sha256": "827f1613736c1f457474103af722f517a627d9534d884d1773f49b7026f45f56"
+    },
+    {
+      "name": "go",
+      "path": "/usr/local/go/bin/go",
+      "resolved_path": "/usr/local/go/bin/go",
+      "sha256": "5900a8e0942f88b7bacf2b44b397b4950c8dc9f850a16ae1249e1636860dd6ef"
+    },
+    {
+      "name": "gofmt",
+      "path": "/usr/local/go/bin/gofmt",
+      "resolved_path": "/usr/local/go/bin/gofmt",
+      "sha256": "f0e9b77df6dcfeec18d33bd9305ff034c28aa2142d3a4fa3aa44e62a44c89e3b"
+    }
+  ],
+  "tool_entrypoints_stable": true,
+  "historical_report_count": 29,
+  "historical_reports_unchanged": true,
+  "independent_holdout": false,
+  "grammar_qualified_count": 0,
+  "pending_kotlin_swift_unknowns": 3,
+  "javascript_extended_cases": [
+    "module_return",
+    "duplicate_binding"
+  ],
+  "javascript_duplicate_binding_measurement_omits_project_rule": true,
+  "reports": [
+    {
+      "path": "tests/acceptance/evidence/native-current-2026-10-06-javascript-input.json",
+      "sha256": "5f55f18f50b87512d05c75ac64f41e6301e0c88b77a0c4fd5bd953369c2eb435"
+    },
+    {
+      "path": "tests/acceptance/evidence/native-current-2026-10-06-javascript-report.json",
+      "sha256": "831adf64bcd7ff3d4be9bb5a0f843ac012b7678a29819cb8c867c2ab8ac58824"
+    },
+    {
+      "path": "tests/acceptance/evidence/native-current-2026-10-06-go-input.json",
+      "sha256": "d76d0b5c3fe264bb487c1e437996b2bf177603399f8e5386ed7e0933284eb3a9"
+    },
+    {
+      "path": "tests/acceptance/evidence/native-current-2026-10-06-go-report.json",
+      "sha256": "a63d7ad60da187413fc17e9ac20e8ce94f1c7abda1d87bb12e2612d6b778fa8d"
+    },
+    {
+      "path": "tests/acceptance/evidence/native-current-2026-10-06-ruby-input.json",
+      "sha256": "a3ec42480b777afdda808e7dba323af2afcac97ee9886448b6c75556400bc7eb"
+    },
+    {
+      "path": "tests/acceptance/evidence/native-current-2026-10-06-ruby-report.json",
+      "sha256": "fa35459239e0e32eb2287c1ec412053c40911729985136824e506b6fdd03e6ce"
+    },
+    {
+      "path": "tests/acceptance/evidence/native-current-2026-10-06-java21-report.json",
+      "sha256": "3691f0f76cd89222f75372cd10fc21d61c53275b98bfd41d11e34a68c8b95b2d"
+    }
+  ],
+  "logs": [
+    {
+      "path": "/private/tmp/cg-native-current-nine-language.log",
+      "sha256": "cefb741d4d5a8aecef72cc2e3f788f84e20f7d26516f567cf8ca745bddd7ca27"
+    },
+    {
+      "path": "/private/tmp/cg-native-archive-regression.log",
+      "sha256": "bfe0dccf6ef6645aafc431116efcda6325dd4a8fa145686011e6a5da98a5d335"
+    },
+    {
+      "path": "/private/tmp/cg-native-archive-clippy.log",
+      "sha256": "774add0498e67523d68744a553a7255efdb3119342bd83992336407983a39d56"
+    }
+  ]
+}

@@ -157,3 +157,52 @@ Go candidate-task rechecks now accept `--go-tool /absolute/sdk/bin/go` and invok
 ### Native-first Go lint with missing-tool candidates
 
 Source-built `codeguard lint go . --format json` prefers explicit `--go-tool`, then executable Go from absolute caller PATH entries. Selected tool/version/execution failures remain native failures. When no native tool exists, the built-in WASM produces bounded whole-file recovery and structure candidates. Candidates or incomplete prechecks require a project-appropriate native tool; zero candidates in the completely observed bounded scope only recommend preparation. Native obligations remain incomplete and exit3 is retained. Builds without WASM report that capability gap. Repeated lint/check reuse the confirmation task; adding a package declaration does not close it. Public npm0.1.4 is unchanged. See [limited acceptance](../tests/acceptance/go-lint-fallback.md).
+
+## 2026-10-06 Java21 native comparison
+
+Java differential acceptance now checks truncated_files before treating empty recoveries as clean; hidden recovery remains unknown. The original13 cases retain their javac21/release17 comparison. A separate release21 group covers pattern switch, guards, record patterns, sealed records, text blocks and three syntax errors: actual3TP/5TN/0FP/0FN/0unknown. These are author-created local cases (independent_holdout=false), not independent qualification or additions to the fixed358-case metrics. Native-tool and source digests bind the evidence. See [acceptance](../tests/acceptance/java21-native-differential.md).
+
+## JavaScript native differential uses project structure candidates
+
+The development differential now shares the project's direct duplicate-binding worker. Report0.9 separates raw parser recovery from combined structure metrics. Actual Node24.18.0 over18 additional module cases gives raw5TP/11TN/0FP/2FN and combined6TP/11TN/0FP/1FN: duplicate binding has rule evidence, while module-level return remains missed. The schema constrains rule digests and language scope; existing protocols remain unchanged and0.4 consumers reject the new version. This measurement correction does not change the fixed358-case metrics or grant grammar qualification. CommonJS or unknown modes must not receive unconditional module-return findings. Independent holdout and formal qualification remain open. See [limited acceptance](../tests/acceptance/javascript-native-project-binding.md).
+
+## AST facts for a module-only return candidate
+
+The runtime now traverses bounded AST nodes outside function/generator/arrow/method subtrees, including outer control flow. It retains UTF-8 byte locations and explicit budget truncation. Actual Node24.18.0 compared11 source samples in module and CommonJS modes (22 syntax checks), confirming the need for explicit module context. This is only the fact layer; public worker/probe, project mode and differential wiring remain open. The existing module_return false negative and0/32 qualification are unchanged. See [limited acceptance](../tests/acceptance/javascript-module-return-ast.md).
+
+## Explicit module candidates and native combined differential
+
+`grammar probe javascript FILE --module --format=json` now observes outer returns through worker1.7/probe0.8. The undeclared-mode path does not activate this rule; zero candidates and input failures retain explicit context. The development Node differential fixes module context and reuses this worker in report0.10: actual18 cases yield raw5TP/11TN/0FP/2FN and combined7TP/11TN/0FP/0FN. Raw misses remain visible, fixed358 metrics and0/32 qualification are unchanged, and this is not an independent holdout. Automatic project-mode observation, task and host wiring remain open. See [limited acceptance](../tests/acceptance/javascript-module-worker-probe.md).
+
+## Project JavaScript declared-mode evidence interface
+
+The mode observation interface now returns `javascript_mode_observation`0.1. It binds ordinary source and a physical workspace: `.mjs`/`.cjs` explicitly declare module/CommonJS, while `.js` reads only the nearest in-scope package's unique explicit `type`. Missing types, malformed/duplicate JSON, links, out-of-scope or over-budget inputs and unresolved loader modes remain unknown without outer-package inheritance. Limits are1MiB source,256KiB manifest and64 searched directories. Source/package digests and searched directories preserve evidence for detecting nearer-package changes before and after scanning. This does not execute native tools or prove effective ESLint configuration.
+
+This interface-only checkpoint did not connect scanners/tasks/hooks. Current integration and its separate acceptance are documented below. See [limited acceptance](../tests/acceptance/javascript-project-mode.md) for5 actual Node file checks and21 protocol observations.
+
+## Core production acceptance and declared-module integration
+
+The production target now requires all 57 canonical language entries to qualify syntax, detailed documentation comments, development conventions and vulnerability checking. Historical planned entries remain unfinished targets. Java must qualify both Maven and Gradle vulnerability paths, detailed Javadoc and native P3C. A configured tool, runnable WASM or mocked test does not establish qualification. Independent labelled evaluation, supported versions/builds/platforms and the complete native repair/recheck/reopen path are mandatory; current formal WASM qualification remains 0/32. See OpenSpec tasks15.1–15.7.
+
+Current source integrates declared JavaScript module evidence into project checks, standalone `lint typescript`, `lint all` and file-edit feedback. Applicable native ESLint retains priority. Uncovered whole-file `.mjs` and explicitly module-typed `.js` use the module candidate worker, while CommonJS/unknown modes keep their existing precheck and never activate the outer-return module rule. Source and mode evidence are rechecked after worker execution. Persisted confirmation0.15, check0.60, ESLint feedback0.7, hook0.29/fast0.17 and module repair brief0.21 retain separate versioned contracts. Module context changes prevent native task recheck from reusing the old package boundary. Repeated checks reuse stable tasks; clean candidates cannot close them. No new npm/host publication or production qualification is claimed. See [integration acceptance](../tests/acceptance/javascript-module-workbench.md).
+
+```mermaid
+flowchart LR
+    A[Project lint or edit request] --> B{Applicable native ESLint}
+    B -->|Available| C[Original native checks]
+    B -->|Unavailable or uncovered| D[Observe source and declared mode]
+    D -->|Module| E[Module WASM candidate worker]
+    D -->|CommonJS or unknown| F[Existing bounded precheck]
+    E --> G[Recheck source and mode evidence]
+    F --> H[Incomplete precheck feedback]
+    G -->|Changed| H
+    G -->|Stable| I[Evidence-bound stable confirmation task]
+    I --> J[Agent feedback and original native verification]
+    J --> K[Closure requires accepted native repair evidence]
+```
+
+
+Uniform development replay now reuses the fixed Clang service for C11/C++17 with shared cancellation. Warnings do not count as syntax errors; only the audited expected-expression parsing rule classifies invalid syntax. Semantic/mixed/context diagnostics remain unknown. Report0.11 records standard and policy, preserves the32-language inventory, and grants no qualification. See [bounded acceptance](../tests/acceptance/c-family-native-replay.md).
+
+
+Report0.12 audits seven exact Clang punctuation IDs; unaudited warnings and mixed semantic diagnostics remain unknown. C11 extensions and C++17 errors are measured separately, with historical0.11 unchanged. See [incremental acceptance](../tests/acceptance/c-family-native-punctuation.md) and [pending CI source action](../tests/acceptance/ci-source-reachability.md).

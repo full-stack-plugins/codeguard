@@ -1,0 +1,320 @@
+{
+  "evidence_scope": "synthetic_cli_fixtures_only",
+  "actual_native_tool_verified": false,
+  "actual_host_verified": false,
+  "grammar_qualified_count": 0,
+  "reports": {
+    "duplicate_candidate": {
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "findings": [],
+      "local_coherent": false,
+      "native": {
+        "reason": "explicit_context_missing",
+        "status": "not_run"
+      },
+      "next_action": "查看原报告 codeguard.javascript.duplicate_direct_lexical_binding 的位置和摘要；核对原 JavaScript 方言、构建根及 ESLint 配置，恢复适用原生 lint 确认后才修复并复检。候选仅覆盖顶层简单 let/const 名称，WASM 零恢复不能关闭任务",
+      "reason": "eslint_execution_context_missing",
+      "report_type": "eslint_local_feedback",
+      "schema_version": "0.6.0",
+      "setup": {
+        "reason": "native_confirmation_needed",
+        "requirement": "required",
+        "task_id": "CG-B-4af56fe5c4420d81fb2988b9989c6870"
+      },
+      "status": "incomplete",
+      "suppressed_count": 0,
+      "syntax_candidates": {
+        "authority": "candidate_unqualified",
+        "delivery_decision": "incomplete",
+        "execution_phase": "after_native",
+        "native_preferred_count": 0,
+        "next_action": "核对适用语言版本，使用原生 lint/编译器对原始源码确认；原生确认合法时调查 grammar 版本/兼容性或扫描预算，诊断成立时才按真实位置修复；零恢复不表示完整通过",
+        "observations": [
+          {
+            "byte_offset": 0,
+            "grammar_qualified": false,
+            "grammar_sha256": "7978e62bcc851ab1d1f6dcd4678f9eda79df2b3b3490e75f81dd819d9bccccfa",
+            "known_limitations": [
+              "Node 24.18.0 module syntax differential agrees on 13 narrow cases; script mode, other versions, systematic precision, complete native-first lint route and release remain unqualified"
+            ],
+            "language": "javascript",
+            "path": "input.js",
+            "reason": null,
+            "recoveries": [],
+            "recovery_count": 0,
+            "scope": "whole_file",
+            "source_sha256": "0a2c7877e24c4c58e60f45ef6999c46dc2cad670658d1e9713ccc6b1c9cb2e18",
+            "status": "candidate_observed",
+            "structural_observation_count": 1,
+            "structural_observations": [
+              {
+                "basis": "codeguard_structure_rule",
+                "end_byte": 18,
+                "end_column_byte": 18,
+                "end_row": 0,
+                "parent_syntax_kind": "program",
+                "rule_id": "codeguard.javascript.duplicate_direct_lexical_binding",
+                "rule_sha256": "6d450c14bd4f89f0f3798f458fba371fb455a2642034d836c8ef988ef44641a4",
+                "rule_version": "1.0.0",
+                "start_byte": 17,
+                "start_column_byte": 17,
+                "start_row": 0
+              }
+            ]
+          }
+        ],
+        "reason": "candidate_unqualified",
+        "skipped_count": 0,
+        "source_file_count": 1,
+        "status": "observed_partial",
+        "unrouted_count": 0
+      },
+      "syntax_tasks": {
+        "failures": [],
+        "new_blockers": 1,
+        "status": "synced_partial",
+        "tasks": [
+          {
+            "language": "javascript",
+            "path": "input.js",
+            "task_id": "CG-B-4af56fe5c4420d81fb2988b9989c6870"
+          }
+        ]
+      },
+      "workbench": {
+        "status": "synced_partial",
+        "task_id": "CG-B-4af56fe5c4420d81fb2988b9989c6870"
+      },
+      "workbench_status": "synced_partial"
+    },
+    "pending_native_confirmation": {
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "findings": [],
+      "local_coherent": false,
+      "native": {
+        "reason": "explicit_context_missing",
+        "status": "not_run"
+      },
+      "next_action": "查看原报告 codeguard.javascript.duplicate_direct_lexical_binding 的位置和摘要；核对原 JavaScript 方言、构建根及 ESLint 配置，恢复适用原生 lint 确认后才修复并复检。候选仅覆盖顶层简单 let/const 名称，WASM 零恢复不能关闭任务",
+      "reason": "eslint_execution_context_missing",
+      "report_type": "eslint_local_feedback",
+      "schema_version": "0.6.0",
+      "setup": {
+        "reason": "native_confirmation_still_pending",
+        "requirement": "required",
+        "task_id": "CG-B-4af56fe5c4420d81fb2988b9989c6870"
+      },
+      "status": "incomplete",
+      "suppressed_count": 0,
+      "syntax_candidates": {
+        "authority": "candidate_unqualified",
+        "delivery_decision": "incomplete",
+        "execution_phase": "after_native",
+        "native_preferred_count": 0,
+        "next_action": "核对适用语言版本，使用原生 lint/编译器对原始源码确认；原生确认合法时调查 grammar 版本/兼容性或扫描预算，诊断成立时才按真实位置修复；零恢复不表示完整通过",
+        "observations": [
+          {
+            "byte_offset": 0,
+            "grammar_qualified": false,
+            "grammar_sha256": "7978e62bcc851ab1d1f6dcd4678f9eda79df2b3b3490e75f81dd819d9bccccfa",
+            "known_limitations": [
+              "Node 24.18.0 module syntax differential agrees on 13 narrow cases; script mode, other versions, systematic precision, complete native-first lint route and release remain unqualified"
+            ],
+            "language": "javascript",
+            "path": "input.js",
+            "reason": null,
+            "recoveries": [],
+            "recovery_count": 0,
+            "scope": "whole_file",
+            "source_sha256": "fc4e6fafdc3fe0463aae3f489fd47314e10981f6917c7a487744d873fd933764",
+            "status": "candidate_observed"
+          }
+        ],
+        "reason": "candidate_unqualified",
+        "skipped_count": 0,
+        "source_file_count": 1,
+        "status": "observed_partial",
+        "unrouted_count": 0
+      },
+      "syntax_tasks": {
+        "failures": [],
+        "new_blockers": 0,
+        "status": "synced_partial",
+        "tasks": []
+      },
+      "workbench": {
+        "status": "synced_partial",
+        "task_id": "CG-B-4af56fe5c4420d81fb2988b9989c6870"
+      },
+      "workbench_status": "synced_partial"
+    },
+    "recommendation": {
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "findings": [],
+      "local_coherent": false,
+      "native": {
+        "reason": "explicit_context_missing",
+        "status": "not_run"
+      },
+      "next_action": "本次有界候选初检未发现疑似问题；推荐配置并运行原生 ESLint，类型、依赖、安全及完整项目质量仍未检查",
+      "reason": "eslint_execution_context_missing",
+      "report_type": "eslint_local_feedback",
+      "schema_version": "0.6.0",
+      "setup": {
+        "reason": "native_lint_recommended",
+        "requirement": "recommended",
+        "task_id": null
+      },
+      "status": "incomplete",
+      "suppressed_count": 0,
+      "syntax_candidates": {
+        "authority": "candidate_unqualified",
+        "delivery_decision": "incomplete",
+        "execution_phase": "after_native",
+        "native_preferred_count": 0,
+        "next_action": "核对适用语言版本，使用原生 lint/编译器对原始源码确认；原生确认合法时调查 grammar 版本/兼容性或扫描预算，诊断成立时才按真实位置修复；零恢复不表示完整通过",
+        "observations": [
+          {
+            "byte_offset": 0,
+            "grammar_qualified": false,
+            "grammar_sha256": "7978e62bcc851ab1d1f6dcd4678f9eda79df2b3b3490e75f81dd819d9bccccfa",
+            "known_limitations": [
+              "Node 24.18.0 module syntax differential agrees on 13 narrow cases; script mode, other versions, systematic precision, complete native-first lint route and release remain unqualified"
+            ],
+            "language": "javascript",
+            "path": "input.cjs",
+            "reason": null,
+            "recoveries": [],
+            "recovery_count": 0,
+            "scope": "whole_file",
+            "source_sha256": "f58b7c3af621b52a2bb7dc67d4491f9ab6c6d16e3cfa1e46e670ff4f9a301fdc",
+            "status": "candidate_observed"
+          }
+        ],
+        "reason": "candidate_unqualified",
+        "skipped_count": 0,
+        "source_file_count": 1,
+        "status": "observed_partial",
+        "unrouted_count": 0
+      },
+      "syntax_tasks": null,
+      "workbench": null,
+      "workbench_status": "not_connected"
+    },
+    "sync_failure": {
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "findings": [],
+      "local_coherent": false,
+      "native": {
+        "reason": "explicit_context_missing",
+        "status": "not_run"
+      },
+      "next_action": "工作区未初始化；先对原工作区执行 codeguard init <工作区> --apply，再按原 lint 命令复检。保留初检候选，不修改源码或虚构任务",
+      "reason": "eslint_execution_context_missing",
+      "report_type": "eslint_local_feedback",
+      "schema_version": "0.6.0",
+      "setup": {
+        "reason": "native_confirmation_needed",
+        "requirement": "required",
+        "task_id": null
+      },
+      "status": "incomplete",
+      "suppressed_count": 0,
+      "syntax_candidates": {
+        "authority": "candidate_unqualified",
+        "delivery_decision": "incomplete",
+        "execution_phase": "after_native",
+        "native_preferred_count": 0,
+        "next_action": "核对适用语言版本，使用原生 lint/编译器对原始源码确认；原生确认合法时调查 grammar 版本/兼容性或扫描预算，诊断成立时才按真实位置修复；零恢复不表示完整通过",
+        "observations": [
+          {
+            "byte_offset": 0,
+            "grammar_qualified": false,
+            "grammar_sha256": "7978e62bcc851ab1d1f6dcd4678f9eda79df2b3b3490e75f81dd819d9bccccfa",
+            "known_limitations": [
+              "Node 24.18.0 module syntax differential agrees on 13 narrow cases; script mode, other versions, systematic precision, complete native-first lint route and release remain unqualified"
+            ],
+            "language": "javascript",
+            "path": "input.js",
+            "reason": null,
+            "recoveries": [],
+            "recovery_count": 0,
+            "scope": "whole_file",
+            "source_sha256": "0a2c7877e24c4c58e60f45ef6999c46dc2cad670658d1e9713ccc6b1c9cb2e18",
+            "status": "candidate_observed",
+            "structural_observation_count": 1,
+            "structural_observations": [
+              {
+                "basis": "codeguard_structure_rule",
+                "end_byte": 18,
+                "end_column_byte": 18,
+                "end_row": 0,
+                "parent_syntax_kind": "program",
+                "rule_id": "codeguard.javascript.duplicate_direct_lexical_binding",
+                "rule_sha256": "6d450c14bd4f89f0f3798f458fba371fb455a2642034d836c8ef988ef44641a4",
+                "rule_version": "1.0.0",
+                "start_byte": 17,
+                "start_column_byte": 17,
+                "start_row": 0
+              }
+            ]
+          }
+        ],
+        "reason": "candidate_unqualified",
+        "skipped_count": 0,
+        "source_file_count": 1,
+        "status": "observed_partial",
+        "unrouted_count": 0
+      },
+      "syntax_tasks": {
+        "failures": [
+          {
+            "language": "javascript",
+            "path": "input.js",
+            "reason": "workspace_not_initialized"
+          }
+        ],
+        "new_blockers": 0,
+        "status": "incomplete",
+        "tasks": []
+      },
+      "workbench": {
+        "status": "incomplete"
+      },
+      "workbench_status": "incomplete"
+    },
+    "outside_workspace": {
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "findings": [],
+      "local_coherent": false,
+      "native": {
+        "reason": "explicit_context_missing",
+        "status": "not_run"
+      },
+      "next_action": "源码范围无法绑定；先核对源码位置及 --workspace 的已核验绝对路径，本次语法初检未运行，不修改源码",
+      "reason": "eslint_execution_context_missing",
+      "report_type": "eslint_local_feedback",
+      "schema_version": "0.6.0",
+      "setup": {
+        "reason": "native_confirmation_needed",
+        "requirement": "required",
+        "task_id": null
+      },
+      "status": "incomplete",
+      "suppressed_count": 0,
+      "syntax_candidates": {
+        "observations": [],
+        "reason": "source_scope_unavailable",
+        "status": "not_run"
+      },
+      "syntax_tasks": null,
+      "workbench": null,
+      "workbench_status": "not_connected"
+    }
+  }
+}

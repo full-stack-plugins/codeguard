@@ -1,0 +1,36 @@
+{
+  "schema_version": "0.1.0",
+  "report_type": "cfquery_postgres_development_oracle",
+  "image_id": "sha256:6c538e7206ea40ff740ef27883529390a690b6ead6ba96b44c67a9f7c638e8fd",
+  "server_version": "postgres (PostgreSQL) 18.6",
+  "network": "none",
+  "persistent_storage": false,
+  "authority": "development_only",
+  "grammar_qualified": false,
+  "delivery_decision": "not_evaluated",
+  "cases": [
+    {
+      "id": "postgres-empty-select-list",
+      "dialect": "postgresql",
+      "source": "SELECT FROM users",
+      "source_sha256": "40cfe2fef3dbbdb052f013c95d5601fabbf774ce3cf6a2df615c4e1e9529d409",
+      "native_valid": true,
+      "native_exit_code": 0,
+      "sqlstate": null,
+      "query_execution": "not_executed_prepare_only",
+      "isolated_relation": "fixture_users"
+    },
+    {
+      "id": "postgres-distinct-empty-select-list",
+      "dialect": "postgresql",
+      "source": "SELECT DISTINCT FROM users",
+      "source_sha256": "ce27ebdd1d6d792ec06a196783622c7e90f9c583251b8572798d4937b5ac90ba",
+      "native_valid": false,
+      "native_exit_code": 1,
+      "sqlstate": "42601",
+      "query_execution": "not_executed_prepare_only",
+      "isolated_relation": "fixture_users"
+    }
+  ],
+  "independent_holdout": false
+}

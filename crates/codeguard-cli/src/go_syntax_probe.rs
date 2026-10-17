@@ -109,6 +109,11 @@ pub(crate) fn observe(
         report["reason"] = json!("go_syntax_tool_changed");
         return report;
     }
+    // 请求级终止（取消/预算耗尽）不是 SDK 版本缺陷；先于版本判定保留原始原因。
+    if let Some(reason) = request_reason(&version.termination) {
+        report["reason"] = json!(reason);
+        return report;
+    }
     if version.termination != Termination::Exited(0)
         || !version.stderr.is_empty()
         || !verified_version(&version.stdout)
@@ -131,6 +136,10 @@ pub(crate) fn observe(
     );
     if !current() {
         report["reason"] = json!("go_syntax_tool_changed");
+        return report;
+    }
+    if let Some(reason) = request_reason(&fmt_version.termination) {
+        report["reason"] = json!(reason);
         return report;
     }
     let mut expected = gofmt.as_os_str().as_encoded_bytes().to_vec();
@@ -158,6 +167,10 @@ pub(crate) fn observe(
     );
     if !current() {
         report["reason"] = json!("go_syntax_tool_changed");
+        return report;
+    }
+    if let Some(reason) = request_reason(&outcome.termination) {
+        report["reason"] = json!(reason);
         return report;
     }
     if !matches!(outcome.termination, Termination::Exited(0 | 2)) {
@@ -195,6 +208,16 @@ pub(crate) fn observe(
 }
 fn digest(bytes: &[u8]) -> String {
     format!("{:x}", Sha256::digest(bytes))
+}
+/// 请求级终止原因；取消/预算耗尽不能改写为 SDK 版本或执行缺陷。
+fn request_reason(termination: &Termination) -> Option<&'static str> {
+    match termination {
+        Termination::Cancelled => Some("request_cancelled"),
+        Termination::TimedOut | Termination::DeadlineBeforeStart => {
+            Some("request_deadline_exceeded")
+        }
+        _ => None,
+    }
 }
 fn verified_version(stdout: &[u8]) -> bool {
     std::str::from_utf8(stdout)
@@ -466,6 +489,75 @@ mod tests {
         );
         assert_eq!(report["reason"], "go_syntax_logical_positions_unresolved");
         assert_eq!(report["diagnostics"], serde_json::json!([]));
+    }
+    #[test]
+    fn request_level_termination_is_not_relabelled_as_tool_defects() {
+        for phase in ["version", "helper_version", "scan"] {
+            let root = root(&format!("request-cancel-{phase}"));
+            let go = root.join("go");
+            let fmt = root.join("gofmt");
+            let block = "printf started > \"$0.started\"; exec /bin/sleep 30";
+            let condition = match phase {
+                "version" => "[ \"$#\" = 1 ]",
+                "helper_version" => "[ \"$#\" = 2 ]",
+                _ => "false",
+            };
+            executable(
+                &go,
+                &format!("#!/bin/sh\nif {condition}; then {block}; fi\n{GO_VERSION}\n"),
+            );
+            executable(&fmt, &format!("#!/bin/sh\n{block}\n"));
+            let marker = if phase == "scan" {
+                fmt.with_extension("started")
+            } else {
+                go.with_extension("started")
+            };
+            let cancelled = Arc::new(AtomicBool::new(false));
+            let trigger = Arc::clone(&cancelled);
+            let watcher = thread::spawn(move || {
+                let deadline = Instant::now() + Duration::from_secs(4);
+                while !marker.exists() && Instant::now() < deadline {
+                    thread::sleep(Duration::from_millis(5));
+                }
+                let started = marker.exists();
+                trigger.store(true, Ordering::Relaxed);
+                started
+            });
+            let started = Instant::now();
+            let report = observe(
+                &go,
+                b"package p\n",
+                started + Duration::from_secs(10),
+                &cancelled,
+            );
+            assert!(watcher.join().unwrap(), "{phase}: 原生阶段必须先启动");
+            assert!(
+                started.elapsed() < Duration::from_secs(5),
+                "{phase}: 取消未终止活动进程"
+            );
+            assert_eq!(report["status"], "incomplete", "{phase}: {report}");
+            assert_eq!(report["reason"], "request_cancelled", "{phase}: {report}");
+            assert_eq!(report["diagnostics"], serde_json::json!([]));
+            fs::remove_dir_all(root).unwrap();
+        }
+    }
+    #[test]
+    fn expired_deadline_reports_request_budget_not_version_mismatch() {
+        let root = root("request-deadline");
+        let go = root.join("go");
+        let fmt = root.join("gofmt");
+        executable(&go, &format!("#!/bin/sh\n{GO_VERSION}\n"));
+        executable(&fmt, "#!/bin/sh\n/bin/cat\n");
+        let report = observe(
+            &go,
+            b"package p\n",
+            Instant::now() - Duration::from_millis(1),
+            &AtomicBool::new(false),
+        );
+        assert_eq!(report["status"], "incomplete", "{report}");
+        assert_eq!(report["reason"], "request_deadline_exceeded", "{report}");
+        assert_eq!(report["diagnostics"], serde_json::json!([]));
+        fs::remove_dir_all(root).unwrap();
     }
 }
 

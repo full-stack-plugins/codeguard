@@ -1,0 +1,34 @@
+{
+  "evidence_type": "repair_sync_ambiguous_fact_rejection",
+  "captured_at": "2026-10-06",
+  "base_commit": "7c2221adfe60de8c4004face1ea420a82c586615",
+  "sources_sha256": {
+    "crates/codeguard-cli/src/work_sync.rs": "e9a8606bed9b198b462a76f1873617b32d3b1c3f92fbff8496b213b32d21771a",
+    "crates/codeguard-cli/src/task_attempt_command.rs": "e8eb09914537daac8f7f237dd02e331636d621d780fc96042fd79282a49bf55a",
+    "crates/codeguard-cli/tests/work_sync_contract.rs": "046a2d7131460a8c04d34461e7835d1401727913993e3e3f60527de845f79e8c"
+  },
+  "logs_sha256": {
+    "cg-write-fact-duplicate-red.log": "b359a0e17d12836d1d4eb31984d7e407733e845336b93379fcc1473359e077bc",
+    "cg-write-fact-duplicate-green.log": "1bbc819228c18e5e42243f4370b8ceb8577c03d0b08968c4bd430ecc4ba8bb2f",
+    "cg-write-fact-duplicate-default.log": "23dd04cbfc46fad1ce36361e83a83f742a99469cdc6301e1a2fa58b9b8c25c57",
+    "cg-write-fact-duplicate-default-final.log": "ffff01193af5c4b0a6a49c279eca80b153770dcd415a45ae81830acf97fc4827",
+    "cg-write-fact-duplicate-wasm.log": "fa61492c2da60e44622d9f46b11bcbba2517a4be869f63a463ae2784e31d23ba",
+    "cg-write-fact-duplicate-wasm-final.log": "41c86278ba3acc89b87b2865a4946ee6ff3f66fda1bdb5ac0ed5f915e605361d",
+    "cg-write-fact-duplicate-clippy-final.log": "b561f5dddeb03ed2e5bfd2d22d556be88df75530eeef1d40d5d9391763deb7c6"
+  },
+  "default_final_per_target_union": {
+    "passed": 60,
+    "failed": 0,
+    "ignored": 12
+  },
+  "wasm_final_per_target_union": {
+    "passed": 78,
+    "failed": 0,
+    "ignored": 12
+  },
+  "wasm_first_sync_test_failure": "incorrect global task count; corrected to same checker/reason identity; no production behavior changed to satisfy fixture",
+  "clippy": "wasm_all_targets_passed",
+  "full_workspace_regression": false,
+  "host_acceptance": false,
+  "delivery_decision": "not_evaluated"
+}

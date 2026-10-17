@@ -252,7 +252,7 @@ fn check_all_keeps_local_checker_candidate_separate_from_execution() {
 
     let (exit, report) = project.check(&[]);
     assert_eq!(exit, 3);
-    assert_eq!(report["schema_version"], "0.38.0");
+    assert_eq!(report["schema_version"], "0.73.0");
     assert_eq!(report["discovery"]["schema_version"], "0.4.0");
     let candidates = report["discovery"]["native_tool_candidates"]
         .as_array()
@@ -568,7 +568,7 @@ fn rust_only_project_keeps_categories_as_candidates_without_inventing_policy_obl
     let (exit, report) = project.check(&[]);
     assert_eq!(exit, 3);
     assert_eq!(report["report_type"], "check_feedback");
-    assert_eq!(report["schema_version"], "0.38.0");
+    assert_eq!(report["schema_version"], "0.73.0");
     assert_eq!(report["execution_budget"]["timeout_ms"], 1_800_000);
     assert_eq!(report["execution_budget"]["source"], "builtin_default");
     assert_eq!(
@@ -934,6 +934,16 @@ fn check_budget_expires_during_native_probe_without_reset_or_false_completion() 
 
 #[test]
 fn check_all_cancelled_native_task_returns_130_and_keeps_discovery() {
+    cancelled_native_task_retains_sibling_result("check");
+}
+
+#[test]
+fn lint_all_cancelled_native_task_retains_lint_scope_and_sibling_result() {
+    cancelled_native_task_retains_sibling_result("lint");
+}
+
+// 共用受控进程夹具，分别验证全检查与仅lint入口的真实SIGINT和子孙清理。
+fn cancelled_native_task_retains_sibling_result(operation: &str) {
     use std::os::unix::fs::PermissionsExt;
     use std::process::Stdio;
     use std::thread;
@@ -984,7 +994,7 @@ fn check_all_cancelled_native_task_returns_130_and_keeps_discovery() {
     fs::set_permissions(&cargo_tool, fs::Permissions::from_mode(0o700)).unwrap();
     let mut child = Command::new(env!("CARGO_BIN_EXE_codeguard"))
         .args([
-            "check",
+            operation,
             "all",
             project.0.to_str().unwrap(),
             "--ruff-tool",
@@ -1044,7 +1054,7 @@ fn check_all_cancelled_native_task_returns_130_and_keeps_discovery() {
         report["execution_budget"]["started_native_task_count"]
             .as_u64()
             .unwrap()
-            >= 4
+            >= if operation == "lint" { 2 } else { 4 }
     );
     assert_eq!(report["execution_budget"]["jobs_limit"], 2);
     assert!(
@@ -1055,6 +1065,28 @@ fn check_all_cancelled_native_task_returns_130_and_keeps_discovery() {
             .any(|task| task["status"] == "cancelled")
     );
     assert_eq!(report["delivery_decision"], "incomplete");
+    if operation == "lint" {
+        assert_eq!(report["schema_version"], "0.73.0");
+        assert_eq!(report["requested_categories"], serde_json::json!(["lint"]));
+        assert!(
+            report["execution_tasks"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .all(|task| { matches!(task["id"].as_str(), Some("python.lint" | "rust.lint")) })
+        );
+        assert!(
+            report["category_candidates"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .all(|item| item["category"] == "lint")
+        );
+        if let Ok(path) = std::env::var("CODEGUARD_LINT_CANCEL_REPORT") {
+            fs::write(path, serde_json::to_vec_pretty(&report).unwrap()).unwrap();
+        }
+    }
+
     assert_eq!(
         report["native_results"]["rust_lint"]["findings"][0]["rule_id"],
         "clippy::needless_return"

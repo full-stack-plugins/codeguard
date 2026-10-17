@@ -474,3 +474,45 @@ fn cargo_proxy_preserves_selected_entrypoint_and_rejects_retargeting() {
         );
     }
 }
+
+#[test]
+fn lint_all_skips_historical_build_blocker_and_selects_current_clippy_task() {
+    let fixture = Fixture::new();
+    fixture.init();
+    let (_, build) = fixture.check(&[]);
+    assert_eq!(build["backlog_status"], "synced", "{build}");
+    let tool = fixture.tool("printf '%s\\n' '{\"reason\":\"compiler-message\",\"message\":{\"level\":\"warning\",\"code\":{\"code\":\"clippy::needless_return\"},\"message\":\"unneeded return\",\"spans\":[{\"file_name\":\"src/lib.rs\",\"line_start\":1,\"column_start\":1,\"is_primary\":true}]}}' '{\"reason\":\"build-finished\",\"success\":true}'");
+    let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args([
+            "lint",
+            "all",
+            fixture.0.to_str().unwrap(),
+            "--cargo-tool",
+            tool.to_str().unwrap(),
+            "--format=json",
+        ])
+        .output()
+        .unwrap();
+    assert_eq!(output.status.code(), Some(3));
+    let report: Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(
+        report["native_results"]["rust_lint"]["findings"][0]["rule_id"], "clippy::needless_return",
+        "{report}"
+    );
+    assert_eq!(
+        report["next"]["repair_brief"]["checker_id"], "rust.cargo_clippy",
+        "{report}"
+    );
+    let build_facts = fs::read_dir(fixture.0.join(".codeguard/findings"))
+        .unwrap()
+        .filter_map(|entry| {
+            let bytes = fs::read(entry.ok()?.path().join("finding.json")).ok()?;
+            serde_json::from_slice::<Value>(&bytes).ok()
+        })
+        .filter(|fact| fact["checker_id"] == "rust.cargo_check")
+        .count();
+    assert!(build_facts > 0, "历史构建阻塞不能被删除以绕过选择");
+    if let Ok(path) = std::env::var("CODEGUARD_LINT_NEXT_REPORT") {
+        fs::write(path, serde_json::to_vec_pretty(&report).unwrap()).unwrap();
+    }
+}

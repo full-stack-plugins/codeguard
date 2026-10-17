@@ -1,0 +1,55 @@
+{
+  "date": "2026-10-06",
+  "base_commit": "63e09f77071d9a374f33884056dcfd1aaf02e22d",
+  "scope": "maven_javadoc_multifile_workbench_local_acceptance",
+  "regression": {
+    "passed": 88,
+    "failed": 0,
+    "ignored": 22
+  },
+  "schemas": {
+    "new": 3,
+    "actual_diagnostic_and_preparation_instances": "passed",
+    "fake_coverage": "rejected"
+  },
+  "actual_maven_plugin_executed": false,
+  "task_verify_status": "not_integrated",
+  "delivery_decision": "not_evaluated",
+  "trusted_closure": false,
+  "source_sha256": {
+    "crates/codeguard-cli/src/java_comments_command.rs": "b637005609b319c247fd6b23e08270794c83bbd0249a9c4e08b1e3e2f26fd1c7",
+    "crates/codeguard-cli/src/lib.rs": "5d1611ba1f415d74eace0d86c46bd8cf820767dc4c5a854cfdbf2a64526669db",
+    "crates/codeguard-cli/src/next_command.rs": "096a1afa760fcdd58700c2c0e5b23d35aa9207ac942e51e50598208530ff6be3",
+    "crates/codeguard-cli/src/work_sync.rs": "0a9b07a7d6f414677b42effa66f539ac5b7d711dfb7ca89b189423f88f3b25b6",
+    "crates/codeguard-cli/tests/maven_javadoc_input_stability.rs": "a5e63e7030cf715a1ba7df2b46151d0c808e008a1b98eb09125f72fb8864de5b",
+    "crates/codeguard-cli/src/maven_javadoc_workbench.rs": "7c8b4f92b4b1184e6be4a0247388c2ee8db268cbc6e9d3dfd9dc30580d06ad6b",
+    "crates/codeguard-cli/src/work_sync/maven_javadoc_report.rs": "3d3a131df52156f72ba5ef2233398b03ebc6af1188b36ad9ac89b75f9d6bcc6f"
+  },
+  "logs": {
+    "red": {
+      "path": "/private/tmp/cg-maven-workbench-red.log",
+      "sha256": "00889cf66e985fd33571d07b245f21a3deecf333c9356eb791d24231c88660bf",
+      "results": [
+        "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 3 filtered out; finished in 1.87s"
+      ]
+    },
+    "final": {
+      "path": "/private/tmp/cg-maven-workbench-final.log",
+      "sha256": "bff11f823789c15f7e84f7811e15689ea43b15a377500fb3b0d6d169812a823a",
+      "results": [
+        "test result: ok. 26 passed; 0 failed; 6 ignored; 0 measured; 0 filtered out; finished in 2.56s",
+        "test result: ok. 18 passed; 0 failed; 4 ignored; 0 measured; 0 filtered out; finished in 1.53s",
+        "test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.31s",
+        "test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.35s",
+        "test result: ok. 10 passed; 0 failed; 10 ignored; 0 measured; 0 filtered out; finished in 0.64s",
+        "test result: ok. 21 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 1.96s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.35s"
+      ]
+    },
+    "clippy-final": {
+      "path": "/private/tmp/cg-maven-workbench-clippy-final.log",
+      "sha256": "3e2268e9dc5a154bb75a66a97ad8a1aa3046b03de17ce484b1d398a0d4def232",
+      "results": []
+    }
+  }
+}

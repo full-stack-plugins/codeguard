@@ -1,0 +1,52 @@
+{
+  "compiler_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+  "compiler_version": "Apple clang version 21.0.0 (clang-2100.3.34.2)\nTarget: arm64-apple-darwin27.0.0\nThread model: posix\nInstalledDir: /Library/Developer/CommandLineTools/usr/bin",
+  "native_ast_sha256": "6d7c386c373ad3a008865e738278054cf11eeed53d17cb49ffa8bbd0ed57978a",
+  "observation": {
+    "authority": "local_unverified",
+    "coverage_proven": false,
+    "errors_and_behavior": "not_evaluated",
+    "functions": [
+      {
+        "column_byte": 49,
+        "comment_presence": "absent",
+        "line": 1,
+        "missing_components": [
+          "documentation_comment"
+        ],
+        "name": "ordinary",
+        "offset_byte": 48,
+        "parameters": [],
+        "purpose_description": "unknown",
+        "return_description": "unknown",
+        "structure_status": "observed_supported_subset"
+      },
+      {
+        "column_byte": 65,
+        "comment_presence": "absent",
+        "line": 1,
+        "missing_components": [
+          "documentation_comment"
+        ],
+        "name": "operator_helper",
+        "offset_byte": 64,
+        "parameters": [],
+        "purpose_description": "unknown",
+        "return_description": "unknown",
+        "structure_status": "observed_supported_subset"
+      }
+    ],
+    "observation_type": "clang_function_documentation_structure",
+    "qualification": "not_granted",
+    "schema_version": "0.1.0",
+    "semantic_accuracy": "not_evaluated",
+    "unresolved_declaration_kinds": [
+      "CXXRecordDecl",
+      "FunctionDecl"
+    ]
+  },
+  "qualification": "not_granted",
+  "scope": "unsupported_free_operator_preserves_ordinary_functions",
+  "source_sha256": "4d4931d156ac5de673d0ae85964080665121a97f67458446cf4ec261235574e4",
+  "test_source_sha256": "f89d2fe3c05c338e7b7cb572fb74eb0a8d6520438f301849ad69fb2a1e0d4ffe"
+}

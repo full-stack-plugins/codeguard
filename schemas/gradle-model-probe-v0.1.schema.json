@@ -1,0 +1,334 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://codeguard.dev/schemas/gradle-model-probe-v0.1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "0.1.0"
+    },
+    "report_type": {
+      "const": "gradle_model_probe"
+    },
+    "native_status": {
+      "enum": [
+        "incomplete",
+        "model_observed_unverified"
+      ]
+    },
+    "reason": {
+      "enum": [
+        "prerequisites_missing",
+        "request_cancelled",
+        "request_deadline_exceeded",
+        "root_build_inputs_missing",
+        "project_snapshot_unavailable",
+        "native_prerequisite_unavailable",
+        "native_tool_identity_unavailable",
+        "jdk_version_unverified",
+        "private_workspace_unavailable",
+        "native_process_incomplete",
+        "native_inputs_changed_during_probe",
+        "native_identity_changed_during_probe",
+        "native_execution_incomplete",
+        "native_model_missing",
+        "native_model_invalid_or_incomplete",
+        "selected_inputs_and_jdk_closure_unverified"
+      ]
+    },
+    "model": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/model"
+        }
+      ]
+    },
+    "input_scope": {
+      "const": "selected_project_files"
+    },
+    "input_files": {
+      "type": "array",
+      "maxItems": 128,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        },
+        "required": [
+          "path",
+          "sha256"
+        ]
+      }
+    },
+    "source_snapshot_sha256": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      ]
+    },
+    "gradle_bundle_sha256": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      ]
+    },
+    "java_entry_sha256": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      ]
+    },
+    "jdk_release_sha256": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      ]
+    },
+    "init_script_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "native_report_sha256": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      ]
+    },
+    "jdk_closure_verified": {
+      "const": false
+    },
+    "project_sources_complete": {
+      "const": false
+    },
+    "coverage_proven": {
+      "const": false
+    },
+    "authority": {
+      "const": "local_unverified"
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    }
+  },
+  "required": [
+    "schema_version",
+    "report_type",
+    "native_status",
+    "reason",
+    "model",
+    "input_scope",
+    "input_files",
+    "source_snapshot_sha256",
+    "gradle_bundle_sha256",
+    "java_entry_sha256",
+    "jdk_release_sha256",
+    "init_script_sha256",
+    "native_report_sha256",
+    "jdk_closure_verified",
+    "project_sources_complete",
+    "coverage_proven",
+    "authority",
+    "delivery_decision"
+  ],
+  "$defs": {
+    "model": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "0.1.0"
+        },
+        "report_type": {
+          "const": "gradle_checker_model"
+        },
+        "gradle_version": {
+          "type": "string",
+          "maxLength": 32,
+          "pattern": "^[0-9]+\\.[0-9]+(?:\\.[0-9]+)?$"
+        },
+        "included_build_count": {
+          "const": 0
+        },
+        "projects": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 128,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1024
+              },
+              "project_dir": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4096
+              },
+              "build_dir": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4096
+              },
+              "plugins": {
+                "type": "array",
+                "maxItems": 6,
+                "uniqueItems": true,
+                "items": {
+                  "enum": [
+                    "java",
+                    "java-library",
+                    "org.owasp.dependencycheck",
+                    "checkstyle",
+                    "pmd",
+                    "com.github.spotbugs"
+                  ]
+                }
+              },
+              "tasks": {
+                "type": "array",
+                "maxItems": 64,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 256
+                    },
+                    "implementation": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 512
+                    },
+                    "enabled": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "implementation",
+                    "enabled"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "path",
+              "project_dir",
+              "build_dir",
+              "plugins",
+              "tasks"
+            ]
+          }
+        }
+      },
+      "required": [
+        "schema_version",
+        "report_type",
+        "gradle_version",
+        "included_build_count",
+        "projects"
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "native_status": {
+            "const": "incomplete"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "model": {
+            "type": "null"
+          },
+          "native_report_sha256": {
+            "type": "null"
+          },
+          "reason": {
+            "not": {
+              "const": "selected_inputs_and_jdk_closure_unverified"
+            }
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "model": {
+            "$ref": "#/$defs/model"
+          },
+          "reason": {
+            "const": "selected_inputs_and_jdk_closure_unverified"
+          },
+          "source_snapshot_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "gradle_bundle_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "java_entry_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "jdk_release_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "native_report_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "input_files": {
+            "minItems": 2
+          }
+        }
+      }
+    }
+  ]
+}

@@ -107,15 +107,17 @@ fn render(brief: &Value) -> Result<String, &'static str> {
     let mut text = format!(
         "# CodeGuard 任务 {id}\n\n此文件由已绑定本地事实恢复，仅为可读投影。勾选、备注或删除不能关闭问题。请用 task show 查询当前指引。\n"
     );
+    let basis = if brief["rule_source"] == "codeguard_structural_policy" {
+        json!({"kind":brief["kind"],"checker_id":brief["checker_id"],"structural_rule_id":brief["structural_rule_id"],"rule_source":brief["rule_source"],"reason_code":brief["reason_code"]})
+    } else {
+        json!({"kind":brief["kind"],"checker_id":brief["checker_id"],"native_rule_id":brief["native_rule_id"],"reason_code":brief["reason_code"]})
+    };
     let sections = [
         (
             "问题证据",
             json!({"evidence_ref":brief["evidence_ref"],"native_confirmation_ref":brief["native_confirmation_ref"]}),
         ),
-        (
-            "规则依据",
-            json!({"kind":brief["kind"],"checker_id":brief["checker_id"],"native_rule_id":brief["native_rule_id"],"reason_code":brief["reason_code"]}),
-        ),
+        ("规则依据", basis),
         (
             "允许修改的范围",
             json!({"scope":brief["scope"],"affected_paths":brief["affected_paths"],"constraints":brief["constraints"],"disposition":brief["disposition"]}),

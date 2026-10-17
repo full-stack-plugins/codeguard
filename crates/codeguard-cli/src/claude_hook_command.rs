@@ -302,7 +302,9 @@ fn summarize(path: &str, report: &Value) -> String {
     }
     let feedback = &report["local_feedback"];
     let mut rules = Vec::new();
-    let mut count = 0;
+    let (documentation_count, documentation_guidance) =
+        crate::c_family_documentation_host_guidance::project(feedback);
+    let mut count = documentation_count;
     let python = feedback["python_lint"]["files"]
         .as_array()
         .into_iter()
@@ -341,7 +343,40 @@ fn summarize(path: &str, report: &Value) -> String {
         .flatten()
         .filter(|f| f["current"] == true)
         .flat_map(|f| f["native"]["diagnostics"].as_array().into_iter().flatten());
-    for finding in python.chain(node).chain(swift).chain(zig).chain(ruby) {
+    let go = feedback["go_syntax"]["files"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .filter(|f| f["current"] == true)
+        .flat_map(|f| f["native"]["diagnostics"].as_array().into_iter().flatten());
+    let rust = feedback["rust_syntax"]["files"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .filter(|f| f["current"] == true)
+        .flat_map(|f| f["native"]["diagnostics"].as_array().into_iter().flatten());
+    let shell = feedback["shell_lint"]["files"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .filter(|f| f["input_stable"] == true)
+        .flat_map(|f| f["native"]["diagnostics"].as_array().into_iter().flatten());
+    let erlang = feedback["erlang_lint"]["files"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .filter(|f| f["current"] == true)
+        .flat_map(|f| f["native"]["diagnostics"].as_array().into_iter().flatten());
+    for finding in python
+        .chain(node)
+        .chain(swift)
+        .chain(zig)
+        .chain(ruby)
+        .chain(go)
+        .chain(rust)
+        .chain(shell)
+        .chain(erlang)
+    {
         count += 1;
         if let Some(rule) = finding["rule_id"].as_str().filter(|r| {
             r.len() <= 96
@@ -355,10 +390,40 @@ fn summarize(path: &str, report: &Value) -> String {
     }
     let recoveries = feedback["candidate_recovery_count"].as_u64().unwrap_or(0);
     let structures = feedback["candidate_structure_count"].as_u64().unwrap_or(0);
-    let structural_rule = if structures > 0 {
-        "；结构规则 codeguard.python.required_suite"
+    let structural_ids = feedback["syntax_candidates"]["observations"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .flat_map(|row| {
+            row["structural_observations"]
+                .as_array()
+                .into_iter()
+                .flatten()
+        })
+        .filter_map(|row| row["rule_id"].as_str())
+        .filter(|id| {
+            matches!(
+                *id,
+                "codeguard.python.required_suite"
+                    | "codeguard.go.required_package"
+                    | "codeguard.erlang.form_terminator"
+                    | "codeguard.cfquery.distinct_projection"
+                    | "codeguard.javascript.duplicate_direct_lexical_binding"
+                    | "codeguard.javascript.module_return_outside_function"
+            )
+        })
+        .collect::<std::collections::BTreeSet<_>>();
+    let structural_rule = if structural_ids.is_empty() {
+        String::new()
     } else {
-        ""
+        format!(
+            "；结构规则 {}",
+            structural_ids
+                .into_iter()
+                .take(3)
+                .collect::<Vec<_>>()
+                .join(", ")
+        )
     };
     let candidates = feedback["syntax_candidates"]["observations"]
         .as_array()
@@ -371,6 +436,12 @@ fn summarize(path: &str, report: &Value) -> String {
                 .count()
         });
     let guidance = match feedback["next_action"].as_str() {
+        Some("repair_native_source") if feedback["rust_syntax"].is_object() => {
+            "按项目 edition 和已核对行号确认语法；继续原工具复检、Clippy、类型与项目构建检查"
+        }
+        Some("repair_native_source") if feedback["shell_lint"].is_object() => {
+            "按当前 SC 规则及 Unicode 标量位置修复；继续原 ShellCheck 任务复检和完整项目检查"
+        }
         Some("repair_native_source") if feedback["ruby_lint"].is_object() => {
             "先核对项目 Ruby 版本适用性，再按报告已有行号确认和修复语法；继续原工具复检及完整项目检查"
         }
@@ -378,7 +449,7 @@ fn summarize(path: &str, report: &Value) -> String {
             "按当前原生字节位置修复语法，再使用原工具复检；完整 lint、类型和项目构建仍须检查"
         }
         Some("require_native_lint_confirmation") => {
-            "必须准备或修复适用的原生 lint/编译器，再确认疑似问题或恢复未完成检查；不要仅凭候选结果修改源码"
+            "必须准备或修复适用的原生 lint/编译器，对原始源码确认；原生确认合法时调查 grammar 版本/兼容性或扫描预算，诊断成立时才按真实位置修复；不要仅凭候选结果修改源码"
         }
         Some("recommend_native_lint") => {
             "初检未发现恢复节点，建议安装适用原生 lint；这不表示完整检查通过"
@@ -389,7 +460,7 @@ fn summarize(path: &str, report: &Value) -> String {
     let unwired = feedback["native_unwired_files"]
         .as_array()
         .map_or(0, Vec::len);
-    let mut repair = String::new();
+    let mut repair = documentation_guidance;
     if feedback["zig_lint"].is_object() {
         for file in feedback["zig_lint"]["files"]
             .as_array()
@@ -418,6 +489,119 @@ fn summarize(path: &str, report: &Value) -> String {
             }
         }
         repair.push_str("Zig 修复后运行 codeguard lint zig <当前文件> --format=json；核对原工具和完整项目检查。只使用实际同步的任务ID；不凭零诊断关闭历史任务。");
+    }
+    if feedback["shell_lint"].is_object() {
+        let scan = &feedback["shell_lint"];
+        for file in scan["files"]
+            .as_array()
+            .into_iter()
+            .flatten()
+            .filter(|f| f["input_stable"] == true)
+            .take(2)
+        {
+            for row in file["native"]["diagnostics"]
+                .as_array()
+                .into_iter()
+                .flatten()
+                .take(2)
+            {
+                if let (Some(line), Some(column)) = (row["line"].as_u64(), row["column"].as_u64()) {
+                    repair.push_str(&format!(
+                        "Shell 第 {line} 行，第 {column} 列（Unicode 标量）；"
+                    ));
+                }
+            }
+            for id in file["workbench"]["task_ids"]
+                .as_array()
+                .into_iter()
+                .flatten()
+                .filter_map(Value::as_str)
+                .filter(|id| {
+                    id.strip_prefix("CG-B-")
+                        .or_else(|| id.strip_prefix("CG-"))
+                        .is_some_and(|s| s.len() == 32 && s.bytes().all(|b| b.is_ascii_hexdigit()))
+                })
+                .take(2)
+            {
+                repair.push_str(&format!("Shell 原生任务 {id}：codeguard task show {id} . --format=json；修复后 codeguard task verify {id} . --shellcheck-tool <已核验绝对路径> --format=json。"));
+            }
+        }
+        if scan["task_status"] != "synced_partial" {
+            repair.push_str("Shell 任务工作台未连接或同步未完成；保留当前观察，不假定已有任务。");
+        }
+        repair.push_str("缺工具时安装适用ShellCheck；未知或不支持方言先核对实际方言与检查器，不反复重装。当前没有Shell内置WASM，检查不完整；不凭零诊断关闭任务。");
+    }
+    if feedback["rust_syntax"].is_object() {
+        let scan = &feedback["rust_syntax"];
+        for file in scan["files"]
+            .as_array()
+            .into_iter()
+            .flatten()
+            .filter(|f| f["current"] == true)
+            .take(2)
+        {
+            for row in file["native"]["diagnostics"]
+                .as_array()
+                .into_iter()
+                .flatten()
+                .take(2)
+            {
+                if let Some(line) = row["line"].as_u64() {
+                    repair.push_str(&format!("Rust 第 {line} 行（列号不可用）；"));
+                }
+            }
+            if let Some(id) = file["task_id"].as_str().filter(|id| {
+                id.strip_prefix("CG-B-")
+                    .is_some_and(|s| s.len() == 32 && s.bytes().all(|b| b.is_ascii_hexdigit()))
+            }) {
+                repair.push_str(&format!("Rust 原生任务 {id}：codeguard task show {id} . --format=json；修复后 codeguard task verify {id} . --rustfmt-tool <已核验绝对路径> --format=json。"));
+            }
+            if file["native"]["status"] == "incomplete" {
+                repair.push_str("Rust 原生观察未完成；先核对项目 edition、工具版本和环境，再复检，避免修改无关源码。");
+            }
+        }
+        if scan["task_status"] == "not_connected" || scan["task_status"] == "incomplete" {
+            repair.push_str("Rust 任务工作台未连接或同步未完成；保留当前观察，不假定已有任务。");
+        }
+        repair.push_str("Rustfmt 仅提供语法解析观察，本次未运行项目级 Clippy；完成编辑批次后执行 codeguard lint rust . --format=json，按返回任务使用原 Cargo 复检；类型和完整构建检查继续保留，零诊断不自动关闭任务或允许交付。");
+    }
+    if feedback["go_syntax"].is_object() {
+        let scan = &feedback["go_syntax"];
+        for file in scan["files"]
+            .as_array()
+            .into_iter()
+            .flatten()
+            .filter(|f| f["current"] == true)
+            .take(2)
+        {
+            for row in file["native"]["diagnostics"]
+                .as_array()
+                .into_iter()
+                .flatten()
+                .take(2)
+            {
+                if let Some(line) = row["line"].as_u64() {
+                    if let Some(column) = row["column"].as_u64() {
+                        repair.push_str(&format!("Go 第 {line} 行、第 {column} 列（UTF-8字节）；"));
+                    }
+                }
+            }
+            if let Some(id) = file["task_id"].as_str().filter(|id| {
+                id.strip_prefix("CG-B-")
+                    .is_some_and(|s| s.len() == 32 && s.bytes().all(|b| b.is_ascii_hexdigit()))
+            }) {
+                repair.push_str(&format!("Go 原生任务 {id}：codeguard task show {id} . --format=json；修复后 codeguard task verify {id} . --go-tool <已核验绝对路径> --format=json。"));
+            }
+        }
+        if scan["task_status"] == "not_connected" {
+            repair.push_str("Go 原生任务工作台未连接；保留当前诊断，不假定已有任务。");
+        }
+        if scan["task_status"] == "incomplete" {
+            repair.push_str("Go 原生任务同步未完成；核对工作台，不伪造任务引用。");
+        }
+        repair.push_str(
+            "核对Go1.23.4与同目录gofmt；继续go vet、类型与依赖检查，不凭零诊断关闭任务。",
+        );
     }
     if feedback["ruby_lint"].is_object() {
         let scan = &feedback["ruby_lint"];

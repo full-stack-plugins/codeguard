@@ -1,0 +1,1678 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:check-feedback:0.71.0",
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "report_type",
+        "operation",
+        "selection",
+        "command_status",
+        "exit_code",
+        "delivery_decision",
+        "authority",
+        "reason",
+        "discovery",
+        "native_results",
+        "execution_tasks",
+        "obligation_status",
+        "required_obligations",
+        "category_candidates",
+        "syntax_candidates",
+        "unresolved_conditions",
+        "execution_budget",
+        "next",
+        "export",
+        "syntax_tasks",
+        "gradle_javadoc_tasks",
+        "gradle_cve_tasks"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "selection": {
+                "const": "all"
+              }
+            },
+            "required": [
+              "selection"
+            ]
+          },
+          "then": {
+            "properties": {
+              "delivery_decision": {
+                "const": "incomplete"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "delivery_decision": {
+                "const": "not_evaluated"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "command_status": {
+                "const": "cancelled"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "exit_code": {
+                "const": 130
+              },
+              "reason": {
+                "const": "request_cancelled"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "exit_code": {
+                "const": 3
+              }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "selection": {
+                      "const": "all"
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "reason": {
+                      "const": "full_project_obligations_and_trusted_policy_unavailable"
+                    }
+                  }
+                },
+                "else": {
+                  "properties": {
+                    "reason": {
+                      "enum": [
+                        "java_selection_obligations_and_trusted_policy_unavailable",
+                        "language_selection_obligations_and_trusted_policy_unavailable"
+                      ]
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "selection": {
+                "const": "zig"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "native_results": {
+                "properties": {
+                  "python_cve": {
+                    "type": "array",
+                    "maxItems": 0
+                  },
+                  "go_lint": {
+                    "type": "null"
+                  },
+                  "rust_lint": {
+                    "type": "null"
+                  },
+                  "java_p3c": {
+                    "type": "null"
+                  },
+                  "java_dependencies": {
+                    "type": "null"
+                  },
+                  "java_cve": {
+                    "type": "null"
+                  },
+                  "java_javadoc": {
+                    "type": "null"
+                  },
+                  "python_lint": {
+                    "type": "null"
+                  },
+                  "npm_cve": {
+                    "type": "array",
+                    "maxItems": 0
+                  },
+                  "rust_comments": {
+                    "type": "null"
+                  },
+                  "rust_build": {
+                    "type": "null"
+                  },
+                  "rust_cve": {
+                    "type": "null"
+                  },
+                  "node_lint": {
+                    "type": "null"
+                  },
+                  "erlang_lint": {
+                    "type": "null"
+                  },
+                  "kotlin_lint": {
+                    "type": "null"
+                  },
+                  "swift_lint": {
+                    "type": "null"
+                  }
+                }
+              },
+              "category_candidates": {
+                "items": {
+                  "properties": {
+                    "language": {
+                      "const": "zig"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "gradle_javadoc_tasks": {
+                "type": "object"
+              }
+            },
+            "required": [
+              "gradle_javadoc_tasks"
+            ]
+          },
+          "then": {
+            "properties": {
+              "native_results": {
+                "required": [
+                  "java_gradle_javadoc"
+                ],
+                "not": {
+                  "required": [
+                    "java_gradle_model"
+                  ]
+                }
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "native_results": {
+                "not": {
+                  "required": [
+                    "java_gradle_javadoc"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "0.71.0"
+        },
+        "export": {
+          "$ref": "check-feedback-v0.46.schema.json#/properties/export"
+        },
+        "execution_tasks": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "status"
+            ],
+            "properties": {
+              "id": {
+                "oneOf": [
+                  {
+                    "enum": [
+                      "python.lint",
+                      "rust.lint",
+                      "go.lint",
+                      "java.p3c",
+                      "java.javadoc",
+                      "java.dependencies",
+                      "java.cve",
+                      "rust.comments",
+                      "rust.build",
+                      "rust.cve",
+                      "node.lint",
+                      "erlang.lint",
+                      "kotlin.lint",
+                      "swift.lint",
+                      "zig.lint",
+                      "ruby.lint",
+                      "shell.lint",
+                      "java.gradle.javadoc",
+                      "java.gradle.dependency_check"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "pattern": "^npm\\.cve\\.[0-9]+$"
+                  },
+                  {
+                    "type": "string",
+                    "pattern": "^python\\.cve\\.[0-9]+$"
+                  }
+                ]
+              },
+              "status": {
+                "enum": [
+                  "native_observed_unverified",
+                  "native_incomplete",
+                  "cancelled",
+                  "deadline_exceeded",
+                  "dependency_failed",
+                  "cancelled_before_start",
+                  "deadline_before_start",
+                  "internal_failure"
+                ]
+              }
+            }
+          }
+        },
+        "execution_budget": {
+          "$ref": "check-feedback-v0.46.schema.json#/properties/execution_budget"
+        },
+        "report_type": {
+          "$ref": "check-feedback-v0.46.schema.json#/properties/report_type"
+        },
+        "operation": {
+          "$ref": "check-feedback-v0.46.schema.json#/properties/operation"
+        },
+        "selection": {
+          "enum": [
+            "all",
+            "java"
+          ]
+        },
+        "command_status": {
+          "$ref": "check-feedback-v0.46.schema.json#/properties/command_status"
+        },
+        "exit_code": {
+          "$ref": "check-feedback-v0.46.schema.json#/properties/exit_code"
+        },
+        "delivery_decision": {
+          "$ref": "check-feedback-v0.46.schema.json#/properties/delivery_decision"
+        },
+        "authority": {
+          "$ref": "check-feedback-v0.46.schema.json#/properties/authority"
+        },
+        "reason": {
+          "enum": [
+            "full_project_obligations_and_trusted_policy_unavailable",
+            "language_selection_obligations_and_trusted_policy_unavailable",
+            "java_selection_obligations_and_trusted_policy_unavailable",
+            "request_cancelled"
+          ]
+        },
+        "discovery": {
+          "$ref": "check-feedback-v0.46.schema.json#/properties/discovery"
+        },
+        "native_results": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "python_lint",
+            "python_cve",
+            "rust_lint",
+            "go_lint",
+            "java_p3c",
+            "java_javadoc",
+            "java_dependencies",
+            "java_cve",
+            "npm_cve",
+            "rust_comments",
+            "rust_build",
+            "rust_cve",
+            "node_lint",
+            "erlang_lint",
+            "kotlin_lint",
+            "swift_lint",
+            "zig_lint",
+            "ruby_lint",
+            "shell_lint",
+            "java_gradle_cve"
+          ],
+          "properties": {
+            "python_cve": {
+              "$ref": "check-feedback-v0.46.schema.json#/properties/native_results/properties/python_cve"
+            },
+            "go_lint": {
+              "$ref": "check-feedback-v0.46.schema.json#/properties/native_results/properties/go_lint"
+            },
+            "rust_lint": {
+              "$ref": "check-feedback-v0.46.schema.json#/properties/native_results/properties/rust_lint"
+            },
+            "java_p3c": {
+              "$ref": "check-feedback-v0.46.schema.json#/properties/native_results/properties/java_p3c"
+            },
+            "java_dependencies": {
+              "$ref": "check-feedback-v0.46.schema.json#/properties/native_results/properties/java_dependencies"
+            },
+            "java_cve": {
+              "$ref": "check-feedback-v0.46.schema.json#/properties/native_results/properties/java_cve"
+            },
+            "java_javadoc": {
+              "anyOf": [
+                {
+                  "$ref": "check-feedback-v0.46.schema.json#/properties/native_results/properties/java_javadoc"
+                },
+                {
+                  "$ref": "java-javadoc-project-probe-v0.4.schema.json"
+                },
+                {
+                  "$ref": "java-javadoc-project-probe-v0.5.schema.json"
+                }
+              ]
+            },
+            "python_lint": {
+              "$ref": "check-feedback-v0.46.schema.json#/properties/native_results/properties/python_lint"
+            },
+            "npm_cve": {
+              "$ref": "check-feedback-v0.46.schema.json#/properties/native_results/properties/npm_cve"
+            },
+            "rust_comments": {
+              "$ref": "check-feedback-v0.46.schema.json#/properties/native_results/properties/rust_comments"
+            },
+            "rust_build": {
+              "$ref": "check-feedback-v0.46.schema.json#/properties/native_results/properties/rust_build"
+            },
+            "rust_cve": {
+              "$ref": "check-feedback-v0.46.schema.json#/properties/native_results/properties/rust_cve"
+            },
+            "node_lint": {
+              "$ref": "check-feedback-v0.46.schema.json#/properties/native_results/properties/node_lint"
+            },
+            "erlang_lint": {
+              "$ref": "check-feedback-v0.46.schema.json#/properties/native_results/properties/erlang_lint"
+            },
+            "kotlin_lint": {
+              "$ref": "check-feedback-v0.46.schema.json#/properties/native_results/properties/kotlin_lint"
+            },
+            "swift_lint": {
+              "$ref": "check-feedback-v0.46.schema.json#/properties/native_results/properties/swift_lint"
+            },
+            "zig_lint": {
+              "anyOf": [
+                {
+                  "$ref": "zig-ast-scan-v0.2.schema.json"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "ruby_lint": {
+              "anyOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "$ref": "ruby-syntax-scan-v0.1.schema.json"
+                },
+                {
+                  "$ref": "ruby-syntax-scan-v0.2.schema.json"
+                }
+              ]
+            },
+            "shell_lint": {
+              "anyOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "$ref": "shell-native-scan-v0.1.schema.json"
+                }
+              ]
+            },
+            "java_gradle_javadoc": {
+              "anyOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "$ref": "gradle-javadoc-probe-v0.2.schema.json"
+                }
+              ]
+            },
+            "java_gradle_model": {
+              "anyOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "$ref": "gradle-model-probe-v0.1.schema.json"
+                }
+              ]
+            },
+            "java_gradle_cve": {
+              "anyOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "$ref": "gradle-dependency-check-probe-v0.2.schema.json"
+                }
+              ]
+            }
+          }
+        },
+        "obligation_status": {
+          "$ref": "check-feedback-v0.46.schema.json#/properties/obligation_status"
+        },
+        "required_obligations": {
+          "$ref": "check-feedback-v0.46.schema.json#/properties/required_obligations"
+        },
+        "category_candidates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "language",
+              "legacy_status",
+              "capability_status",
+              "category",
+              "checker_id",
+              "next_action",
+              "status",
+              "reason"
+            ],
+            "properties": {
+              "language": {
+                "type": "string",
+                "minLength": 1
+              },
+              "legacy_status": {
+                "enum": [
+                  "stable",
+                  "planned",
+                  "unknown"
+                ]
+              },
+              "capability_status": {
+                "enum": [
+                  "gap",
+                  null
+                ]
+              },
+              "category": {
+                "enum": [
+                  "lint",
+                  "comments",
+                  "dependencies",
+                  "cve",
+                  "security",
+                  "build"
+                ]
+              },
+              "checker_id": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "minLength": 1
+              },
+              "next_action": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "minLength": 1
+              },
+              "status": {
+                "enum": [
+                  "observed_unverified",
+                  "native_incomplete",
+                  "not_configured",
+                  "configuration_unresolved",
+                  "not_integrated"
+                ]
+              },
+              "reason": {
+                "enum": [
+                  "trusted_policy_and_coverage_unavailable",
+                  "native_scan_incomplete",
+                  "p3c_declared_rulesets_unverified_coverage",
+                  "javadoc_single_file_probe_unverified_coverage",
+                  "javadoc_checker_not_configured",
+                  "javadoc_configuration_unresolved",
+                  "javadoc_multifile_probe_unverified_project_coverage",
+                  "dependency_graph_observed_unverified_coverage",
+                  "cve_report_observed_database_unverified",
+                  "configured_checker_not_integrated",
+                  "recognized_checker_not_configured",
+                  "checker_configuration_not_observed",
+                  "checker_configuration_mixed_across_sources",
+                  "checker_configuration_unresolved",
+                  "checker_build_systems_mixed",
+                  "gradle_model_not_resolved",
+                  "native_adapter_not_integrated",
+                  "eslint_project_coverage_unverified",
+                  "planned_language_adapter_gap",
+                  "npm_advisory_coverage_and_freshness_unverified",
+                  "rust_cve_database_freshness_unverified",
+                  "rust_cve_native_incomplete",
+                  "python_cve_native_incomplete",
+                  "python_cve_advisory_coverage_and_freshness_unverified",
+                  "erlang_forms_observed_unverified_project_coverage",
+                  "erlang_native_scan_incomplete",
+                  "erlang_native_task_not_started",
+                  "kotlin_single_file_project_checks_unverified",
+                  "swift_single_file_project_checks_unverified",
+                  "zig_single_file_project_checks_unverified",
+                  "ruby_single_file_project_checks_unverified",
+                  "shell_project_obligations_and_source_coverage_unverified",
+                  "not_configured",
+                  "gradle_javadoc_selected_inputs_and_rules_unverified",
+                  "gradle_javadoc_native_incomplete",
+                  "gradle_cve_coverage_and_freshness_unverified",
+                  "gradle_cve_native_incomplete"
+                ]
+              }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "required": [
+                    "reason"
+                  ],
+                  "properties": {
+                    "reason": {
+                      "const": "not_configured"
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "language": {
+                      "const": "java"
+                    },
+                    "category": {
+                      "const": "comments"
+                    },
+                    "status": {
+                      "const": "not_configured"
+                    },
+                    "checker_id": {
+                      "type": "null"
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "reason": {
+                      "const": "gradle_javadoc_selected_inputs_and_rules_unverified"
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "language": {
+                      "const": "java"
+                    },
+                    "category": {
+                      "const": "comments"
+                    },
+                    "checker_id": {
+                      "const": "java.gradle.javadoc"
+                    },
+                    "status": {
+                      "const": "observed_unverified"
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "reason": {
+                      "const": "gradle_javadoc_native_incomplete"
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "language": {
+                      "const": "java"
+                    },
+                    "category": {
+                      "const": "comments"
+                    },
+                    "checker_id": {
+                      "const": "java.gradle.javadoc"
+                    },
+                    "status": {
+                      "const": "native_incomplete"
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "checker_id": {
+                      "const": "java.gradle.javadoc"
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "reason": {
+                      "enum": [
+                        "gradle_javadoc_selected_inputs_and_rules_unverified",
+                        "gradle_javadoc_native_incomplete"
+                      ]
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "checker_id": {
+                      "const": "java.gradle.dependency_check"
+                    }
+                  },
+                  "required": [
+                    "checker_id"
+                  ]
+                },
+                "then": {
+                  "properties": {
+                    "language": {
+                      "const": "java"
+                    },
+                    "category": {
+                      "const": "cve"
+                    },
+                    "status": {
+                      "enum": [
+                        "observed_unverified",
+                        "native_incomplete"
+                      ]
+                    },
+                    "reason": {
+                      "enum": [
+                        "gradle_cve_coverage_and_freshness_unverified",
+                        "gradle_cve_native_incomplete"
+                      ]
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "syntax_candidates": {
+          "$ref": "#/$defs/syntax_candidates"
+        },
+        "unresolved_conditions": {
+          "$ref": "check-feedback-v0.46.schema.json#/properties/unresolved_conditions"
+        },
+        "next": {
+          "anyOf": [
+            {
+              "$ref": "check-feedback-v0.46.schema.json#/properties/next"
+            },
+            {
+              "$ref": "repair-brief-preview-v0.12.schema.json"
+            },
+            {
+              "$ref": "repair-brief-preview-v0.13.schema.json"
+            },
+            {
+              "$ref": "repair-brief-preview-v0.14.schema.json"
+            },
+            {
+              "$ref": "repair-brief-preview-v0.15.schema.json"
+            },
+            {
+              "$ref": "repair-brief-preview-v0.17.schema.json"
+            },
+            {
+              "$ref": "repair-brief-preview-v0.20.schema.json"
+            },
+            {
+              "$ref": "rust-clippy-repair-brief-preview-v0.1.schema.json"
+            },
+            {
+              "$ref": "maven-javadoc-repair-brief-preview-v0.3.schema.json"
+            },
+            {
+              "$ref": "p3c-configuration-repair-brief-preview-v0.1.schema.json"
+            },
+            {
+              "$ref": "npm-preparation-repair-brief-preview-v0.1.schema.json"
+            },
+            {
+              "$ref": "repair-brief-preview-v0.21.schema.json"
+            },
+            {
+              "$ref": "repair-brief-preview-v0.24.schema.json"
+            },
+            {
+              "$ref": "javadoc-repair-brief-preview-v0.4.schema.json"
+            },
+            {
+              "$ref": "checkstyle-repair-brief-preview-v0.25.schema.json"
+            },
+            {
+              "$ref": "repair-brief-preview-v0.27.schema.json"
+            }
+          ]
+        },
+        "syntax_tasks": {
+          "$ref": "check-feedback-v0.46.schema.json#/properties/syntax_tasks"
+        },
+        "gradle_javadoc_tasks": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "status",
+                "new_findings",
+                "new_blockers",
+                "task_verify_status",
+                "summary_scope"
+              ],
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9_]+$"
+                },
+                "new_findings": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "new_blockers": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "task_verify_status": {
+                  "const": "local_observation_only"
+                },
+                "summary_scope": {
+                  "const": "workspace_sync"
+                }
+              }
+            }
+          ]
+        },
+        "gradle_cve_tasks": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "task_sync",
+            "task_sync_reason"
+          ],
+          "properties": {
+            "task_sync": {
+              "enum": [
+                "synced",
+                "not_initialized",
+                "incomplete"
+              ]
+            },
+            "task_sync_reason": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "minLength": 1
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "task_sync": {
+                    "const": "incomplete"
+                  }
+                },
+                "required": [
+                  "task_sync"
+                ]
+              },
+              "then": {
+                "properties": {
+                  "task_sync_reason": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "task_sync_reason": {
+                    "type": "null"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "title": "Aggregate native checks with explicit Gradle Javadoc category attribution"
+    },
+    {
+      "$ref": "check-aborted-v0.21.schema.json"
+    }
+  ],
+  "$defs": {
+    "syntax_candidates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "reason",
+        "execution_phase",
+        "authority",
+        "delivery_decision",
+        "source_file_count",
+        "skipped_count",
+        "unrouted_count",
+        "native_preferred_count",
+        "observations",
+        "next_action"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "not_run",
+            "attempted_incomplete",
+            "observed_partial"
+          ]
+        },
+        "reason": {
+          "enum": [
+            "source_or_scope_changed",
+            "request_cancelled",
+            "worker_executable_unavailable",
+            "grammar_manifest_invalid",
+            "bounded_scope",
+            "unrouted_source",
+            "candidate_unavailable",
+            "candidate_unqualified",
+            "native_preferred",
+            "binary_without_wasm_precheck"
+          ]
+        },
+        "execution_phase": {
+          "const": "after_native"
+        },
+        "authority": {
+          "const": "candidate_unqualified"
+        },
+        "delivery_decision": {
+          "const": "incomplete"
+        },
+        "source_file_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "skipped_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unrouted_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "native_preferred_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "next_action": {
+          "type": "string",
+          "minLength": 1
+        },
+        "observations": {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "anyOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "path",
+                  "language",
+                  "scope",
+                  "byte_offset",
+                  "status",
+                  "reason",
+                  "grammar_qualified",
+                  "source_sha256",
+                  "grammar_sha256",
+                  "recovery_count",
+                  "recoveries",
+                  "known_limitations"
+                ],
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "language": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "scope": {
+                    "enum": [
+                      "whole_file",
+                      "cfquery_body"
+                    ]
+                  },
+                  "byte_offset": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "status": {
+                    "enum": [
+                      "candidate_observed",
+                      "candidate_unavailable"
+                    ]
+                  },
+                  "reason": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "grammar_qualified": {
+                    "const": false
+                  },
+                  "source_sha256": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "grammar_sha256": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "recovery_count": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "known_limitations": {
+                    "type": "array",
+                    "maxItems": 8,
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 1024
+                    }
+                  },
+                  "recoveries": {
+                    "type": "array",
+                    "maxItems": 8,
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "kind",
+                        "syntax_kind",
+                        "start_byte",
+                        "end_byte",
+                        "start_row",
+                        "start_column_byte",
+                        "end_row",
+                        "end_column_byte"
+                      ],
+                      "properties": {
+                        "kind": {
+                          "enum": [
+                            "ERROR",
+                            "MISSING"
+                          ]
+                        },
+                        "syntax_kind": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "start_byte": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "end_byte": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "start_row": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "start_column_byte": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "end_row": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "end_column_byte": {
+                          "type": "integer",
+                          "minimum": 0
+                        }
+                      }
+                    }
+                  },
+                  "structural_observation_count": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 128
+                  },
+                  "structural_observations": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 8,
+                    "items": {
+                      "oneOf": [
+                        {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "basis",
+                            "rule_id",
+                            "rule_version",
+                            "rule_sha256",
+                            "parent_syntax_kind",
+                            "start_byte",
+                            "end_byte",
+                            "start_row",
+                            "start_column_byte",
+                            "end_row",
+                            "end_column_byte"
+                          ],
+                          "properties": {
+                            "basis": {
+                              "const": "codeguard_structure_rule"
+                            },
+                            "rule_id": {
+                              "const": "codeguard.python.required_suite"
+                            },
+                            "rule_version": {
+                              "const": "1.0.0"
+                            },
+                            "rule_sha256": {
+                              "type": "string",
+                              "pattern": "^[0-9a-f]{64}$"
+                            },
+                            "parent_syntax_kind": {
+                              "enum": [
+                                "function_definition",
+                                "class_definition",
+                                "if_statement",
+                                "elif_clause",
+                                "else_clause",
+                                "for_statement",
+                                "while_statement",
+                                "try_statement",
+                                "except_clause",
+                                "finally_clause",
+                                "with_statement",
+                                "match_statement",
+                                "case_clause"
+                              ]
+                            },
+                            "start_byte": {
+                              "type": "integer",
+                              "minimum": 0
+                            },
+                            "end_byte": {
+                              "type": "integer",
+                              "minimum": 0
+                            },
+                            "start_row": {
+                              "type": "integer",
+                              "minimum": 0
+                            },
+                            "start_column_byte": {
+                              "type": "integer",
+                              "minimum": 0
+                            },
+                            "end_row": {
+                              "type": "integer",
+                              "minimum": 0
+                            },
+                            "end_column_byte": {
+                              "type": "integer",
+                              "minimum": 0
+                            }
+                          }
+                        },
+                        {
+                          "$ref": "grammar-probe-v0.3.schema.json#/$defs/structure"
+                        },
+                        {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "basis",
+                            "rule_id",
+                            "rule_version",
+                            "rule_sha256",
+                            "parent_syntax_kind",
+                            "start_byte",
+                            "end_byte",
+                            "start_row",
+                            "start_column_byte",
+                            "end_row",
+                            "end_column_byte"
+                          ],
+                          "properties": {
+                            "basis": {
+                              "const": "codeguard_structure_rule"
+                            },
+                            "rule_id": {
+                              "const": "codeguard.javascript.duplicate_direct_lexical_binding"
+                            },
+                            "rule_version": {
+                              "const": "1.0.0"
+                            },
+                            "rule_sha256": {
+                              "type": "string",
+                              "pattern": "^[0-9a-f]{64}$"
+                            },
+                            "parent_syntax_kind": {
+                              "const": "program"
+                            },
+                            "start_byte": {
+                              "type": "integer",
+                              "minimum": 0
+                            },
+                            "end_byte": {
+                              "type": "integer",
+                              "minimum": 0
+                            },
+                            "start_row": {
+                              "type": "integer",
+                              "minimum": 0
+                            },
+                            "start_column_byte": {
+                              "type": "integer",
+                              "minimum": 0
+                            },
+                            "end_row": {
+                              "type": "integer",
+                              "minimum": 0
+                            },
+                            "end_column_byte": {
+                              "type": "integer",
+                              "minimum": 0
+                            }
+                          }
+                        },
+                        {
+                          "$ref": "grammar-probe-v0.7.schema.json#/$defs/structure"
+                        }
+                      ]
+                    }
+                  }
+                },
+                "allOf": [
+                  {
+                    "if": {
+                      "anyOf": [
+                        {
+                          "required": [
+                            "structural_observation_count"
+                          ]
+                        },
+                        {
+                          "required": [
+                            "structural_observations"
+                          ]
+                        }
+                      ]
+                    },
+                    "then": {
+                      "required": [
+                        "structural_observation_count",
+                        "structural_observations"
+                      ],
+                      "properties": {
+                        "language": {
+                          "enum": [
+                            "python",
+                            "go",
+                            "javascript",
+                            "erlang"
+                          ]
+                        },
+                        "scope": {
+                          "const": "whole_file"
+                        },
+                        "byte_offset": {
+                          "const": 0
+                        },
+                        "status": {
+                          "const": "candidate_observed"
+                        },
+                        "recovery_count": {
+                          "maximum": 128
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "language": {
+                          "const": "python"
+                        }
+                      },
+                      "required": [
+                        "language"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "structural_observations": {
+                          "items": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [
+                              "basis",
+                              "rule_id",
+                              "rule_version",
+                              "rule_sha256",
+                              "parent_syntax_kind",
+                              "start_byte",
+                              "end_byte",
+                              "start_row",
+                              "start_column_byte",
+                              "end_row",
+                              "end_column_byte"
+                            ],
+                            "properties": {
+                              "basis": {
+                                "const": "codeguard_structure_rule"
+                              },
+                              "rule_id": {
+                                "const": "codeguard.python.required_suite"
+                              },
+                              "rule_version": {
+                                "const": "1.0.0"
+                              },
+                              "rule_sha256": {
+                                "type": "string",
+                                "pattern": "^[0-9a-f]{64}$"
+                              },
+                              "parent_syntax_kind": {
+                                "enum": [
+                                  "function_definition",
+                                  "class_definition",
+                                  "if_statement",
+                                  "elif_clause",
+                                  "else_clause",
+                                  "for_statement",
+                                  "while_statement",
+                                  "try_statement",
+                                  "except_clause",
+                                  "finally_clause",
+                                  "with_statement",
+                                  "match_statement",
+                                  "case_clause"
+                                ]
+                              },
+                              "start_byte": {
+                                "type": "integer",
+                                "minimum": 0
+                              },
+                              "end_byte": {
+                                "type": "integer",
+                                "minimum": 0
+                              },
+                              "start_row": {
+                                "type": "integer",
+                                "minimum": 0
+                              },
+                              "start_column_byte": {
+                                "type": "integer",
+                                "minimum": 0
+                              },
+                              "end_row": {
+                                "type": "integer",
+                                "minimum": 0
+                              },
+                              "end_column_byte": {
+                                "type": "integer",
+                                "minimum": 0
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "language": {
+                          "const": "go"
+                        }
+                      },
+                      "required": [
+                        "language"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "structural_observations": {
+                          "items": {
+                            "$ref": "grammar-probe-v0.3.schema.json#/$defs/structure"
+                          },
+                          "maxItems": 1
+                        },
+                        "structural_observation_count": {
+                          "const": 1
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "language": {
+                          "const": "javascript"
+                        }
+                      },
+                      "required": [
+                        "language"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "structural_observations": {
+                          "items": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [
+                              "basis",
+                              "rule_id",
+                              "rule_version",
+                              "rule_sha256",
+                              "parent_syntax_kind",
+                              "start_byte",
+                              "end_byte",
+                              "start_row",
+                              "start_column_byte",
+                              "end_row",
+                              "end_column_byte"
+                            ],
+                            "properties": {
+                              "basis": {
+                                "const": "codeguard_structure_rule"
+                              },
+                              "rule_id": {
+                                "const": "codeguard.javascript.duplicate_direct_lexical_binding"
+                              },
+                              "rule_version": {
+                                "const": "1.0.0"
+                              },
+                              "rule_sha256": {
+                                "type": "string",
+                                "pattern": "^[0-9a-f]{64}$"
+                              },
+                              "parent_syntax_kind": {
+                                "const": "program"
+                              },
+                              "start_byte": {
+                                "type": "integer",
+                                "minimum": 0
+                              },
+                              "end_byte": {
+                                "type": "integer",
+                                "minimum": 0
+                              },
+                              "start_row": {
+                                "type": "integer",
+                                "minimum": 0
+                              },
+                              "start_column_byte": {
+                                "type": "integer",
+                                "minimum": 0
+                              },
+                              "end_row": {
+                                "type": "integer",
+                                "minimum": 0
+                              },
+                              "end_column_byte": {
+                                "type": "integer",
+                                "minimum": 0
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "language": {
+                          "const": "erlang"
+                        }
+                      },
+                      "required": [
+                        "language"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "structural_observations": {
+                          "items": {
+                            "$ref": "grammar-probe-v0.7.schema.json#/$defs/structure"
+                          }
+                        }
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "$ref": "cfquery-candidate-row-v0.1.schema.json"
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "path",
+                  "language",
+                  "scope",
+                  "byte_offset",
+                  "status",
+                  "reason",
+                  "grammar_qualified",
+                  "source_sha256",
+                  "grammar_sha256",
+                  "recovery_count",
+                  "recoveries",
+                  "known_limitations",
+                  "javascript_mode_observation",
+                  "structural_observation_count",
+                  "structural_observations"
+                ],
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "language": {
+                    "const": "javascript"
+                  },
+                  "scope": {
+                    "const": "whole_file"
+                  },
+                  "byte_offset": {
+                    "const": 0
+                  },
+                  "status": {
+                    "const": "candidate_observed"
+                  },
+                  "reason": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "grammar_qualified": {
+                    "const": false
+                  },
+                  "source_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "grammar_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "recovery_count": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "known_limitations": {
+                    "type": "array",
+                    "maxItems": 8,
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 1024
+                    }
+                  },
+                  "recoveries": {
+                    "type": "array",
+                    "maxItems": 8,
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "kind",
+                        "syntax_kind",
+                        "start_byte",
+                        "end_byte",
+                        "start_row",
+                        "start_column_byte",
+                        "end_row",
+                        "end_column_byte"
+                      ],
+                      "properties": {
+                        "kind": {
+                          "enum": [
+                            "ERROR",
+                            "MISSING"
+                          ]
+                        },
+                        "syntax_kind": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "start_byte": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "end_byte": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "start_row": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "start_column_byte": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "end_row": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "end_column_byte": {
+                          "type": "integer",
+                          "minimum": 0
+                        }
+                      }
+                    }
+                  },
+                  "structural_observation_count": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 128
+                  },
+                  "structural_observations": {
+                    "type": "array",
+                    "minItems": 0,
+                    "maxItems": 8,
+                    "items": {
+                      "oneOf": [
+                        {
+                          "$ref": "grammar-probe-v0.8.schema.json#/$defs/structure"
+                        },
+                        {
+                          "$ref": "grammar-probe-v0.8.schema.json#/$defs/module_structure"
+                        }
+                      ]
+                    }
+                  },
+                  "javascript_mode_observation": {
+                    "allOf": [
+                      {
+                        "$ref": "javascript-mode-observation-v0.1.schema.json"
+                      },
+                      {
+                        "properties": {
+                          "mode": {
+                            "const": "module"
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

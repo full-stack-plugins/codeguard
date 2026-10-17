@@ -1,0 +1,81 @@
+{
+  "schema_version": "1.0.0",
+  "language": "php",
+  "dialect": "php_8",
+  "platforms": ["macos_arm64", "macos_x86_64", "linux_x86_64", "linux_aarch64", "windows_x86_64"],
+  "platform_validation": "unverified",
+  "categories": [
+    {
+      "category": "lint",
+      "applicability": "applicable",
+      "status": "gap",
+      "candidate_tool": "phpcs",
+      "candidate_version": "project_toolchain",
+      "version_status": "resolved_at_run",
+      "candidate_argv": ["phpcs", "--standard=PSR12", "."],
+      "requires_database_freshness": false,
+      "sources": ["https://github.com/squizlabs/PHP_CodeSniffer"],
+      "coverage_gaps": ["native_adapter_unvalidated", "php_version_dialect_unvalidated"]
+    },
+    {
+      "category": "comments",
+      "applicability": "applicable",
+      "status": "gap",
+      "candidate_tool": "phpcs",
+      "candidate_version": "project_toolchain",
+      "version_status": "resolved_at_run",
+      "candidate_argv": ["phpcs", "--standard=PSR12", "--sniffs=Generic.Commenting", "."],
+      "requires_database_freshness": false,
+      "sources": ["https://github.com/squizlabs/PHP_CodeSniffer"],
+      "coverage_gaps": ["comment_rules_unvalidated", "docblock_convention_unvalidated"]
+    },
+    {
+      "category": "dependencies",
+      "applicability": "applicable",
+      "status": "gap",
+      "candidate_tool": "composer",
+      "candidate_version": "project_toolchain",
+      "version_status": "resolved_at_run",
+      "candidate_argv": ["composer", "show", "--direct"],
+      "requires_database_freshness": false,
+      "sources": ["https://getcomposer.org/doc/"],
+      "coverage_gaps": ["dependency_graph_unvalidated", "composer_v2_unvalidated"]
+    },
+    {
+      "category": "cve",
+      "applicability": "applicable",
+      "status": "gap",
+      "candidate_tool": "roave_security_advisories",
+      "candidate_version": "project_toolchain",
+      "version_status": "resolved_at_run",
+      "candidate_argv": ["composer", "audit"],
+      "requires_database_freshness": true,
+      "sources": ["https://github.com/Roave/SecurityAdvisories"],
+      "coverage_gaps": ["cve_database_freshness_unvalidated", "vulnerability_mapping_unvalidated"]
+    },
+    {
+      "category": "security",
+      "applicability": "applicable",
+      "status": "gap",
+      "candidate_tool": "psalm",
+      "candidate_version": "project_toolchain",
+      "version_status": "resolved_at_run",
+      "candidate_argv": ["psalm", "--no-cache"],
+      "requires_database_freshness": false,
+      "sources": ["https://psalm.dev/"],
+      "coverage_gaps": ["security_rules_unvalidated", "taint_analysis_unvalidated"]
+    },
+    {
+      "category": "build",
+      "applicability": "applicable",
+      "status": "gap",
+      "candidate_tool": "composer",
+      "candidate_version": "project_toolchain",
+      "version_status": "resolved_at_run",
+      "candidate_argv": ["composer", "install", "--dry-run"],
+      "requires_database_freshness": false,
+      "sources": ["https://getcomposer.org/doc/"],
+      "coverage_gaps": ["build_verification_unvalidated", "autoloader_check_unvalidated"]
+    }
+  ]
+}

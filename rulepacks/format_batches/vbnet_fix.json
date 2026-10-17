@@ -1,0 +1,36 @@
+{
+  "schema_version": "0.1.0",
+  "batch": "vbnet_fix",
+  "languages": [
+    {
+      "language": "vbnet",
+      "status": "integrated",
+      "formatter": "bash",
+      "tool_key": "bash",
+      "check_argv": [
+        "-c",
+        "f=\"$1\"; { [ -n \"$f\" ] && [ -f \"$f\" ]; } || exit 2\nline=\"$(dotnet --list-sdks 2>/dev/null | tail -1)\"; [ -n \"$line\" ] || exit 2\nver=\"${line%% *}\"; root=\"${line#*\\[}\"; root=\"${root%\\]}\"\nrb=\"$root/$ver/DotnetTools/dotnet-format\"\n[ -f \"$rb/Microsoft.CodeAnalysis.VisualBasic.Workspaces.dll\" ] || rb=\"$(find \"$root/$ver\" -type d -name dotnet-format 2>/dev/null | head -1)\"\n[ -f \"$rb/Microsoft.CodeAnalysis.VisualBasic.Workspaces.dll\" ] || exit 2\nt=\"$(mktemp -d \"${TMPDIR:-/tmp}/cg-vbnet.XXXXXX\")\" || exit 2\ntrap 'rm -rf \"$t\"' EXIT\n{ printf '#r \"%s/Microsoft.CodeAnalysis.dll\"\\n#r \"%s/Microsoft.CodeAnalysis.VisualBasic.dll\"\\n#r \"%s/Microsoft.CodeAnalysis.Workspaces.dll\"\\n#r \"%s/Microsoft.CodeAnalysis.VisualBasic.Workspaces.dll\"\\n' \"$rb\" \"$rb\" \"$rb\" \"$rb\"; cat <<'FSX'\nopen System\nopen System.IO\nopen Microsoft.CodeAnalysis\nopen Microsoft.CodeAnalysis.VisualBasic\nopen Microsoft.CodeAnalysis.Formatting\nlet path = Environment.GetEnvironmentVariable \"CG_VBNET_FILE\"\nlet mode = Environment.GetEnvironmentVariable \"CG_VBNET_MODE\"\ntry\n    if isNull path || not (File.Exists path) then\n        eprintfn \"file not found\"\n        Environment.Exit 2\n    let src = File.ReadAllText path\n    let tree = VisualBasicSyntaxTree.ParseText(src)\n    let errs =\n        tree.GetDiagnostics()\n        |> Seq.filter (fun d -> d.Severity = DiagnosticSeverity.Error)\n        |> Seq.toList\n    if not errs.IsEmpty then\n        eprintfn \"VB parse errors: %d\" errs.Length\n        Environment.Exit 2\n    let ws = new AdhocWorkspace()\n    let formatted = (Formatter.Format(tree.GetRoot(), ws)).ToFullString()\n    if mode = \"apply\" then\n        if formatted <> src then File.WriteAllText(path, formatted)\n        Environment.Exit 0\n    else\n        if formatted = src then Environment.Exit 0 else Environment.Exit 1\nwith\n| ex ->\n    eprintfn \"wrapper error: %s\" ex.Message\n    Environment.Exit 2\nFSX\n} > \"$t/vbfmt.fsx\" || exit 2\nCG_VBNET_FILE=\"$f\" CG_VBNET_MODE=check dotnet fsi --exec \"$t/vbfmt.fsx\" >/dev/null\n",
+        "codeguard",
+        "{file}"
+      ],
+      "apply_argv": [
+        "-c",
+        "f=\"$1\"; { [ -n \"$f\" ] && [ -f \"$f\" ]; } || exit 2\nline=\"$(dotnet --list-sdks 2>/dev/null | tail -1)\"; [ -n \"$line\" ] || exit 2\nver=\"${line%% *}\"; root=\"${line#*\\[}\"; root=\"${root%\\]}\"\nrb=\"$root/$ver/DotnetTools/dotnet-format\"\n[ -f \"$rb/Microsoft.CodeAnalysis.VisualBasic.Workspaces.dll\" ] || rb=\"$(find \"$root/$ver\" -type d -name dotnet-format 2>/dev/null | head -1)\"\n[ -f \"$rb/Microsoft.CodeAnalysis.VisualBasic.Workspaces.dll\" ] || exit 2\nt=\"$(mktemp -d \"${TMPDIR:-/tmp}/cg-vbnet.XXXXXX\")\" || exit 2\ntrap 'rm -rf \"$t\"' EXIT\n{ printf '#r \"%s/Microsoft.CodeAnalysis.dll\"\\n#r \"%s/Microsoft.CodeAnalysis.VisualBasic.dll\"\\n#r \"%s/Microsoft.CodeAnalysis.Workspaces.dll\"\\n#r \"%s/Microsoft.CodeAnalysis.VisualBasic.Workspaces.dll\"\\n' \"$rb\" \"$rb\" \"$rb\" \"$rb\"; cat <<'FSX'\nopen System\nopen System.IO\nopen Microsoft.CodeAnalysis\nopen Microsoft.CodeAnalysis.VisualBasic\nopen Microsoft.CodeAnalysis.Formatting\nlet path = Environment.GetEnvironmentVariable \"CG_VBNET_FILE\"\nlet mode = Environment.GetEnvironmentVariable \"CG_VBNET_MODE\"\ntry\n    if isNull path || not (File.Exists path) then\n        eprintfn \"file not found\"\n        Environment.Exit 2\n    let src = File.ReadAllText path\n    let tree = VisualBasicSyntaxTree.ParseText(src)\n    let errs =\n        tree.GetDiagnostics()\n        |> Seq.filter (fun d -> d.Severity = DiagnosticSeverity.Error)\n        |> Seq.toList\n    if not errs.IsEmpty then\n        eprintfn \"VB parse errors: %d\" errs.Length\n        Environment.Exit 2\n    let ws = new AdhocWorkspace()\n    let formatted = (Formatter.Format(tree.GetRoot(), ws)).ToFullString()\n    if mode = \"apply\" then\n        if formatted <> src then File.WriteAllText(path, formatted)\n        Environment.Exit 0\n    else\n        if formatted = src then Environment.Exit 0 else Environment.Exit 1\nwith\n| ex ->\n    eprintfn \"wrapper error: %s\" ex.Message\n    Environment.Exit 2\nFSX\n} > \"$t/vbfmt.fsx\" || exit 2\nCG_VBNET_FILE=\"$f\" CG_VBNET_MODE=apply dotnet fsi --exec \"$t/vbfmt.fsx\" >/dev/null\n",
+        "codeguard",
+        "{file}"
+      ],
+      "config_markers": [],
+      "extensions": [
+        ".vb"
+      ],
+      "dialects": {
+        "dotnet_sdk": "10.0.401"
+      },
+      "notes": "integrated：bash 包装 dotnet fsi（.NET SDK 自带 F# Interactive）加载 SDK 自带的 dotnet-format 捆绑 Roslyn 程序集（DotnetTools/dotnet-format/ 下的 Microsoft.CodeAnalysis.VisualBasic(.Workspaces)/Workspaces），用 VisualBasicSyntaxTree.ParseText 解析 + Formatter.Format 与源码逐字对比，逐文件判定——无需安装任何额外工具，只要求 .NET SDK 6+（不是仅运行时：fsi 与程序集都随 SDK 分发；SDK 发现走 dotnet --list-sdks，缺失即退出 2 工具故障）。选型原因：dotnet format 直连已实测不可用（.NET SDK 10.0.401 复现）——--include 传绝对路径对脏文件退出 0 且 stdout/stderr 全空（静默假阴性），语法损坏的 .vb verify 与 apply 均退出 0 且不改文件（静默假通过），无 MSBuild 工程的裸 .vb 抛未处理异常退出 1；本包装在三态上都实测封堵：check 合规退出 0（stdout 0 字节，已重定向）、需格式化退出 1、语法解析错误/文件不可读/SDK 缺失退出 2（工具故障，不静默通过），check 全程只读（实测前后 md5 一致），apply 退出 0 就地写回且幂等、解析坏文件退出 2 且不改动。退出码为标准 B 类 [1]；fsi 内 Environment.Exit 经 bash 透传为进程退出码（实测）。限制：只做 Roslyn 默认选项的空白/缩进/换行排版（Formatter.Format），不读项目 .editorconfig（config_markers 为空的原因），不做类型检查/编译/语义诊断——语义报错但语法合法的文件照常检查（与 fsharp fantomas、powershell Invoke-Formatter 档位同级）；每文件约 1.5-2.5 秒（fsi 冷启动开销，与 julia 档位同级），批量检查耗时明显；带 BOM 的文件 check 正常，apply 会以无 BOM UTF-8 重写；apply 失败时不写文件（坏文件不会写半截）。",
+      "unformatted_exit_codes": [
+        1
+      ],
+      "unparsable_detection": "none"
+    }
+  ]
+}

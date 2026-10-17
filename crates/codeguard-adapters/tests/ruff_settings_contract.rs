@@ -109,3 +109,46 @@ fn unknown_implicit_duplicate_and_per_file_targets_do_not_supply_a_closure_targe
         assert!(!observed.coverage_proven);
     }
 }
+
+#[test]
+fn pydoclint_exact_catalog_does_not_expand_pydocstyle_or_approved_mappings() {
+    for code in [
+        "DOC102", "DOC201", "DOC202", "DOC402", "DOC403", "DOC501", "DOC502",
+    ] {
+        assert!(codeguard_adapters::is_ruff_documentation_rule(code));
+        assert!(!is_ruff_pydocstyle_rule(code));
+        let rule = codeguard_adapters::RuffDocumentationRule::from_code(code).unwrap();
+        assert_eq!(rule.investigation_required, code == "DOC502");
+        assert!(rule.step.contains("实际"));
+        let raw = format!(
+            "linter.rules.enabled = [\n\tdocumentation ({code}),\n]\nlinter.per_file_ignores = {{}}\n"
+        );
+        let settings = parse_ruff_settings(raw.as_bytes()).unwrap();
+        assert!(settings.native_rule_enabled(code));
+        assert!(settings.globally_enabled_mapped_rules.is_empty());
+    }
+    for code in [
+        "DOC", "DOC20", "DOC2010", "DOC101", "DOC999", "doc201", "DOC2A1", "F401",
+    ] {
+        assert!(!codeguard_adapters::is_ruff_documentation_rule(code));
+        assert!(codeguard_adapters::RuffDocumentationRule::from_code(code).is_none());
+    }
+    assert!(codeguard_adapters::is_ruff_documentation_rule("D417"));
+}
+
+#[test]
+fn documentation_selection_is_exact_sorted_and_does_not_change_serialized_settings() {
+    let raw = b"linter.rules.enabled = [\n\tx (DOC201),\n\tx (F401),\n\tx (D101),\n\tx (DOC999),\n\tx (D1000),\n]\nlinter.per_file_ignores = {}\n";
+    let settings = parse_ruff_settings(raw).unwrap();
+    assert_eq!(
+        settings.globally_enabled_documentation_rules(),
+        ["D101", "DOC201"]
+    );
+    let old_shape = serde_json::to_value(&settings).unwrap();
+    assert_eq!(old_shape.as_object().unwrap().len(), 4);
+    assert_eq!(
+        old_shape["globally_enabled_mapped_rules"],
+        serde_json::json!(["F401"])
+    );
+    assert!(!settings.coverage_proven);
+}

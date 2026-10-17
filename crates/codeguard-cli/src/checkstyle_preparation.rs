@@ -257,7 +257,7 @@ fn later_native_observation(root: &Path, preparation: &Value) -> Result<Value, &
         } else {
             continue;
         };
-        if scan["schema_version"] != "0.1.0"
+        if !matches!(scan["schema_version"].as_str(), Some("0.1.0" | "0.2.0"))
             || scan["checker_id"] != "java.checkstyle"
             || scan["authority"] != "local_unverified"
             || scan["coverage_proven"] != false

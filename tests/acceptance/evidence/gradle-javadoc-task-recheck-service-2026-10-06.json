@@ -1,0 +1,518 @@
+{
+  "schema_version": "0.1.0",
+  "evidence_kind": "local_internal_native_service_acceptance",
+  "production_qualified": false,
+  "source_sha256": {
+    "crates/codeguard-cli/src/gradle_javadoc_task_recheck.rs": "3f60d0be0ac88073d54e2d0720f4c94d09d5d69d8b7664ef8f62c13fce7e4b2e",
+    "crates/codeguard-cli/src/gradle_javadoc_workbench.rs": "54fa992ed7a4de7d8a428756610d8d0bc072b9de5d0c7290a367807c9dc9a75a",
+    "crates/codeguard-cli/tests/gradle_javadoc_task_recheck.rs": "12a6e89450709204eef5716d652dbaa124ac4996b010e94ad763f068dd1e0000",
+    "schemas/gradle-javadoc-task-recheck-v0.1.schema.json": "5dab292592117b7ac927f86100b873bbce2fee28f4b54a56650bd5648d30e7b9"
+  },
+  "reports": {
+    "absent": {
+      "authority": "local_unverified",
+      "checker_id": "java.gradle.javadoc",
+      "configuration_matches": true,
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "input_bindings": [
+        {
+          "location": "workspace",
+          "path": "build.gradle",
+          "sha256": "46f603e292b5568476f749c4f601958e097a6056fec78ee4d70d4c5d3be17ebc"
+        },
+        {
+          "location": "workspace",
+          "path": "settings.gradle",
+          "sha256": "5fc71a8158938e049ea85421a78c9591c38732aa7fa3b559c545c3754f43c6ec"
+        },
+        {
+          "location": "workspace",
+          "path": "src/main/java/Sample.java",
+          "sha256": "1a8dbd2b74c4daf70210534af9f2d50ea80bed412ef6e0b0b66b177de89c97f9"
+        },
+        {
+          "location": "bundle",
+          "path": "/Users/wandl/.gradle/wrapper/dists/gradle-8.10.2-bin/a04bxjujx95o3nb99gddekhwo/gradle-8.10.2",
+          "sha256": "915f28e8fd4f7133e51321c688bf59dbc4c18da8748a297913010d245ddd3651"
+        },
+        {
+          "location": "tool",
+          "path": "/Users/wandl/Library/Java/JavaVirtualMachines/ms-21.0.12.1/Contents/Home/bin/java",
+          "sha256": "e820b09ad7e80bf14ec6803d9ade8abc02dfbfe9d0540f9b0e8c6d334706bc5e"
+        },
+        {
+          "location": "tool",
+          "path": "/Users/wandl/Library/Java/JavaVirtualMachines/ms-21.0.12.1/Contents/Home/release",
+          "sha256": "9e5f483cd7a0b0bd3524139fb7e08dae750bd9b60336004fa70cd2d00bcc0583"
+        }
+      ],
+      "operation": "task_verify",
+      "origin": {
+        "first_report_sha256": "d63686329175eb538969d4b7b4cae16ff6add3f4990a2665a54f5ec22ec0a265",
+        "first_run_id": "javadoc-gradle-64770-1791287220598365000"
+      },
+      "original_tool_identity_complete": true,
+      "reason": "gradle_javadoc_local_policy_unverified",
+      "report_type": "gradle_javadoc_task_recheck",
+      "run_id": "javadoc-gradle-task-64770-1791287226337653000",
+      "scan": {
+        "authority": "local_unverified",
+        "blockers": [
+          {
+            "affected_paths": [
+              "src/main/java/Sample.java"
+            ],
+            "build_root": ".",
+            "checker_id": "java.gradle.javadoc",
+            "diagnostic_reason": "selected_sources_and_complete_documentation_rules_unverified",
+            "fingerprint": "9aebf6877bb1b844d23ecd72d4c4e9fbddf1a80a8e51694bb667ae578cfbfad9",
+            "id": "CG-B-9aebf6877bb1b844d23ecd72d4c4e9fb",
+            "reason": "gradle_documentation_rules_and_coverage_unverified",
+            "scope": "."
+          }
+        ],
+        "checker_id": "java.gradle.javadoc",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "findings": [],
+        "inputs": [
+          {
+            "path": "build.gradle",
+            "sha256": "46f603e292b5568476f749c4f601958e097a6056fec78ee4d70d4c5d3be17ebc"
+          },
+          {
+            "path": "settings.gradle",
+            "sha256": "5fc71a8158938e049ea85421a78c9591c38732aa7fa3b559c545c3754f43c6ec"
+          },
+          {
+            "path": "src/main/java/Sample.java",
+            "sha256": "1a8dbd2b74c4daf70210534af9f2d50ea80bed412ef6e0b0b66b177de89c97f9"
+          }
+        ],
+        "native": {
+          "authority": "local_unverified",
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "findings": [],
+          "gradle_bundle_sha256": "915f28e8fd4f7133e51321c688bf59dbc4c18da8748a297913010d245ddd3651",
+          "init_scripts_sha256": "f759fb2fde664dbf316a17f752630f5f78b4b98dac5131f2ac43133e763ba309",
+          "java_entry_sha256": "e820b09ad7e80bf14ec6803d9ade8abc02dfbfe9d0540f9b0e8c6d334706bc5e",
+          "jdk_release_sha256": "9e5f483cd7a0b0bd3524139fb7e08dae750bd9b60336004fa70cd2d00bcc0583",
+          "model_report_sha256": "4b6e4673bc26d43ebf422edc7e6dba28f4ad91a20a8166dba6f0a4029580a664",
+          "native_status": "empty_output_unverified",
+          "native_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "native_stdout_sha256": "37c356f163c81be1038fa8b3ed141416502fd8388b2f88a31d16aef347c56323",
+          "reason": "selected_sources_and_complete_documentation_rules_unverified",
+          "report_type": "gradle_javadoc_probe",
+          "rule_configuration_complete": false,
+          "schema_version": "0.1.0",
+          "selected_java_file_count": 1,
+          "source_snapshot_sha256": "b71503a5e0196dcf0bff66b4cdfdef58d216467ca4452afa0cf09a9c85fee208",
+          "task_paths": [
+            ":javadoc"
+          ]
+        },
+        "report_type": "gradle_javadoc_workbench_observation",
+        "run_id": "javadoc-gradle-task-64770-1791287226337653000",
+        "schema_version": "0.1.0",
+        "workspace_binding": "bound",
+        "workspace_id": "ws-121078f921dde9c959edfc6a74f938c2"
+      },
+      "schema_version": "0.1.0",
+      "source_scope_matches": true,
+      "task_id": "CG-3beab8078f43f7747e25351fe2246c64",
+      "task_input_stable": true,
+      "task_path": "src/main/java/Sample.java",
+      "task_rule": "JavadocMissingComment",
+      "tool_identity_matches": true,
+      "workspace_binding": "bound",
+      "workspace_id": "ws-121078f921dde9c959edfc6a74f938c2"
+    },
+    "cancelled": {
+      "authority": "local_unverified",
+      "checker_id": "java.gradle.javadoc",
+      "configuration_matches": true,
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "input_bindings": [
+        {
+          "location": "workspace",
+          "path": "build.gradle",
+          "sha256": "46f603e292b5568476f749c4f601958e097a6056fec78ee4d70d4c5d3be17ebc"
+        },
+        {
+          "location": "workspace",
+          "path": "settings.gradle",
+          "sha256": "5fc71a8158938e049ea85421a78c9591c38732aa7fa3b559c545c3754f43c6ec"
+        },
+        {
+          "location": "workspace",
+          "path": "src/main/java/Sample.java",
+          "sha256": "1a8dbd2b74c4daf70210534af9f2d50ea80bed412ef6e0b0b66b177de89c97f9"
+        },
+        {
+          "location": "bundle",
+          "path": "/Users/wandl/.gradle/wrapper/dists/gradle-8.10.2-bin/a04bxjujx95o3nb99gddekhwo/gradle-8.10.2",
+          "sha256": "915f28e8fd4f7133e51321c688bf59dbc4c18da8748a297913010d245ddd3651"
+        },
+        {
+          "location": "tool",
+          "path": "/Users/wandl/Library/Java/JavaVirtualMachines/ms-21.0.12.1/Contents/Home/bin/java",
+          "sha256": "e820b09ad7e80bf14ec6803d9ade8abc02dfbfe9d0540f9b0e8c6d334706bc5e"
+        },
+        {
+          "location": "tool",
+          "path": "/Users/wandl/Library/Java/JavaVirtualMachines/ms-21.0.12.1/Contents/Home/release",
+          "sha256": "9e5f483cd7a0b0bd3524139fb7e08dae750bd9b60336004fa70cd2d00bcc0583"
+        }
+      ],
+      "operation": "task_verify",
+      "origin": {
+        "first_report_sha256": "d63686329175eb538969d4b7b4cae16ff6add3f4990a2665a54f5ec22ec0a265",
+        "first_run_id": "javadoc-gradle-64770-1791287220598365000"
+      },
+      "original_tool_identity_complete": true,
+      "reason": "gradle_javadoc_local_policy_unverified",
+      "report_type": "gradle_javadoc_task_recheck",
+      "run_id": "javadoc-gradle-task-64770-1791287231662986000",
+      "scan": {
+        "authority": "local_unverified",
+        "blockers": [
+          {
+            "affected_paths": [
+              "src/main/java/Sample.java"
+            ],
+            "build_root": ".",
+            "checker_id": "java.gradle.javadoc",
+            "diagnostic_reason": "request_cancelled",
+            "fingerprint": "9aebf6877bb1b844d23ecd72d4c4e9fbddf1a80a8e51694bb667ae578cfbfad9",
+            "id": "CG-B-9aebf6877bb1b844d23ecd72d4c4e9fb",
+            "reason": "gradle_javadoc_native_incomplete",
+            "scope": "."
+          }
+        ],
+        "checker_id": "java.gradle.javadoc",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "findings": [],
+        "inputs": [
+          {
+            "path": "build.gradle",
+            "sha256": "46f603e292b5568476f749c4f601958e097a6056fec78ee4d70d4c5d3be17ebc"
+          },
+          {
+            "path": "settings.gradle",
+            "sha256": "5fc71a8158938e049ea85421a78c9591c38732aa7fa3b559c545c3754f43c6ec"
+          },
+          {
+            "path": "src/main/java/Sample.java",
+            "sha256": "1a8dbd2b74c4daf70210534af9f2d50ea80bed412ef6e0b0b66b177de89c97f9"
+          }
+        ],
+        "native": {
+          "authority": "local_unverified",
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "findings": [],
+          "gradle_bundle_sha256": null,
+          "init_scripts_sha256": "f759fb2fde664dbf316a17f752630f5f78b4b98dac5131f2ac43133e763ba309",
+          "java_entry_sha256": null,
+          "jdk_release_sha256": null,
+          "model_report_sha256": null,
+          "native_status": "incomplete",
+          "native_stderr_sha256": null,
+          "native_stdout_sha256": null,
+          "reason": "request_cancelled",
+          "report_type": "gradle_javadoc_probe",
+          "rule_configuration_complete": false,
+          "schema_version": "0.1.0",
+          "selected_java_file_count": 0,
+          "source_snapshot_sha256": null,
+          "task_paths": []
+        },
+        "report_type": "gradle_javadoc_workbench_observation",
+        "run_id": "javadoc-gradle-task-64770-1791287231662986000",
+        "schema_version": "0.1.0",
+        "workspace_binding": "bound",
+        "workspace_id": "ws-121078f921dde9c959edfc6a74f938c2"
+      },
+      "schema_version": "0.1.0",
+      "source_scope_matches": true,
+      "task_id": "CG-3beab8078f43f7747e25351fe2246c64",
+      "task_input_stable": true,
+      "task_path": "src/main/java/Sample.java",
+      "task_rule": "JavadocMissingComment",
+      "tool_identity_matches": true,
+      "workspace_binding": "bound",
+      "workspace_id": "ws-121078f921dde9c959edfc6a74f938c2"
+    },
+    "original": {
+      "authority": "local_unverified",
+      "blockers": [
+        {
+          "affected_paths": [
+            "src/main/java/Sample.java"
+          ],
+          "build_root": ".",
+          "checker_id": "java.gradle.javadoc",
+          "diagnostic_reason": "selected_sources_and_complete_documentation_rules_unverified",
+          "fingerprint": "9aebf6877bb1b844d23ecd72d4c4e9fbddf1a80a8e51694bb667ae578cfbfad9",
+          "id": "CG-B-9aebf6877bb1b844d23ecd72d4c4e9fb",
+          "reason": "gradle_documentation_rules_and_coverage_unverified",
+          "scope": "."
+        }
+      ],
+      "checker_id": "java.gradle.javadoc",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "findings": [
+        {
+          "checker_id": "java.gradle.javadoc",
+          "column": 8,
+          "finding_fingerprint": "3beab8078f43f7747e25351fe2246c649ff7bfb2157b219f1cdeafb318bbb9bd",
+          "finding_id": "CG-3beab8078f43f7747e25351fe2246c64",
+          "line": 1,
+          "path": "src/main/java/Sample.java",
+          "rule_id": "JavadocMissingComment",
+          "source_sha256": "badd08caced739e5eff34c64109646baa80e6e827b1979435162e3732137a31a"
+        },
+        {
+          "checker_id": "java.gradle.javadoc",
+          "column": 9,
+          "finding_fingerprint": "ee8a371c5e16877103863a02c1aca78f84f52b22ce7b144cdc7d0f8c904a0b0b",
+          "finding_id": "CG-ee8a371c5e16877103863a02c1aca78f",
+          "line": 2,
+          "path": "src/main/java/Sample.java",
+          "rule_id": "JavadocMissingComment",
+          "source_sha256": "badd08caced739e5eff34c64109646baa80e6e827b1979435162e3732137a31a"
+        }
+      ],
+      "inputs": [
+        {
+          "path": "build.gradle",
+          "sha256": "46f603e292b5568476f749c4f601958e097a6056fec78ee4d70d4c5d3be17ebc"
+        },
+        {
+          "path": "settings.gradle",
+          "sha256": "5fc71a8158938e049ea85421a78c9591c38732aa7fa3b559c545c3754f43c6ec"
+        },
+        {
+          "path": "src/main/java/Sample.java",
+          "sha256": "badd08caced739e5eff34c64109646baa80e6e827b1979435162e3732137a31a"
+        }
+      ],
+      "native": {
+        "authority": "local_unverified",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "findings": [
+          {
+            "column": 8,
+            "line": 1,
+            "path": "src/main/java/Sample.java",
+            "rule_id": "JavadocMissingComment"
+          },
+          {
+            "column": 9,
+            "line": 2,
+            "path": "src/main/java/Sample.java",
+            "rule_id": "JavadocMissingComment"
+          }
+        ],
+        "gradle_bundle_sha256": "915f28e8fd4f7133e51321c688bf59dbc4c18da8748a297913010d245ddd3651",
+        "init_scripts_sha256": "f759fb2fde664dbf316a17f752630f5f78b4b98dac5131f2ac43133e763ba309",
+        "java_entry_sha256": "e820b09ad7e80bf14ec6803d9ade8abc02dfbfe9d0540f9b0e8c6d334706bc5e",
+        "jdk_release_sha256": "9e5f483cd7a0b0bd3524139fb7e08dae750bd9b60336004fa70cd2d00bcc0583",
+        "model_report_sha256": "4b6e4673bc26d43ebf422edc7e6dba28f4ad91a20a8166dba6f0a4029580a664",
+        "native_status": "findings_observed_unverified",
+        "native_stderr_sha256": "4cb1afe3dbdd4ebfbf9b8cfb5ce3eb8d4f6b1067b6633ab74a331e3aff8169e7",
+        "native_stdout_sha256": "345ad3994d7c90d240429a29e59cb1259cfe81aee908c46c2404f510c7c9d830",
+        "reason": "selected_sources_and_complete_documentation_rules_unverified",
+        "report_type": "gradle_javadoc_probe",
+        "rule_configuration_complete": false,
+        "schema_version": "0.1.0",
+        "selected_java_file_count": 1,
+        "source_snapshot_sha256": "b67857a8a83be0ed82edd8d66b72bf0f60df4589c346a7a7ff511e3759af3f7d",
+        "task_paths": [
+          ":javadoc"
+        ]
+      },
+      "report_type": "gradle_javadoc_workbench_observation",
+      "run_id": "javadoc-gradle-64770-1791287220598365000",
+      "schema_version": "0.1.0",
+      "workspace_binding": "bound",
+      "workspace_id": "ws-121078f921dde9c959edfc6a74f938c2"
+    },
+    "present": {
+      "authority": "local_unverified",
+      "checker_id": "java.gradle.javadoc",
+      "configuration_matches": true,
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "input_bindings": [
+        {
+          "location": "workspace",
+          "path": "build.gradle",
+          "sha256": "46f603e292b5568476f749c4f601958e097a6056fec78ee4d70d4c5d3be17ebc"
+        },
+        {
+          "location": "workspace",
+          "path": "settings.gradle",
+          "sha256": "5fc71a8158938e049ea85421a78c9591c38732aa7fa3b559c545c3754f43c6ec"
+        },
+        {
+          "location": "workspace",
+          "path": "src/main/java/Sample.java",
+          "sha256": "badd08caced739e5eff34c64109646baa80e6e827b1979435162e3732137a31a"
+        },
+        {
+          "location": "bundle",
+          "path": "/Users/wandl/.gradle/wrapper/dists/gradle-8.10.2-bin/a04bxjujx95o3nb99gddekhwo/gradle-8.10.2",
+          "sha256": "915f28e8fd4f7133e51321c688bf59dbc4c18da8748a297913010d245ddd3651"
+        },
+        {
+          "location": "tool",
+          "path": "/Users/wandl/Library/Java/JavaVirtualMachines/ms-21.0.12.1/Contents/Home/bin/java",
+          "sha256": "e820b09ad7e80bf14ec6803d9ade8abc02dfbfe9d0540f9b0e8c6d334706bc5e"
+        },
+        {
+          "location": "tool",
+          "path": "/Users/wandl/Library/Java/JavaVirtualMachines/ms-21.0.12.1/Contents/Home/release",
+          "sha256": "9e5f483cd7a0b0bd3524139fb7e08dae750bd9b60336004fa70cd2d00bcc0583"
+        }
+      ],
+      "operation": "task_verify",
+      "origin": {
+        "first_report_sha256": "d63686329175eb538969d4b7b4cae16ff6add3f4990a2665a54f5ec22ec0a265",
+        "first_run_id": "javadoc-gradle-64770-1791287220598365000"
+      },
+      "original_tool_identity_complete": true,
+      "reason": "gradle_javadoc_local_policy_unverified",
+      "report_type": "gradle_javadoc_task_recheck",
+      "run_id": "javadoc-gradle-task-64770-1791287220712627000",
+      "scan": {
+        "authority": "local_unverified",
+        "blockers": [
+          {
+            "affected_paths": [
+              "src/main/java/Sample.java"
+            ],
+            "build_root": ".",
+            "checker_id": "java.gradle.javadoc",
+            "diagnostic_reason": "selected_sources_and_complete_documentation_rules_unverified",
+            "fingerprint": "9aebf6877bb1b844d23ecd72d4c4e9fbddf1a80a8e51694bb667ae578cfbfad9",
+            "id": "CG-B-9aebf6877bb1b844d23ecd72d4c4e9fb",
+            "reason": "gradle_documentation_rules_and_coverage_unverified",
+            "scope": "."
+          }
+        ],
+        "checker_id": "java.gradle.javadoc",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "findings": [
+          {
+            "checker_id": "java.gradle.javadoc",
+            "column": 8,
+            "finding_fingerprint": "3beab8078f43f7747e25351fe2246c649ff7bfb2157b219f1cdeafb318bbb9bd",
+            "finding_id": "CG-3beab8078f43f7747e25351fe2246c64",
+            "line": 1,
+            "path": "src/main/java/Sample.java",
+            "rule_id": "JavadocMissingComment",
+            "source_sha256": "badd08caced739e5eff34c64109646baa80e6e827b1979435162e3732137a31a"
+          },
+          {
+            "checker_id": "java.gradle.javadoc",
+            "column": 9,
+            "finding_fingerprint": "ee8a371c5e16877103863a02c1aca78f84f52b22ce7b144cdc7d0f8c904a0b0b",
+            "finding_id": "CG-ee8a371c5e16877103863a02c1aca78f",
+            "line": 2,
+            "path": "src/main/java/Sample.java",
+            "rule_id": "JavadocMissingComment",
+            "source_sha256": "badd08caced739e5eff34c64109646baa80e6e827b1979435162e3732137a31a"
+          }
+        ],
+        "inputs": [
+          {
+            "path": "build.gradle",
+            "sha256": "46f603e292b5568476f749c4f601958e097a6056fec78ee4d70d4c5d3be17ebc"
+          },
+          {
+            "path": "settings.gradle",
+            "sha256": "5fc71a8158938e049ea85421a78c9591c38732aa7fa3b559c545c3754f43c6ec"
+          },
+          {
+            "path": "src/main/java/Sample.java",
+            "sha256": "badd08caced739e5eff34c64109646baa80e6e827b1979435162e3732137a31a"
+          }
+        ],
+        "native": {
+          "authority": "local_unverified",
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "findings": [
+            {
+              "column": 8,
+              "line": 1,
+              "path": "src/main/java/Sample.java",
+              "rule_id": "JavadocMissingComment"
+            },
+            {
+              "column": 9,
+              "line": 2,
+              "path": "src/main/java/Sample.java",
+              "rule_id": "JavadocMissingComment"
+            }
+          ],
+          "gradle_bundle_sha256": "915f28e8fd4f7133e51321c688bf59dbc4c18da8748a297913010d245ddd3651",
+          "init_scripts_sha256": "f759fb2fde664dbf316a17f752630f5f78b4b98dac5131f2ac43133e763ba309",
+          "java_entry_sha256": "e820b09ad7e80bf14ec6803d9ade8abc02dfbfe9d0540f9b0e8c6d334706bc5e",
+          "jdk_release_sha256": "9e5f483cd7a0b0bd3524139fb7e08dae750bd9b60336004fa70cd2d00bcc0583",
+          "model_report_sha256": "4b6e4673bc26d43ebf422edc7e6dba28f4ad91a20a8166dba6f0a4029580a664",
+          "native_status": "findings_observed_unverified",
+          "native_stderr_sha256": "3a9a9737b2540f9c9bbc3a36d494276c57d2559e3e8b0f7258f54ba165fa9bf8",
+          "native_stdout_sha256": "345ad3994d7c90d240429a29e59cb1259cfe81aee908c46c2404f510c7c9d830",
+          "reason": "selected_sources_and_complete_documentation_rules_unverified",
+          "report_type": "gradle_javadoc_probe",
+          "rule_configuration_complete": false,
+          "schema_version": "0.1.0",
+          "selected_java_file_count": 1,
+          "source_snapshot_sha256": "b67857a8a83be0ed82edd8d66b72bf0f60df4589c346a7a7ff511e3759af3f7d",
+          "task_paths": [
+            ":javadoc"
+          ]
+        },
+        "report_type": "gradle_javadoc_workbench_observation",
+        "run_id": "javadoc-gradle-task-64770-1791287220712627000",
+        "schema_version": "0.1.0",
+        "workspace_binding": "bound",
+        "workspace_id": "ws-121078f921dde9c959edfc6a74f938c2"
+      },
+      "schema_version": "0.1.0",
+      "source_scope_matches": true,
+      "task_id": "CG-3beab8078f43f7747e25351fe2246c64",
+      "task_input_stable": true,
+      "task_path": "src/main/java/Sample.java",
+      "task_rule": "JavadocMissingComment",
+      "tool_identity_matches": true,
+      "workspace_binding": "bound",
+      "workspace_id": "ws-121078f921dde9c959edfc6a74f938c2"
+    }
+  },
+  "default": {
+    "passed": 17,
+    "failed": 0,
+    "ignored": 5
+  },
+  "wasm": {
+    "passed": 17,
+    "failed": 0,
+    "ignored": 5
+  },
+  "native_explicit": {
+    "passed": 1,
+    "failed": 0
+  },
+  "public_task_verify_integrated": false,
+  "trusted_closure_qualified": false
+}

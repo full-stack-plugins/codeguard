@@ -2394,3 +2394,157 @@ Clippy 现在在原生执行前冻结已观察源码及根配置/锁的字节或
 208 schema 元定义、真实宿主两份原生 wrapper 与内部 native scan 通过历史协议；Swift 5 项、无定位 4 项开发 schema 回归通过。当前开发二进制的独立首次 next/task show 捕获明确不是实际宿主新版本安装；公开包、插件锁、grammar 字节/资格不变。完整目标与父任务仍开放。
 
 本批首次准备简报 0.7.0 与聚合反馈 0.40.0 正式分版本；task show 外层动作保留同一工具参数。最终 WASM 两目标 22 passed、另五目标 44 passed/5 ignored；默认两目标 11 passed，与同名契约重叠不相加。默认/WASM 全目标 Clippy、fmt、分层、strict 验证通过；210 schema 元定义、208 历史字节、13 开发协议测试与 705 本地链接通过。旧非法报告只留 RED 证据；原生条件未运行不当作通过。实际宿主公开包与开发修正版本分开，日志身份见[本批验收](../../../tests/acceptance/claude-host-prepared-runtime.md)。4d620f7 远端 CI 37198192252 已 success，本批新修改不借用该成功。完整父任务、grammar 资格、其它宿主、可信关闭及发行继续未完成，未新增勾选。
+
+## 2026-10-06 JavaScript 项目候选与稳定任务接线
+
+原生优先后接通直接简单lexical重复绑定的项目检查、确认编辑Hook、稳定ESLint确认任务和具体next指引；新协议0.54/0.13/0.27/0.20均保持旧schema不改。端到端RED后验证同ID归并、四种伪造报告导入拒绝及后续候选干净不关闭；Claude CLI摘要显示固定规则，不作为实际宿主验收。八目标79 passed/0 failed/3 ignored；随后增加Claude摘要断言的端到端1 passed与前者重叠。365 schema元定义、5实际输出和5语义伪造变体通过；WASM及默认全目标Clippy -D warnings、格式/分层/OpenSpec strict通过。报告选择等价条件按Clippy修正，最终契约回归另记录。
+
+[验收与合成工作区实际报告](../../../tests/acceptance/javascript-binding-workbench.md)。完整默认工作区/358例/语言资格/真实宿主/独立lint/公开发布未在本批完成，父任务保留开放，受保护Erlang草稿保持原字节。已知远端插件source审计阻塞不由本批规避。
+
+最终源代码下新增端到端与next/work sync契约三目标：27 passed/0 failed/2 ignored。与前述目标有重叠，不累加为整体覆盖。
+
+## 2026-10-06 JavaScript 独立入口、历史确认与自动工具边界
+
+ESLint统一入口对JavaScript四种扩展接入原生优先及共享候选扫描/任务同步，公开0.6保持旧schema不改。无待办零候选为推荐；同范围历史确认仍开放则保留ID和required。独立参数RED修复等号写法及规范化重复拒绝；副作用RED修复自动发现越过子工作区启动父工具的问题，复用既有有界工具选择。工作区未初始化、记录路径symlink及外部源码均保留诊断/恢复步骤，不造任务或修改源码。
+
+最终四组WASM目标34 passed/0 failed/0 ignored，参数单目标1 passed（其他库目标过滤不计）；默认/WASM全目标Clippy -D warnings、格式/分层/OpenSpec strict/diff通过。366 schema元定义、19实际反馈/7伪造变体通过，新旧任务原身份复用。真实ESLint/宿主/语言资格/358语料与公开发行未在本批完成，父任务保持开放，受保护Erlang草稿保持原字节。上轮CI37401747231因固定插件源码dec5f9d远端不可达在gate早期失败，MSRV成功；不绕过该审计，不借其结果证明本轮成功。详情及实际报告见[验收](../../../tests/acceptance/javascript-lint-candidate.md)。
+
+本批默认原生入口三目标终态8 passed/0 failed/6 ignored；真实工具条件未执行不计原生验收。默认参数目标1 passed，与特性参数测试范围重叠，不累加；本批未执行全工作区。受保护Erlang草稿SHA-256保持原值。
+
+### JavaScript 历史记录恢复分流
+
+公开RED证明坏JSON导致错误推荐；修复后6项独立测试及受影响35项回归通过（重叠不累加），保留required、失败原因及空引用。已初始化无历史的正向对照通过。实际JSON/schema记录见tests/acceptance/javascript-history-recovery.md；不借用模拟历史证明真实ESLint、宿主、关闭或全语言精度。
+
+### 全注册表独立候选lint入口
+
+统一单文件服务实际调用剩余20grammar，与原专用入口分开；原生适配缺口输出unknown，不证明工具未安装。WASM四目标31通过、补充身份/路径反例后单目标5通过（重叠），默认四目标14通过/4忽略。实际报告/schema和验收记录在tests/acceptance/standalone-syntax-lint.md。未以此证据声称32语言原生lint、正式精度、完整关闭、真实宿主或发行完成。
+
+### C/C++显式原生入口
+
+默认两个目标7通过/1忽略、WASM四目标21通过/1忽略，解析器契约1通过；另显式真实Clang目标1通过（八份反馈）。参数/human问题均真实RED修复；固定driver/input/rule及Unicode字节位置保留，疑似编译上下文不当源码违规。报告0.2及源样例见tests/acceptance/clang-standalone-native.md；不借该限定结果证明完整C/C++ lint、项目模型、任务关闭或真实宿主完成。
+
+### Erlang 显式函数form终止符候选
+
+24样例公开RED/GREEN：13合法零终止符候选，9种终止符非法各有独立候选、2裸表达式保留原始恢复。runtime6通过、受影响CLI40通过/1条件忽略、显式Erlang目标1通过；24份实际反馈/6矛盾变体/369schema通过。固定WASM字节不改，项目/Hook/任务及全量组合差分未接线，十项raw漏检历史不消账，父任务保持开放。完整证据见tests/acceptance/erlang-form-candidates.md。
+
+## 2026-10-06 Erlang 原生优先项目、编辑与稳定任务
+
+对应9.x及14.6/14.10/14.11/14.19，原生优先编辑与缺工具结构兜底已接通；check0.55/确认0.14/Hook0.28保留旧schema。重复项目/编辑扫描沿用原任务，四类伪造导入拒绝；已消费历史报告在源码修复后仍有原marker摘要约束，首次导入仍核验当前字节。真实已安装OTP28坏源码编辑及原工具复检、修复后零诊断均实测，同ID保留open；缺工具与所选坏工具不冒充源码违规，不换工具逃逸。
+
+最终受控3通过/1条件忽略及实际OTP显式1通过；18份受控和6份原生实际输出、4种schema篡改拒绝、372元定义通过，捕获绑定同一实际执行程序摘要。默认三个受影响目标42通过/4条件忽略；WASM七目标先前50通过/7条件忽略，最终协议字段修正后新目标与真实OTP重新通过；不叠加计数。默认/WASM全目标Clippy及最后测试辅助的目标Clippy、分层、OpenSpec strict、diff通过。详见[验收](../../../tests/acceptance/erlang-form-workbench.md)。
+
+未运行完整358例组合回放、独立语言精度或实际宿主；可信关闭、预处理与全项目语义及发行仍开放，资格0/32，父任务不勾选。受保护Erlang草稿摘要不变、未执行或提交。
+
+## 2026-10-06 当前358例组合结构规则测量
+
+使用同一worker的原始恢复与结构事实，明确JavaScript/Erlang显式结构入口，其它语言沿用已有候选；版本grammar_structure_evaluation0.1嵌套旧原始协议，不重写历史。全量目标1通过/0失败/0忽略，274.07秒，358样例32语言35来源组全部实际执行且程序稳定。原始73/1/10/269和3unknown/2pending保持；组合83/1/0/269和3unknown/2pending。十个Erlang回归漏检被补充规则检测，剩余VB.NET一例疑似误报、Kotlin/Swift三例unknown和CFQuery/COBOL两例pending。373元定义、实际新报告与六种篡改拒绝通过，源码/规则/分组归档回归见[验收](../../../tests/acceptance/grammar-combined-full-replay-2026-10-06.md)。
+
+取消/过期和程序变化不制造通过；pending不参与混淆计数。没有本轮原生oracle或独立holdout，语言资格0/32，普通关闭/宿主/发行及完整父任务仍开放。用户Erlang草稿未执行、未提交。
+
+最终默认与WASM全目标Clippy -D warnings均通过；所改Rust文件格式、分层、OpenSpec strict和diff检查通过。完整358例仅运行新组合入口一次，原始分类来自该轮相同worker，不冒充另一轮独立原生验收。
+
+## 2026-10-06 Rust CVE 原生已有工具发现
+
+安装状态误反馈先RED后修复：项目rust.cve复用原生服务，绝对PATH只读选择，显式及首个损坏入口不回退，不下载工具/数据库；缺数据库独立保留。默认/WASM四目标分别40通过/7条件忽略，实际cargo-audit0.22.2和已有离线库两轮RUSTSEC-2020-0071、同任务open目标显式1通过2.33秒。实际完整报告揭露check0.38未引用专用Clippy简报，新0.56增加该封闭类型，旧schema保留；374元定义、2聚合+2嵌入报告、3种伪造及旧消费者拒绝通过。详见[验收](../../../tests/acceptance/cargo-audit-path-discovery.md)。
+
+未授予数据库时效/工具/策略/完整覆盖或任务关闭；未执行Erlang草稿和新全量grammar回放。上一提交994d4af的CI37412101222 MSRV成功、gate因远端缺固定插件提交dec5f9d失败，不能归因为本轮测试或取消来源审计。全部父任务保持开放。
+
+最终默认与WASM全目标Clippy -D warnings、分层、所改Rust文件格式、OpenSpec strict与diff检查通过。新CI须按本轮提交独立验收；完整父任务保持开放。
+
+## 2026-10-06 Claude 协议保存反馈的记录故障与恢复
+
+基于4d51c7d补充协议集成回归：新增目标1 passed / 0 failed / 0 ignored；受影响`claude_hook_cli`与`hook_syntax_tasks`合计30 passed / 0 failed / 1 ignored（与显式目标重叠，不累加）。条件忽略的用例未执行，不计通过。两目标WASM严格Clippy通过，所改测试文件定向rustfmt、分层、OpenSpec strict与diff检查通过。报告目录故障、重复事件、目录恢复、唯一任务及注释不回显均有实际断言，现有任务投影未被重复事件覆盖且finding保持open。未修改产品行为、grammar或发布锁。
+
+[验收说明](../../../tests/acceptance/claude-persistence-recovery-protocol.md)与[日志身份和范围](../../../tests/acceptance/evidence/claude-persistence-recovery-protocol-2026-10-06.json)记录本轮边界。旧实际Claude缓存缺active.json；本轮宿主尝试在init之前置阶段停止，没有启动模型会话、安装或下载。协议回归不替代真实宿主验收，11.17/14.14/14.19及插件2.4保留开放。保护的erlang_native_differential.rs摘要仍为2e3a296072e6a3aa34b561799c18c7d8b621d00f8786301d2612cee8cdab85b6，未纳入本次修改或执行。
+
+远端4d51c7d的CI37413646549终态：msrv成功，gate在Check out corpus evidence source失败，固定插件来源提交尚未进入远端；与此前相同来源阻塞。本轮不重复触发无变化的运行，不改写固定来源以绕过门禁。
+
+## 2026-10-06 本地修复事实与收据唯一字段解析
+
+实际RED：加入冲突state后next仍退出0且发布正常简报；新增目标期望3失败。复用现有parse_unique_json后，顶层/嵌套问题事实、实际verify事件和消费收据反例拒绝；合法原件恢复后next/status/show恢复查询，交付未评估。验证事件和收据原件在错误查询后保持不变。next读取的原生报告、导入失败收据、纠错引用同步使用递归唯一字段解析；保留原有大小上限、错误原因和无效纠错过滤行为，不改动批准或关闭政策。
+
+默认status_show/next/task_verify三目标24 passed / 0 failed / 10 ignored；WASM加hook_syntax_tasks四目标42 passed / 0 failed / 10 ignored。两构建重叠不相加，忽略的条件原生用例不计通过。WASM CLI全目标严格Clippy、定向rustfmt、分层、OpenSpec strict和diff检查通过。详见[验收](../../../tests/acceptance/repair-record-unique-json.md)与[证据身份](../../../tests/acceptance/evidence/repair-record-unique-json-2026-10-06.json)。未运行完整工作区、精度、真实宿主或发布验收，不勾选9.x/12.5/12.9父任务。用户Erlang草稿摘要未变，不纳入提交或执行。
+
+## 2026-10-06 写入链路的重复字段拒绝
+
+基于7c2221a，实际RED证明work sync继续接受含冲突state的finding：failed_reports=0/imported_reports=1。同步报告、索引及既有finding/blocker事实，以及尝试历史验证事件/原生报告改用现有递归唯一字段解析。两类反例证明不写新接受观察或成功消费收据，故障事实字节保留；恢复合法事实后的新报告复用同一原生任务，旧失败收据不被自动擦除。
+
+默认五目标最后有效结果60 passed / 0 failed / 12 ignored；WASM六目标最后有效结果78 passed / 0 failed / 12 ignored，两构建重叠不相加。WASM首次新测试将工作区全部任务数误定为1，与独立语法确认任务冲突（20 passed / 1 failed / 2 ignored）；仅将断言修正为核对同一Ruff环境问题唯一身份，最终work sync与cross-category两目标22 passed / 0 failed / 2 ignored。最终结果各目标只计最后有效一次。忽略项未执行，不代表真实SDK通过。
+
+WASM CLI全目标Clippy -D warnings、定向rustfmt、分层、OpenSpec strict与diff检查通过。[验收](../../../tests/acceptance/repair-sync-unique-json.md)保留失败与复跑区别；证据索引记录日志和源码身份。完整目标、9.3/9.7/12.5仍未验收；未改变可信关闭、grammar或公开版本。Erlang用户草稿未改动或执行。
+
+## 2026-10-06 默认全工作区回归及真实Ruff补证
+
+当前54e905c：首次`cargo test --workspace --locked`退出101，CLI库70通过/6失败/3忽略，版本探测超时或未启动使Go/Python/Ruby断言失败；停止后未跑目标不能计通过。未修改源码/预算，CLI整个库复跑76通过/0失败/3忽略；扩大到`cargo test --workspace --all-targets --locked`退出0，287结果目标1535通过/0失败/138忽略。首次失败并非被覆盖或忽略，冷启动可靠性仍未接受。
+
+已有Ruff0.16.8显式执行work_sync两个条件用例2通过/0失败/0忽略，3.51秒；与138忽略中的两项重叠，单独记录。Ruff工具前后摘要稳定；程序摘要仅执行前捕获，归档时target目录不存在，执行后程序身份未复核且未重建。正常重复扫描稳定任务、存储故障保留F401和失败反馈。默认全工作区全目标Clippy -D warnings通过34.13秒；374schema元定义、分层、OpenSpec strict及diff检查通过，不把元定义校验当完整实例验收。
+
+[验收说明](../../../tests/acceptance/workspace-regression-20261006.md)与[日志/制品/来源身份](../../../tests/acceptance/evidence/default-workspace-regression-2026-10-06.json)保留各阶段区别。54e905c远端CI37414921955终态failure，msrv成功，gate失败于Check out corpus evidence source。用户草稿摘要不变，默认cfg下0项测试，未修改/纳入提交；未执行完整WASM/平台/工具链/宿主验收或发布，13.2等父任务仍开放。
+
+## 2026-10-06 Java comments 入口
+
+新增统一 `comments java` 的文件/项目局部原生入口及独立报告schema。三个回归目标15通过/0失败/2条件忽略，真实已有JDK21新目标另行1通过；后一目标与忽略项重叠，不作为第二套独立语料。初始真实样例漏补公共构造函数文档导致失败，补全测试样例后通过，产品规则未抑制。工作台明确not_integrated，父任务不勾选。见 tests/acceptance/java-comments-unified-entry.md。
+
+## 2026-10-06 Javadoc 项目工作台
+
+已初始化Java项目JDK模式接通持久观察、稳定任务及next反馈。五个回归目标46通过/0失败/17条件忽略；真实已有JDK21项目目标另行1通过，与忽略项重叠。修复后局部零诊断保留历史任务open。3份新schema、实际包装/next及观察报告验证通过，严格Clippy、分层、OpenSpec通过。Maven、单文件工作台及task verify仍未接通，父任务不勾选。见 tests/acceptance/javadoc-project-workbench.md。
+
+## 2026-10-06 Javadoc 原任务复检
+
+七个受影响回归目标81通过/0失败/28条件忽略；真实已有JDK21原任务复检目标另行1通过，和忽略项重叠。原问题仍在、补齐注释后的局部消失、配置改变、缺工具分别记录局部结果，保持open。4份新schema及实际项目包装、next、四轮公开复检/原生容器通过schema，严格Clippy、分层、OpenSpec通过。未证明可信关闭、宿主或全语言交付。见 tests/acceptance/javadoc-task-recheck.md。
+
+## 2026-10-06 Javadoc 显式文件工作台
+
+八个受影响目标90通过/0失败/29条件忽略；真实已有JDK21四目标另行4通过，与条件忽略重叠。显式文件无需POM，后增无效POM不改变原任务模式；工作区外不启动工具，未初始化不自动创建，缺工具生成准备任务，局部消失保持open。5份新schema及真实文件/项目实例、伪造覆盖与配置反例通过，严格Clippy、分层、OpenSpec strict通过。详见 tests/acceptance/javadoc-explicit-file-workbench.md。父任务及可信关闭、Maven、宿主验收保持开放。
+
+## 2026-10-06 Maven Javadoc JDK 元数据漂移拒绝
+
+公开夹具反例确认JDK release运行时变化后旧诊断仍被接受，现复核字节后返回incomplete/零诊断；原工作区源码/POM变化已有快照检查，测试保留既有原因。三目标47通过/0失败/10条件忽略，严格Clippy、分层、OpenSpec strict及diff检查通过。未运行真实Maven插件或实现Maven工作台，6.x/9.x父任务保持开放。见 tests/acceptance/maven-javadoc-input-stability.md。
+
+## 2026-10-06 Maven Javadoc 工作台接线
+
+扫描前源码/POM快照绑定原生多文件观察，导入复核输入、构建根、原POM、工具观察、规则位置及指纹，重复扫描复用任务；不完整执行只建准备任务。已消费历史报告按原字节收据保留，源码变化不重演历史。七目标88通过/0失败/22条件忽略，三新schema及两组实际包装/观察/简报、伪造coverage反例通过。严格Clippy、分层、OpenSpec strict、diff通过。没有真实Maven新工作台、完整模型、原任务复检或可信关闭证明，父任务保持开放。见 tests/acceptance/maven-javadoc-workbench.md。
+
+## 2026-10-06 Maven Javadoc 原任务复检局部验收
+
+原任务复检绑定首次报告/工作区/构建根/POM/Maven/JDK/离线仓库，重新执行既有多文件探针；缺工具及身份变化未完成，POM/源集变化要求覆盖复核，零诊断仅消失候选，范围外阻塞保留。租约下两次无进展转needs_decision。受控Maven夹具六项目标及八目标110通过/0失败/22条件忽略；五schema元定义、17实际输出、六伪造coverage反例、CLI全目标Clippy、分层及OpenSpec strict通过。真实check java聚合0.38的P3C准备简报不符合旧schema，独立记为待修复，未声称聚合或真实Maven插件验收通过。详见 tests/acceptance/maven-javadoc-task-recheck.md 及证据JSON。可信关闭/复发、复杂项目、宿主及完整目标保持未完成。
+
+## 2026-10-06 P3C配置准备简报聚合协议修复
+
+完整实际0.38聚合schema拒绝P3C配置准备简报，目标0.58版本测试先失败。新增0.58及限定blocker/检查器/原因/review-project-policy/固定重扫参数的封闭schema，修复Java选择原因码遗漏，保留历史协议。四目标57通过/0失败/10条件忽略；完整实际聚合与两处简报通过，六篡改与旧消费者拒绝符合预期。CLI严格Clippy、分层/OpenSpec strict通过。局部验收 tests/acceptance/p3c-preparation-aggregate-schema.md；不代替全部P3C分支、原生执行、宿主或完整目标。
+
+## 2026-10-06 Java差分隐藏恢复与Java21增量对照
+
+Java验收分类器先检查truncated_files，隐藏恢复不计作干净。现有JDK21.0.12.1对原13例release17和新增8例release21实际差分均一致；新增组3TP/5TN/0FP/0FN/0unknown，作者样本independent_holdout=false，与358固定回归不混计。整个Java目标4通过/0失败/0忽略；目标特性Clippy、diff/OpenSpec验证见对应验收与证据。未运行Erlang草稿或完整WASM/358回放，未安装/下载工具，资格和整体目标仍未完成。
+
+## 2026-10-06 公共CLI语言别名路由
+
+初始plan py因未知语言失败，新增共享Rust规范化后九别名只读计划通过，六组公开lint/check/cve/comments/build与原名对照保留相同报告协议/交付状态。仅语言位置归一，grammar/任务/路径/未知拼写保持，注册表九目标均存在。三CLI目标10通过与三单元通过，CLI全目标严格Clippy、分层/OpenSpec strict/diff通过；证据 tests/acceptance/language-alias-cli.md。没有安装/下载/发行，2.1完整政策义务和总体目标未完成。
+
+## 2026-10-06 当前完整默认工作区回归
+
+第一轮因Rust注释测试把已支持comments java当作用法错误而退出101；修正为真正未知语言并增加合法Java入口未完成反馈与原生执行哨兵。目标16通过/0失败/1忽略；第二轮完整workspace/all-targets退出0：290组1565通过/0失败/142忽略。全工作区严格Clippy、分层/OpenSpec strict/diff及397schema元定义、实际grammar库存与别名plan协议通过。默认WASM目标零测试，不执行用户Erlang草稿，摘要保持。4445f06 CI37423582241 MSRV成功，gate因固定插件源dec5f9d不可达而在测试前失败，未解除锁。提案/实现基线过期状态已更新；全WASM、条件原生、独立精度、真实宿主/多平台及完整目标继续开放。证据见 tests/acceptance/default-workspace-comments-dispatch.md。
+
+## 2026-10-07 Clippy 文档契约指引
+
+三个原规则的真实工具回归补齐具体修复指引，保留原任务与抑制对照；实际空章节零诊断证明原生规则的内容精度缺口。详见[验收](../../../tests/acceptance/clippy-documentation-contract.md)。本批不授予完整文档资格或可信关闭。
+
+本批默认五目标30通过/4条件忽略、WASM31通过/4忽略；精确规则单元两配置各1通过，真实已有Clippy两配置各显式1通过。38实际报告与三种伪造资格经原协议验证，474历史schema原字节保持；双配置全工作区全目标严格Clippy、定向格式、分层、OpenSpec strict及80来源/1312任务引用通过。CI37506378833终态gate失败/MSRV成功，不算远端全通过；插件main固定目标推送仍待用户确认，无发布/合并。
+
+## 2026-10-07 Rust聚合文档义务
+
+目标反例先RED后保留Clippy三精确文档规则和Rustdoc两独立comments行，不重复执行Clippy、不声称详细规则完整启用。默认五目标31通过/4条件忽略，WASM32通过/4忽略；新增Rustdoc失败的兄弟保留反例两配置复核各1通过，真实已有Clippy两配置各显式1通过。44实际报告通过原协议，474历史schema原字节保持；双配置全工作区全目标严格Clippy、定向格式、分层/OpenSpec strict通过。来源计划82文件/1312任务引用仍保留完整57语言×四核心；不勾选父任务或授予0/32以外正式资格。CI37508009119终态gate固定源检出失败/MSRV成功，插件main推送待用户确认。详见[验收](../../../tests/acceptance/clippy-documentation-aggregate.md)。
+
+## 2026-10-07 Cargo文档配置声明
+
+配置缺失目标先RED后增加逐构建根五精确声明与清单摘要绑定；未声明/继承/组/源码属性均unknown，不执行原生工具或修改清单。init沿用画像详情和AGENTS摘要引用，字节保持。默认/WASM六CLI目标各120通过/6条件忽略、已有原生工具两配置各显式1通过；默认畸形与源码变化单元各1通过，WASM Cargo相关单元另核验。12实际报告和474历史schema原字节通过，双配置全工作区全目标严格Clippy、定向格式/分层/OpenSpec strict通过。86来源/1312任务引用保留57语言四核心，66完成/288待完成、正式grammar资格0/32；全生效配置/详细契约/配置任务/可信闭环仍缺。CI37509019562终态MSRV成功/gate固定源检出失败，待确认插件main推送未执行，未发布或合并。见[验收](../../../tests/acceptance/cargo-documentation-declarations.md)。
+
+2026-10-07 Cargo workspace文档候选来源：公开继承RED后GREEN，默认/WASM六目标各104通过/6条件忽略；精确lib祖先身份/I/O/链接/未观察清单/64级预算单元各1通过，真实已有Clippyworkspace oracle各1通过（共8次原Cargo运行）。四份实际discovery报告/474旧schema原字节保持验证通过，证据和失败记录见tests/acceptance/cargo-documentation-workspace.md。配置仍unknown，未证明完整归属/覆盖/详细内容/可信关闭，66/288与0/32不变。上一提交0b593ce的CI37511631874仍在固定插件审计来源checkout失败，不能把跳过的测试视为通过；不更改该门禁。
+
+定向Rustfmt、分层、OpenSpec strict及双配置全工作区全目标Clippy -D warnings验证；Clippy首次要求将返回None的let-else写为问号，按原义修正后两配置通过，未禁用规则。适配器根包继承/非法workspace等级与旧畸形边界两单元通过；本批不签发生产资格。
+
+2026-10-07 Cargo显式workspace候选来源：公开非祖先引用先RED后GREEN，默认/WASM六相关目标各107通过/7条件忽略；三个发现端口边界单元各3通过，适配器Cargo3通过。已有Clippy显式oracle两配置各1通过，三路径×warn/allow共12原Cargo运行、12实际discovery报告/474历史schema原字节保持。缺目录/链接测试按现有partial exit3核验，未改CLI退出协议；实际报告片段同步中英文技术设计。完整成员/生效覆盖/详细内容/可信关闭及平台/宿主/发布仍未验收，66/288与0/32不变。上一提交6bd3b71的CI37513221175仍在固定审计来源checkout失败，插件远端main仍f09c074e，不绕过门禁。
+
+本批默认/WASM全工作区全目标Clippy -D warnings、定向格式、分层/OpenSpec strict通过；生产计划关联90份源码/证据指纹，保持全部生产义务和未验收状态。用户Erlang草稿不编辑/暂存/执行。
+
+2026-10-07 Java原工具准备：固定官方来源只读核对及缺本机缓存审计见tests/acceptance/java-native-tool-preparation-plan.md。受控详细模块/协议回归两个CLI目标7通过/3条件忽略；bootstrap POM固定坐标检查与已有JDK21直接javadoc -Xdoclint:all退出0，只证输入可用。未下载制品或依赖、未运行真实Maven/Checkstyle详细插件正常扫描，等待明确允许；不是生产验收完成，不改变父任务/32grammar资格。CI37515178587仍在固定源checkout失败，不改门禁。

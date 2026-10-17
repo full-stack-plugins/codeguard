@@ -10,7 +10,7 @@ use sha2::{Digest, Sha256};
 use std::sync::atomic::AtomicBool;
 use std::time::Instant;
 
-/// 仅为无任何显式原生上下文的 TypeScript 普通单文件请求启用候选初检。
+/// 仅为无任何显式原生上下文的 TypeScript/JavaScript 普通单文件请求启用候选初检。
 /// 参数为原命令请求；返回是否可尝试补充语法观察，不断言原生工具已缺失。
 pub(crate) fn eligible(args: &EslintLintArguments) -> bool {
     args.node.is_none()
@@ -21,7 +21,7 @@ pub(crate) fn eligible(args: &EslintLintArguments) -> bool {
         && args.version.is_none()
         && std::fs::symlink_metadata(&args.source).is_ok_and(|metadata| metadata.is_file())
         && args.source.extension().is_some_and(|extension| {
-            ["ts", "tsx", "mts", "cts"]
+            ["ts", "tsx", "mts", "cts", "js", "jsx", "mjs", "cjs"]
                 .iter()
                 .any(|value| extension == *value)
         })

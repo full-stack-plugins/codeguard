@@ -266,3 +266,93 @@ Rust reads and rechecks bounded source bytes, then runs `swiftc -frontend -parse
 Native errors make the same task actionable for source repair. Source or tool changes withdraw old positions. A clean parse records `candidate_absent_unverified_policy` without automatically closing the task or satisfying project lint, type checking, macro/conditional-compilation context, build, security or delivery obligations. Existing no-progress budgets still apply. Swift grammar qualification and the 32-language precision conclusions are unchanged; public npm 0.1.4 does not contain this extension.
 
 New protocols are `syntax_task_recheck` 0.4.0, `task_verification_preview` 0.15.0, `repair_brief_preview` 0.6.0 and Hook feedback 0.9.0 (task summary 0.3.0). Aggregate `check` uses 0.39.0 when `next` contains a native Swift brief; other paths retain 0.38.0. Historical schemas remain unchanged. See [Swift native-confirmation acceptance](../tests/acceptance/swift-native-task-confirmation.md) for actual reports and limits.
+
+
+### Ruby resolution with the original tool (current source SDK)
+
+`verify_ruby_task_resolution(&RubyTaskResolutionRequest)` integrates fixed Ruby 2.6.10p210 with the existing host SDK. Signed policy 1.9.0 and evidence 0.10.0 support native-first tasks with a null grammar and the original tool identity, and WASM-first tasks with the original grammar. Both source checks share a deadline; project version declarations and missing declaration paths are rechecked throughout the request. Closure requires the original tool to confirm the original issue and complete the changed current source without diagnostics, while inputs remain stable. Repeated verification is idempotent; ordinary `task verify --ruby-tool` can record recurrence along the same parent chain.
+
+A native counterexample requires false-positive review. Unsupported versions, invalid output, or declaration changes cannot close the task. Diagnostics retain native line numbers without invented columns or claims of RuboCop coverage. Trust still comes from an independent host; this source extension is not an npm release or default-plugin trusted closure acceptance. See [Ruby acceptance](../tests/acceptance/ruby-task-resolution.md).
+
+
+### ShellCheck rule-specific closure and recurrence (source SDK)
+
+`verify_shell_task_resolution(&ShellTaskResolutionRequest)` supports native finding tasks with pinned ShellCheck 0.11.0. Policy 1.10.0 binds task, original rule/report/source, tool, adapter, dialect and project configuration. Evidence 0.11.0 and receipt 0.2.0 use the ordinary `CG-…` finding identity; receipt 0.1.0 is unchanged. The original and current samples are checked by the same tool with frozen configuration. Absence of the original rule closes only that task, while other diagnostics and tasks remain. An ordinary recheck detecting that rule again under the same configuration/tool reopens the same task along its event chain.
+
+Configuration changes cannot count as source fixes. Changed disable directives or existing directives affecting the original rule without scope proof require review; unchanged directives solely affecting unrelated rules do not automatically prevent closure. Malformed/incomplete native output and an original sample that does not confirm the rule cannot close the task. Borrowed leases and ready attempts are supported. The independent host signature requirement remains; this is neither default CLI closure nor project acceptance nor a published npm capability. See [rule-specific acceptance](../tests/acceptance/shell-task-resolution.md).
+
+
+### Native confirmation for unlocated grammar errors (source build)
+
+When an explicit `grammar probe` sees a tree error without publicly traversable recovery positions, report0.5 sets `parser_error_location_unavailable=true` and requests native checking of the original bytes before source repair or grammar investigation. Zero positions no longer receive only routine lint advice. The result remains incomplete, with no fabricated location or grammar qualification. Budget exhaustion retains the existing aggregate but does not fabricate hidden-token evidence; ordinary/structural paths retain prior versions.
+
+The same pinned Kotlin/Swift assets reproduce the visibility gap in existing web-tree-sitter0.25.10. Changing the loader alone is not supported as a fix. A valid Kotlin object declaration can also produce a hidden semicolon, so has_error alone cannot justify a source violation. See [evidence and boundaries](../tests/acceptance/hidden-parser-error-guidance.md).
+
+
+The standalone JDK21 path now preserves empty comments, missing purpose and bare parameter/return/exception descriptions as five native rules in stable repair tasks. `lint java FILE --checker javadoc`, `comments java FILE --workspace .`, configured project comments and original-task verification share source-bound parsing. The legacy parser and Maven protocols remain unchanged. Separate contracts are native0.2, project0.4, workbench/recheck0.3, file feedback0.7/workbench feedback0.8, repair brief0.4, task preview0.31, aggregate0.68 and aborted0.19. Missing configuration/tools and unknown output remain incomplete. Actual JDK21 examples in both modes yield 4/3/1/0 diagnostics; all16 original tasks are rechecked while present and after repair, with absent candidates still open. Detailed Chinese and valid inherited documentation produce no diagnostics. Full Java behavior contracts, actual Maven description acceptance, full native Checkstyle description acceptance, all-language qualification and trusted closure remain pending. See [standalone JDK description acceptance](../tests/acceptance/jdk-javadoc-detailed-descriptions.md).
+
+## Maven detailed Javadoc descriptions: implementation and qualification
+
+The original-POM multifile path now preserves five native description rules: empty comments, missing main purpose, and empty parameter, return and exception descriptions. The separate detailed parser binds messages, source lines, carets, locations and totals; historical parser/schema contracts are unchanged. Warnings remain findings even with BUILD SUCCESS. Unknown output, tool/configuration failures and the observed missing offline plugin remain incomplete preparation observations. A Maven failure cannot fall back to a single-file check.
+
+```mermaid
+flowchart TD
+    A[comments java / check java with original Maven context] --> B[Original POM multifile probe and input validation]
+    B --> C{Output}
+    C -->|Source-bound warning| D[Stable source task and detailed repair guidance]
+    C -->|Missing cache or unknown output| E[Preparation task]
+    D --> F[task verify with original tools and scope]
+    E --> F
+    F --> G{Original finding identity}
+    G -->|Same finding| H[still_present]
+    G -->|Same file/rule, different anchor| I[rule_coverage_requires_review]
+    G -->|No local diagnostic| J[candidate_absent_unverified_policy]
+    H --> K[Persist attempt; fact remains open]
+    I --> K
+    J --> K
+```
+
+Use `codeguard comments java . --maven-tool /absolute/mvn --java-home /absolute/jdk21 --maven-repo /absolute/offline-repo --repo-sha256 ACTUAL_DIGEST --format json`, then `codeguard task verify CG-task-id .` with the same explicit tool context. Replace paths/digests with actual existing identities. CodeGuard does not install plugins or weaken rules. Repair guidance requires meaningful purpose, parameter, return and exception descriptions, not bare tags.
+
+Separate closed protocols are Maven native/workbench/recheck0.2, project0.5, unbound/bound comments0.9/0.10, inner brief0.6/preview0.3, task preview0.32, aggregate0.69 and aborted0.20. First import recomputes rules/projections and rejects downgrade. Recheck verifies the consumed original report digest receipt and task scope/rule, including new tasks whose first evidence is a recheck wrapper. Zero diagnostics cannot close a task; trusted closure/recurrence remain unaccepted.
+
+Controlled process fixtures exercise all five rules with success and warning-failure exits through public checking, task reuse, original-task recheck and repaired untrusted absence. They are not actual plugin qualification. Existing Maven3.9.16/JDK21 ran twice against an empty offline repository: checking and environment-task recheck both identified the missing Javadoc3.12.0 plugin and emitted no source findings. The plugin cache is absent; actual detailed 4/3/1/0 cases and warning-failure configuration remain unexecuted conditional acceptance. Full Java behavior contracts, full native Checkstyle description acceptance, all57 languages/four core capabilities, hosts/platforms and trusted closure remain pending. OpenSpec15.3/15.6 stay open; formal syntax qualification remains0/32. See [acceptance](../tests/acceptance/maven-javadoc-detailed-descriptions.md).
+
+## Checkstyle description modules: source integration, native qualification pending
+
+Original `JavadocStyle`, `NonEmptyAtclauseDescription` and `SummaryJavadoc` configurations now pass the pinned10.21.4 static adapter, retaining official full/short names, custom IDs, severity and module-specific properties. Empty-description, first-sentence/HTML, scopes/tokens, tag tokens, summary period/forbidden fragments and non-tight-HTML options remain original XML for native execution. Rust does not replace Checkstyle or evaluate Java regexes with Rust semantics. Unknown tokens/sources, misplaced properties and shared IDs remain unresolved. Native-valid empty summary period/regex options are preserved.
+
+Use `codeguard lint java FILE --checker checkstyle --workspace . --config ORIGINAL_XML --java-tool EXISTING_JAVA --checkstyle-jar EXISTING_JAR --format json`. Stable tasks retain detailed purpose, parameter/return/exception or summary repair guidance. `codeguard task verify CG-task-id .` requires the explicit original tool/configuration context. New source tasks created during environment recovery can be rechecked from their wrapped first evidence. Local absence/restoration cannot close a task.
+
+```mermaid
+flowchart LR
+    A[Original configuration and native tools] --> B[Native XML and exact rule binding]
+    B --> C[Source repair task]
+    B --> D[Preparation task]
+    C --> E[next detailed guidance]
+    D --> F[task verify environment recovery]
+    F --> C
+    E --> G[task verify original tools]
+    G --> H[Record presence or untrusted absence; remain open]
+```
+
+Separate contracts are local feedback0.5, workbench/source recheck/preparation recheck0.2, brief/preview0.25, source task preview0.33 and preparation preview0.34. Historical schemas are unchanged. First import rejects extended configurations disguised as workbench0.1; recheck and scan versions must match. Aggregate0.70 supports a selected detailed Checkstyle brief, but this batch's public aggregate selected a higher-priority P3C preparation task and retained0.58. Version0.70 has constructed serialization validation only, not actual route qualification. That public aggregate also exposed a historical invalid Javadoc reason; the producer now emits the existing `javadoc_checker_not_configured` code without claiming configuration or execution.
+
+Controlled XML process fixtures cover all three classes, task reuse/repair recheck and preparation recovery with recheckable new source tasks. The fixture is not Java/Checkstyle and proves no native semantics or precision. No existing10.21.4 all-JAR was found; the real conditional test remains unexecuted. Full description/configuration/project coverage, independent false-positive evaluation, trusted closure/recurrence, all57 languages/four capabilities and production host/platform acceptance remain pending. Tasks15.3/15.6 stay open; formal syntax qualification remains0/32. See [acceptance](../tests/acceptance/checkstyle-detailed-descriptions.md).
+
+## Python documentation contracts: native Ruff DOC increment (2026-10-06)
+
+Pinned Ruff 0.16.8 DOC102 (extraneous parameters), DOC201/202 (returns), DOC402/403 (yields), and DOC501/502 (exceptions) now reach documentation classification, bounded guidance, stable tasks and original-tool rechecks. The original project must explicitly select preview and its rules. CodeGuard does not inject preview options or reproduce semantic checks. Diagnostics contradicting effective settings remain incomplete; unknown DOC identifiers receive no adapter qualification from their prefix. Existing D### classification and unapproved rule mappings remain intact.
+
+DOC502 compares direct raise statements and may conflict with accurate implicit-exception documentation. Retain the diagnosis and require investigation of the call chain and project convention; never automatically delete real exception documentation. Use precise false-positive adjudication when needed. Native exemptions for Google Return/Yield summaries, None, stubs and abstract stubs are preserved. This local native version still reports DOC201 for an abstract method with a concrete return body; broad exemption prose is not acceptance. These seven rules do not prove complete purpose, parameter, exception or behavioral documentation.
+
+```mermaid
+flowchart LR
+    A[Original configuration and existing Ruff] --> B[Cross-check native settings and diagnostics]
+    B --> C[DOC findings and stable tasks]
+    C --> D[Detailed repair or convention investigation]
+    D --> E[Original task and tool recheck]
+    E --> F[Present / suppression review / untrusted absence]
+```
+
+Real native tests cover all seven rules, repeated identity, presence, noqa suppression and absence after documentation repair; facts remain open. Additional cases retain native exemptions, implicit-exception conflicts and unselected DOC rules. Existing protocols admit native rule IDs and redacted guidance; historical schemas, approved mappings and closure authority are not expanded. See [Ruff DOC acceptance](../tests/acceptance/ruff-documentation-contract.md) for evidence and version limits. Complete Python documentation, independent precision, all platforms and production qualification remain pending.

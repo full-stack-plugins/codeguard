@@ -1,0 +1,15 @@
+# 开发评测保留隐藏解析错误原因
+
+2026-10-07，延续 introduce-rust-codeguard-cli 的隐藏解析错误 requirement、14.17/14.19/15.2；不勾选父任务。
+
+SyntaxWorkerCandidateObservation 新增仅内部开发评测使用的原因选择：已核验 parser_error_location_unavailable 优先于普通截断 syntax_recovery_incomplete；无这两者返回 None。原始回放和原生差分共用此选择。分类逻辑仍由原截断计数控制，unknown和grammar资格不改变。公开项目check原因和任务指引协议保持原样。
+
+TDD：启用wasm-precheck后的目标单元先因方法缺失E0599失败；实现后1通过。首次未启用feature的命令实际执行0测试，不算通过证据。grammar_evaluation目标15通过/2完整回放忽略；grammar_native_differential目标7通过/1真实Ruff条件忽略。现有evaluation schema的reason允许非空字符串，不扩写历史schema；当前全358回放未重跑，旧报告保持历史程序绑定，不声称新构建已完成全语料验收。
+
+中断前尝试32份占位控制语料的进程句柄消失，父进程已退出，发现PPID=1的COBOL worker并定点TERM清理；该中断运行不计结果。其测试已撤回，使用有界原因单元替代；不代表原生独立精度验证。
+
+交接文档提供完整语言/能力/生态矩阵、全部未完成任务快照、执行任务包和验收模板。正式资格仍0/32，四核心生产义务仍全部blocked。
+
+本次“全部提交”纳入此前用户未提交的Erlang扩展测试，未改其字节。公开grammar probe的真实目标 erlang_candidate_retains_labeled_syntax_corpus 实测0通过/1失败：missing_period、missing_period_eof、missing_period_comment、missing_period_unicode_crlf、missing_period_after_float、missing_period_after_dot_character、missing_period_after_string、final_semicolon、multi_clause_final_semicolon、missing_middle_period十项差异。此测试要求原始候选零差异，当前引擎尚未满足，提交保留为明确RED，不跳过/削弱断言。OTP28实际对照的ignore测试未执行。提交与推送是保存工作，不表示验收通过。
+
+交付前复核：production_acceptance_plan六项目标通过，并重新生成全量all.json绑定当前原生差分源码摘要；全工作区all-targets启用WASM严格Clippy通过；layering、OpenSpec strict和git diff --check通过。完整独立精度和生产资格仍不授予，Erlang目标失败仍保留。

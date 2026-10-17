@@ -67,7 +67,7 @@ function exercise(tarball, selectedTool, evidenceKind) {
 
     const check = () => invoke(['check', 'all', scratch, '--erl-tool', tool, '--timeout', '30s']);
     const aggregate = check();
-    assert.equal(aggregate.schema_version, '0.38.0');
+    assert.equal(aggregate.schema_version, '0.73.0');
     assert.deepEqual(aggregate.syntax_tasks, {
       failures: [], new_blockers: 0, status: 'synced_partial', tasks: [],
     }, 'native-covered Erlang must not create a second WASM task');

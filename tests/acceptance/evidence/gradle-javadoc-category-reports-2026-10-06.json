@@ -1,0 +1,2000 @@
+[
+  {
+    "case": "all-incomplete",
+    "report": {
+      "authority": "local_unverified",
+      "category_candidates": [
+        {
+          "capability_status": "gap",
+          "category": "lint",
+          "checker_id": null,
+          "language": "java",
+          "legacy_status": "stable",
+          "next_action": null,
+          "reason": "native_scan_incomplete",
+          "status": "native_incomplete"
+        },
+        {
+          "capability_status": "gap",
+          "category": "comments",
+          "checker_id": "java.gradle.javadoc",
+          "language": "java",
+          "legacy_status": "stable",
+          "next_action": "\u8bfb\u53d6 native_results.java_gradle_javadoc \u7684\u5177\u4f53\u963b\u585e\uff0c\u6062\u590d\u5df2\u6709 Gradle/JDK\u3001\u9009\u5b9a\u6784\u5efa\u548c Java \u8f93\u5165\u6216\u53d6\u6d88/\u8d85\u65f6\u539f\u56e0\uff0c\u518d\u7528\u76f8\u540c\u539f\u751f\u4efb\u52a1\u590d\u68c0\uff1b\u4e0d\u80fd\u636e\u6267\u884c\u6545\u969c\u5224\u65ad\u914d\u7f6e\u7f3a\u5931\u6216\u4fee\u6539\u65e0\u5173\u6e90\u7801",
+          "reason": "gradle_javadoc_native_incomplete",
+          "status": "native_incomplete"
+        },
+        {
+          "capability_status": "gap",
+          "category": "dependencies",
+          "checker_id": null,
+          "language": "java",
+          "legacy_status": "stable",
+          "next_action": "\u89e3\u6790\u76ee\u6807\u6784\u5efa\u6839\u7684 Gradle \u751f\u6548\u6a21\u578b\u540e\u91cd\u65b0\u68c0\u67e5",
+          "reason": "gradle_model_not_resolved",
+          "status": "configuration_unresolved"
+        },
+        {
+          "capability_status": "gap",
+          "category": "cve",
+          "checker_id": null,
+          "language": "java",
+          "legacy_status": "stable",
+          "next_action": "\u89e3\u6790\u76ee\u6807\u6784\u5efa\u6839\u7684 Gradle \u751f\u6548\u6a21\u578b\u540e\u91cd\u65b0\u68c0\u67e5",
+          "reason": "gradle_model_not_resolved",
+          "status": "configuration_unresolved"
+        },
+        {
+          "capability_status": "gap",
+          "category": "security",
+          "checker_id": null,
+          "language": "java",
+          "legacy_status": "stable",
+          "next_action": "\u89e3\u6790\u76ee\u6807\u6784\u5efa\u6839\u7684 Gradle \u751f\u6548\u6a21\u578b\u540e\u91cd\u65b0\u68c0\u67e5",
+          "reason": "gradle_model_not_resolved",
+          "status": "configuration_unresolved"
+        },
+        {
+          "capability_status": "gap",
+          "category": "build",
+          "checker_id": null,
+          "language": "java",
+          "legacy_status": "stable",
+          "next_action": null,
+          "reason": "native_adapter_not_integrated",
+          "status": "not_integrated"
+        }
+      ],
+      "command_status": "incomplete",
+      "delivery_decision": "incomplete",
+      "discovery": {
+        "blocked_paths": [],
+        "build_roots": [
+          {
+            "manifests": [
+              "build.gradle",
+              "settings.gradle"
+            ],
+            "path": "."
+          }
+        ],
+        "checker_configurations": [
+          {
+            "build_root": ".",
+            "category": "lint",
+            "checker_id": "java.gradle.pmd",
+            "configuration": "unknown",
+            "configuration_ref": "build.gradle",
+            "next_action": "\u89e3\u6790\u751f\u6548 Gradle \u6a21\u578b\u4ee5\u786e\u5b9a\u68c0\u67e5\u914d\u7f6e",
+            "reason": "gradle_model_not_resolved"
+          },
+          {
+            "build_root": ".",
+            "category": "lint",
+            "checker_id": "java.gradle.p3c",
+            "configuration": "unknown",
+            "configuration_ref": "build.gradle",
+            "next_action": "\u89e3\u6790\u751f\u6548 Gradle \u6a21\u578b\u4ee5\u786e\u5b9a\u68c0\u67e5\u914d\u7f6e",
+            "reason": "gradle_model_not_resolved"
+          },
+          {
+            "build_root": ".",
+            "category": "lint",
+            "checker_id": "java.gradle.checkstyle",
+            "configuration": "unknown",
+            "configuration_ref": "build.gradle",
+            "next_action": "\u89e3\u6790\u751f\u6548 Gradle \u6a21\u578b\u4ee5\u786e\u5b9a\u68c0\u67e5\u914d\u7f6e",
+            "reason": "gradle_model_not_resolved"
+          },
+          {
+            "build_root": ".",
+            "category": "comments",
+            "checker_id": "java.gradle.javadoc",
+            "configuration": "unknown",
+            "configuration_ref": "build.gradle",
+            "next_action": "\u89e3\u6790\u751f\u6548 Gradle \u6a21\u578b\u4ee5\u786e\u5b9a\u68c0\u67e5\u914d\u7f6e",
+            "reason": "gradle_model_not_resolved"
+          },
+          {
+            "build_root": ".",
+            "category": "dependencies",
+            "checker_id": "java.gradle.dependency",
+            "configuration": "unknown",
+            "configuration_ref": "build.gradle",
+            "next_action": "\u89e3\u6790\u751f\u6548 Gradle \u6a21\u578b\u4ee5\u786e\u5b9a\u68c0\u67e5\u914d\u7f6e",
+            "reason": "gradle_model_not_resolved"
+          },
+          {
+            "build_root": ".",
+            "category": "cve",
+            "checker_id": "java.gradle.dependency_check",
+            "configuration": "unknown",
+            "configuration_ref": "build.gradle",
+            "next_action": "\u89e3\u6790\u751f\u6548 Gradle \u6a21\u578b\u4ee5\u786e\u5b9a\u68c0\u67e5\u914d\u7f6e",
+            "reason": "gradle_model_not_resolved"
+          },
+          {
+            "build_root": ".",
+            "category": "security",
+            "checker_id": "java.gradle.findsecbugs",
+            "configuration": "unknown",
+            "configuration_ref": "build.gradle",
+            "next_action": "\u89e3\u6790\u751f\u6548 Gradle \u6a21\u578b\u4ee5\u786e\u5b9a\u68c0\u67e5\u914d\u7f6e",
+            "reason": "gradle_model_not_resolved"
+          }
+        ],
+        "declared_versions": {},
+        "languages": [
+          {
+            "id": "java",
+            "manifests": [
+              "build.gradle",
+              "settings.gradle"
+            ],
+            "source_files": [
+              "src/main/java/Sample.java"
+            ]
+          }
+        ],
+        "lockfiles": [],
+        "manifest_sha256": {
+          "build.gradle": "46f603e292b5568476f749c4f601958e097a6056fec78ee4d70d4c5d3be17ebc",
+          "settings.gradle": "64527a18f1aaec8fefd72fea73faf5c778333c4ca6e0e3d50b09486c68d73c07"
+        },
+        "native_tool_candidates": [],
+        "observation_complete": true,
+        "observed_entries": 6,
+        "report_type": "discovery",
+        "root": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-gradle-javadoc-64057-0",
+        "schema_version": "0.4.0",
+        "scope_summary": {
+          "configuration_exception_files_observed": 0,
+          "dependency_roots_excluded": 0,
+          "dot_prefix_roots_excluded": 0,
+          "git_safety_status": "not_evaluated",
+          "ordinary_scan_policy": "project_sources_default_v2"
+        },
+        "source_set_candidates": [
+          {
+            "basis": "directory_convention",
+            "language": "java",
+            "path": "src/main/java",
+            "role": "main"
+          }
+        ],
+        "unknown_conditions": [
+          "build_model_not_evaluated",
+          "some_manifest_metadata_not_parsed",
+          "source_sets_not_fully_classified",
+          "dialects_not_classified"
+        ]
+      },
+      "execution_budget": {
+        "enforcement": "native_execution_only",
+        "jobs_limit": 4,
+        "jobs_source": "builtin_default",
+        "native_task_count": 2,
+        "source": "builtin_default",
+        "started_native_task_count": 2,
+        "timeout_ms": 1800000
+      },
+      "execution_tasks": [
+        {
+          "id": "java.gradle.javadoc",
+          "status": "native_incomplete"
+        },
+        {
+          "id": "java.p3c",
+          "status": "native_incomplete"
+        }
+      ],
+      "exit_code": 3,
+      "export": {
+        "reason_code": null,
+        "status": "not_requested"
+      },
+      "native_results": {
+        "erlang_lint": null,
+        "go_lint": null,
+        "java_cve": null,
+        "java_dependencies": null,
+        "java_gradle_javadoc": {
+          "authority": "local_unverified",
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "findings": [],
+          "gradle_bundle_sha256": null,
+          "init_scripts_sha256": "f759fb2fde664dbf316a17f752630f5f78b4b98dac5131f2ac43133e763ba309",
+          "java_entry_sha256": null,
+          "jdk_release_sha256": null,
+          "model_report_sha256": null,
+          "native_status": "incomplete",
+          "native_stderr_sha256": null,
+          "native_stdout_sha256": null,
+          "reason": "native_prerequisite_unavailable",
+          "report_type": "gradle_javadoc_probe",
+          "rule_configuration_complete": false,
+          "schema_version": "0.1.0",
+          "selected_java_file_count": 0,
+          "source_snapshot_sha256": "c6cabe95d0e6a72d9dc2ffef9094881bd637677bb974432a20dc0f3f5a7cbd12",
+          "task_paths": []
+        },
+        "java_javadoc": null,
+        "java_p3c": {
+          "authority": "local_unverified",
+          "backlog_status": "not_initialized",
+          "backlog_sync": null,
+          "category": "lint",
+          "checker_id": "java.maven.p3c",
+          "command_status": "incomplete",
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "exit_code": 3,
+          "files": [
+            {
+              "build_root": ".",
+              "configuration": "unknown",
+              "configuration_ref": null,
+              "configuration_sha256": null,
+              "observation": null,
+              "path": "src/main/java/Sample.java",
+              "reason": "p3c_configuration_not_confirmed"
+            }
+          ],
+          "finding_count": 0,
+          "findings": [],
+          "language": "java",
+          "local_observation_complete": false,
+          "next": null,
+          "observed_file_count": 0,
+          "operation": "lint",
+          "report_type": "java_p3c_project_observation",
+          "rulepack_approval": "unverified",
+          "run_id": "java-p3c-64291-1791282910245774000-0",
+          "schema_version": "0.2.0",
+          "source_file_count": 1,
+          "tool_approval": "unverified",
+          "workspace_binding": "uninitialized",
+          "workspace_id": null
+        },
+        "kotlin_lint": null,
+        "node_lint": null,
+        "npm_cve": [],
+        "python_cve": [],
+        "python_lint": null,
+        "ruby_lint": null,
+        "rust_build": null,
+        "rust_comments": null,
+        "rust_cve": null,
+        "rust_lint": null,
+        "shell_lint": null,
+        "swift_lint": null,
+        "zig_lint": null
+      },
+      "next": null,
+      "obligation_status": "unresolved",
+      "operation": "check",
+      "reason": "full_project_obligations_and_trusted_policy_unavailable",
+      "report_type": "check_feedback",
+      "required_obligations": null,
+      "schema_version": "0.64.0",
+      "selection": "all",
+      "syntax_candidates": {
+        "authority": "candidate_unqualified",
+        "delivery_decision": "incomplete",
+        "execution_phase": "after_native",
+        "native_preferred_count": 0,
+        "next_action": "\u4f7f\u7528\u5305\u542b\u56fa\u5b9a\u8bed\u6cd5\u8d44\u4ea7\u7684\u53d1\u884c\u5305\u8fd0\u884c\u5019\u9009\u521d\u68c0\uff0c\u5e76\u5b8c\u6210\u9002\u7528\u539f\u751f\u68c0\u67e5",
+        "observations": [],
+        "reason": "binary_without_wasm_precheck",
+        "skipped_count": 0,
+        "source_file_count": 1,
+        "status": "not_run",
+        "unrouted_count": 0
+      },
+      "syntax_tasks": {
+        "failures": [],
+        "new_blockers": 0,
+        "status": "synced_partial",
+        "tasks": []
+      },
+      "unresolved_conditions": [
+        "build_model_not_evaluated",
+        "dialects_not_classified",
+        "gradle_detailed_documentation_rules_and_repair_closure_unverified",
+        "gradle_native_javadoc_incomplete",
+        "gradle_selected_configuration_model_and_quality_coverage_unverified",
+        "java_p3c_task_incomplete",
+        "required_obligations_unresolved",
+        "some_manifest_metadata_not_parsed",
+        "source_sets_not_fully_classified",
+        "tool_lock_unverified",
+        "trusted_policy_unavailable"
+      ]
+    }
+  },
+  {
+    "case": "documented-native",
+    "report": {
+      "authority": "local_unverified",
+      "category_candidates": [
+        {
+          "capability_status": "gap",
+          "category": "lint",
+          "checker_id": null,
+          "language": "java",
+          "legacy_status": "stable",
+          "next_action": null,
+          "reason": "native_scan_incomplete",
+          "status": "native_incomplete"
+        },
+        {
+          "capability_status": "gap",
+          "category": "comments",
+          "checker_id": "java.gradle.javadoc",
+          "language": "java",
+          "legacy_status": "stable",
+          "next_action": "\u8bfb\u53d6 native_results.java_gradle_javadoc \u7684\u539f\u751f\u8bca\u65ad\uff1b\u6309\u7528\u9014\u3001\u53c2\u6570\u548c\u8fd4\u56de\u7b49\u89c4\u5219\u4fee\u590d\uff0c\u7528\u76f8\u540c Gradle/JDK/\u9009\u5b9a\u8f93\u5165\u590d\u68c0\uff1b\u65e0\u8bca\u65ad\u4ecd\u987b\u6838\u9a8c\u539f\u9879\u76ee doclint\u3001\u6e90\u96c6\u548c\u5b8c\u6574\u89c4\u5219\uff0c\u4e0d\u7b7e\u53d1\u5408\u89c4",
+          "reason": "gradle_javadoc_selected_inputs_and_rules_unverified",
+          "status": "observed_unverified"
+        },
+        {
+          "capability_status": "gap",
+          "category": "dependencies",
+          "checker_id": null,
+          "language": "java",
+          "legacy_status": "stable",
+          "next_action": "\u89e3\u6790\u76ee\u6807\u6784\u5efa\u6839\u7684 Gradle \u751f\u6548\u6a21\u578b\u540e\u91cd\u65b0\u68c0\u67e5",
+          "reason": "gradle_model_not_resolved",
+          "status": "configuration_unresolved"
+        },
+        {
+          "capability_status": "gap",
+          "category": "cve",
+          "checker_id": null,
+          "language": "java",
+          "legacy_status": "stable",
+          "next_action": "\u89e3\u6790\u76ee\u6807\u6784\u5efa\u6839\u7684 Gradle \u751f\u6548\u6a21\u578b\u540e\u91cd\u65b0\u68c0\u67e5",
+          "reason": "gradle_model_not_resolved",
+          "status": "configuration_unresolved"
+        },
+        {
+          "capability_status": "gap",
+          "category": "security",
+          "checker_id": null,
+          "language": "java",
+          "legacy_status": "stable",
+          "next_action": "\u89e3\u6790\u76ee\u6807\u6784\u5efa\u6839\u7684 Gradle \u751f\u6548\u6a21\u578b\u540e\u91cd\u65b0\u68c0\u67e5",
+          "reason": "gradle_model_not_resolved",
+          "status": "configuration_unresolved"
+        },
+        {
+          "capability_status": "gap",
+          "category": "build",
+          "checker_id": null,
+          "language": "java",
+          "legacy_status": "stable",
+          "next_action": null,
+          "reason": "native_adapter_not_integrated",
+          "status": "not_integrated"
+        }
+      ],
+      "command_status": "incomplete",
+      "delivery_decision": "not_evaluated",
+      "discovery": {
+        "blocked_paths": [],
+        "build_roots": [
+          {
+            "manifests": [
+              "build.gradle",
+              "settings.gradle"
+            ],
+            "path": "."
+          }
+        ],
+        "checker_configurations": [
+          {
+            "build_root": ".",
+            "category": "lint",
+            "checker_id": "java.gradle.pmd",
+            "configuration": "unknown",
+            "configuration_ref": "build.gradle",
+            "next_action": "\u89e3\u6790\u751f\u6548 Gradle \u6a21\u578b\u4ee5\u786e\u5b9a\u68c0\u67e5\u914d\u7f6e",
+            "reason": "gradle_model_not_resolved"
+          },
+          {
+            "build_root": ".",
+            "category": "lint",
+            "checker_id": "java.gradle.p3c",
+            "configuration": "unknown",
+            "configuration_ref": "build.gradle",
+            "next_action": "\u89e3\u6790\u751f\u6548 Gradle \u6a21\u578b\u4ee5\u786e\u5b9a\u68c0\u67e5\u914d\u7f6e",
+            "reason": "gradle_model_not_resolved"
+          },
+          {
+            "build_root": ".",
+            "category": "lint",
+            "checker_id": "java.gradle.checkstyle",
+            "configuration": "unknown",
+            "configuration_ref": "build.gradle",
+            "next_action": "\u89e3\u6790\u751f\u6548 Gradle \u6a21\u578b\u4ee5\u786e\u5b9a\u68c0\u67e5\u914d\u7f6e",
+            "reason": "gradle_model_not_resolved"
+          },
+          {
+            "build_root": ".",
+            "category": "comments",
+            "checker_id": "java.gradle.javadoc",
+            "configuration": "unknown",
+            "configuration_ref": "build.gradle",
+            "next_action": "\u89e3\u6790\u751f\u6548 Gradle \u6a21\u578b\u4ee5\u786e\u5b9a\u68c0\u67e5\u914d\u7f6e",
+            "reason": "gradle_model_not_resolved"
+          },
+          {
+            "build_root": ".",
+            "category": "dependencies",
+            "checker_id": "java.gradle.dependency",
+            "configuration": "unknown",
+            "configuration_ref": "build.gradle",
+            "next_action": "\u89e3\u6790\u751f\u6548 Gradle \u6a21\u578b\u4ee5\u786e\u5b9a\u68c0\u67e5\u914d\u7f6e",
+            "reason": "gradle_model_not_resolved"
+          },
+          {
+            "build_root": ".",
+            "category": "cve",
+            "checker_id": "java.gradle.dependency_check",
+            "configuration": "unknown",
+            "configuration_ref": "build.gradle",
+            "next_action": "\u89e3\u6790\u751f\u6548 Gradle \u6a21\u578b\u4ee5\u786e\u5b9a\u68c0\u67e5\u914d\u7f6e",
+            "reason": "gradle_model_not_resolved"
+          },
+          {
+            "build_root": ".",
+            "category": "security",
+            "checker_id": "java.gradle.findsecbugs",
+            "configuration": "unknown",
+            "configuration_ref": "build.gradle",
+            "next_action": "\u89e3\u6790\u751f\u6548 Gradle \u6a21\u578b\u4ee5\u786e\u5b9a\u68c0\u67e5\u914d\u7f6e",
+            "reason": "gradle_model_not_resolved"
+          }
+        ],
+        "declared_versions": {},
+        "languages": [
+          {
+            "id": "java",
+            "manifests": [
+              "build.gradle",
+              "settings.gradle"
+            ],
+            "source_files": [
+              "src/main/java/Sample.java"
+            ]
+          }
+        ],
+        "lockfiles": [],
+        "manifest_sha256": {
+          "build.gradle": "46f603e292b5568476f749c4f601958e097a6056fec78ee4d70d4c5d3be17ebc",
+          "settings.gradle": "64527a18f1aaec8fefd72fea73faf5c778333c4ca6e0e3d50b09486c68d73c07"
+        },
+        "native_tool_candidates": [],
+        "observation_complete": true,
+        "observed_entries": 6,
+        "report_type": "discovery",
+        "root": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-gradle-javadoc-67710-1",
+        "schema_version": "0.4.0",
+        "scope_summary": {
+          "configuration_exception_files_observed": 0,
+          "dependency_roots_excluded": 0,
+          "dot_prefix_roots_excluded": 0,
+          "git_safety_status": "not_evaluated",
+          "ordinary_scan_policy": "project_sources_default_v2"
+        },
+        "source_set_candidates": [
+          {
+            "basis": "directory_convention",
+            "language": "java",
+            "path": "src/main/java",
+            "role": "main"
+          }
+        ],
+        "unknown_conditions": [
+          "build_model_not_evaluated",
+          "some_manifest_metadata_not_parsed",
+          "source_sets_not_fully_classified",
+          "dialects_not_classified"
+        ]
+      },
+      "execution_budget": {
+        "enforcement": "native_execution_only",
+        "jobs_limit": 4,
+        "jobs_source": "builtin_default",
+        "native_task_count": 2,
+        "source": "builtin_default",
+        "started_native_task_count": 2,
+        "timeout_ms": 1800000
+      },
+      "execution_tasks": [
+        {
+          "id": "java.gradle.javadoc",
+          "status": "native_observed_unverified"
+        },
+        {
+          "id": "java.p3c",
+          "status": "native_incomplete"
+        }
+      ],
+      "exit_code": 3,
+      "export": {
+        "reason_code": null,
+        "status": "not_requested"
+      },
+      "native_results": {
+        "erlang_lint": null,
+        "go_lint": null,
+        "java_cve": null,
+        "java_dependencies": null,
+        "java_gradle_javadoc": {
+          "authority": "local_unverified",
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "findings": [],
+          "gradle_bundle_sha256": "915f28e8fd4f7133e51321c688bf59dbc4c18da8748a297913010d245ddd3651",
+          "init_scripts_sha256": "f759fb2fde664dbf316a17f752630f5f78b4b98dac5131f2ac43133e763ba309",
+          "java_entry_sha256": "e820b09ad7e80bf14ec6803d9ade8abc02dfbfe9d0540f9b0e8c6d334706bc5e",
+          "jdk_release_sha256": "9e5f483cd7a0b0bd3524139fb7e08dae750bd9b60336004fa70cd2d00bcc0583",
+          "model_report_sha256": "4b6e4673bc26d43ebf422edc7e6dba28f4ad91a20a8166dba6f0a4029580a664",
+          "native_status": "empty_output_unverified",
+          "native_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "native_stdout_sha256": "37c356f163c81be1038fa8b3ed141416502fd8388b2f88a31d16aef347c56323",
+          "reason": "selected_sources_and_complete_documentation_rules_unverified",
+          "report_type": "gradle_javadoc_probe",
+          "rule_configuration_complete": false,
+          "schema_version": "0.1.0",
+          "selected_java_file_count": 1,
+          "source_snapshot_sha256": "81839f5a833bc3d895a54f35d60f03dfc84c7a98396fe790d041b865830c6bad",
+          "task_paths": [
+            ":javadoc"
+          ]
+        },
+        "java_javadoc": null,
+        "java_p3c": {
+          "authority": "local_unverified",
+          "backlog_status": "not_initialized",
+          "backlog_sync": null,
+          "category": "lint",
+          "checker_id": "java.maven.p3c",
+          "command_status": "incomplete",
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "exit_code": 3,
+          "files": [
+            {
+              "build_root": ".",
+              "configuration": "unknown",
+              "configuration_ref": null,
+              "configuration_sha256": null,
+              "observation": null,
+              "path": "src/main/java/Sample.java",
+              "reason": "p3c_configuration_not_confirmed"
+            }
+          ],
+          "finding_count": 0,
+          "findings": [],
+          "language": "java",
+          "local_observation_complete": false,
+          "next": null,
+          "observed_file_count": 0,
+          "operation": "lint",
+          "report_type": "java_p3c_project_observation",
+          "rulepack_approval": "unverified",
+          "run_id": "java-p3c-67727-1791282935488704000-0",
+          "schema_version": "0.2.0",
+          "source_file_count": 1,
+          "tool_approval": "unverified",
+          "workspace_binding": "uninitialized",
+          "workspace_id": null
+        },
+        "kotlin_lint": null,
+        "node_lint": null,
+        "npm_cve": [],
+        "python_cve": [],
+        "python_lint": null,
+        "ruby_lint": null,
+        "rust_build": null,
+        "rust_comments": null,
+        "rust_cve": null,
+        "rust_lint": null,
+        "shell_lint": null,
+        "swift_lint": null,
+        "zig_lint": null
+      },
+      "next": null,
+      "obligation_status": "unresolved",
+      "operation": "check",
+      "reason": "java_selection_obligations_and_trusted_policy_unavailable",
+      "report_type": "check_feedback",
+      "required_obligations": null,
+      "schema_version": "0.64.0",
+      "selection": "java",
+      "syntax_candidates": {
+        "authority": "candidate_unqualified",
+        "delivery_decision": "incomplete",
+        "execution_phase": "after_native",
+        "native_preferred_count": 0,
+        "next_action": "\u4f7f\u7528\u5305\u542b\u56fa\u5b9a\u8bed\u6cd5\u8d44\u4ea7\u7684\u53d1\u884c\u5305\u8fd0\u884c\u5019\u9009\u521d\u68c0\uff0c\u5e76\u5b8c\u6210\u9002\u7528\u539f\u751f\u68c0\u67e5",
+        "observations": [],
+        "reason": "binary_without_wasm_precheck",
+        "skipped_count": 0,
+        "source_file_count": 1,
+        "status": "not_run",
+        "unrouted_count": 0
+      },
+      "syntax_tasks": {
+        "failures": [],
+        "new_blockers": 0,
+        "status": "synced_partial",
+        "tasks": []
+      },
+      "unresolved_conditions": [
+        "build_model_not_evaluated",
+        "dialects_not_classified",
+        "gradle_detailed_documentation_rules_and_repair_closure_unverified",
+        "gradle_selected_configuration_model_and_quality_coverage_unverified",
+        "java_p3c_task_incomplete",
+        "required_obligations_unresolved",
+        "some_manifest_metadata_not_parsed",
+        "source_sets_not_fully_classified",
+        "tool_lock_unverified",
+        "trusted_policy_unavailable"
+      ]
+    }
+  },
+  {
+    "case": "java-incomplete",
+    "report": {
+      "authority": "local_unverified",
+      "category_candidates": [
+        {
+          "capability_status": "gap",
+          "category": "lint",
+          "checker_id": null,
+          "language": "java",
+          "legacy_status": "stable",
+          "next_action": null,
+          "reason": "native_scan_incomplete",
+          "status": "native_incomplete"
+        },
+        {
+          "capability_status": "gap",
+          "category": "comments",
+          "checker_id": "java.gradle.javadoc",
+          "language": "java",
+          "legacy_status": "stable",
+          "next_action": "\u8bfb\u53d6 native_results.java_gradle_javadoc \u7684\u5177\u4f53\u963b\u585e\uff0c\u6062\u590d\u5df2\u6709 Gradle/JDK\u3001\u9009\u5b9a\u6784\u5efa\u548c Java \u8f93\u5165\u6216\u53d6\u6d88/\u8d85\u65f6\u539f\u56e0\uff0c\u518d\u7528\u76f8\u540c\u539f\u751f\u4efb\u52a1\u590d\u68c0\uff1b\u4e0d\u80fd\u636e\u6267\u884c\u6545\u969c\u5224\u65ad\u914d\u7f6e\u7f3a\u5931\u6216\u4fee\u6539\u65e0\u5173\u6e90\u7801",
+          "reason": "gradle_javadoc_native_incomplete",
+          "status": "native_incomplete"
+        },
+        {
+          "capability_status": "gap",
+          "category": "dependencies",
+          "checker_id": null,
+          "language": "java",
+          "legacy_status": "stable",
+          "next_action": "\u89e3\u6790\u76ee\u6807\u6784\u5efa\u6839\u7684 Gradle \u751f\u6548\u6a21\u578b\u540e\u91cd\u65b0\u68c0\u67e5",
+          "reason": "gradle_model_not_resolved",
+          "status": "configuration_unresolved"
+        },
+        {
+          "capability_status": "gap",
+          "category": "cve",
+          "checker_id": null,
+          "language": "java",
+          "legacy_status": "stable",
+          "next_action": "\u89e3\u6790\u76ee\u6807\u6784\u5efa\u6839\u7684 Gradle \u751f\u6548\u6a21\u578b\u540e\u91cd\u65b0\u68c0\u67e5",
+          "reason": "gradle_model_not_resolved",
+          "status": "configuration_unresolved"
+        },
+        {
+          "capability_status": "gap",
+          "category": "security",
+          "checker_id": null,
+          "language": "java",
+          "legacy_status": "stable",
+          "next_action": "\u89e3\u6790\u76ee\u6807\u6784\u5efa\u6839\u7684 Gradle \u751f\u6548\u6a21\u578b\u540e\u91cd\u65b0\u68c0\u67e5",
+          "reason": "gradle_model_not_resolved",
+          "status": "configuration_unresolved"
+        },
+        {
+          "capability_status": "gap",
+          "category": "build",
+          "checker_id": null,
+          "language": "java",
+          "legacy_status": "stable",
+          "next_action": null,
+          "reason": "native_adapter_not_integrated",
+          "status": "not_integrated"
+        }
+      ],
+      "command_status": "incomplete",
+      "delivery_decision": "not_evaluated",
+      "discovery": {
+        "blocked_paths": [],
+        "build_roots": [
+          {
+            "manifests": [
+              "build.gradle",
+              "settings.gradle"
+            ],
+            "path": "."
+          }
+        ],
+        "checker_configurations": [
+          {
+            "build_root": ".",
+            "category": "lint",
+            "checker_id": "java.gradle.pmd",
+            "configuration": "unknown",
+            "configuration_ref": "build.gradle",
+            "next_action": "\u89e3\u6790\u751f\u6548 Gradle \u6a21\u578b\u4ee5\u786e\u5b9a\u68c0\u67e5\u914d\u7f6e",
+            "reason": "gradle_model_not_resolved"
+          },
+          {
+            "build_root": ".",
+            "category": "lint",
+            "checker_id": "java.gradle.p3c",
+            "configuration": "unknown",
+            "configuration_ref": "build.gradle",
+            "next_action": "\u89e3\u6790\u751f\u6548 Gradle \u6a21\u578b\u4ee5\u786e\u5b9a\u68c0\u67e5\u914d\u7f6e",
+            "reason": "gradle_model_not_resolved"
+          },
+          {
+            "build_root": ".",
+            "category": "lint",
+            "checker_id": "java.gradle.checkstyle",
+            "configuration": "unknown",
+            "configuration_ref": "build.gradle",
+            "next_action": "\u89e3\u6790\u751f\u6548 Gradle \u6a21\u578b\u4ee5\u786e\u5b9a\u68c0\u67e5\u914d\u7f6e",
+            "reason": "gradle_model_not_resolved"
+          },
+          {
+            "build_root": ".",
+            "category": "comments",
+            "checker_id": "java.gradle.javadoc",
+            "configuration": "unknown",
+            "configuration_ref": "build.gradle",
+            "next_action": "\u89e3\u6790\u751f\u6548 Gradle \u6a21\u578b\u4ee5\u786e\u5b9a\u68c0\u67e5\u914d\u7f6e",
+            "reason": "gradle_model_not_resolved"
+          },
+          {
+            "build_root": ".",
+            "category": "dependencies",
+            "checker_id": "java.gradle.dependency",
+            "configuration": "unknown",
+            "configuration_ref": "build.gradle",
+            "next_action": "\u89e3\u6790\u751f\u6548 Gradle \u6a21\u578b\u4ee5\u786e\u5b9a\u68c0\u67e5\u914d\u7f6e",
+            "reason": "gradle_model_not_resolved"
+          },
+          {
+            "build_root": ".",
+            "category": "cve",
+            "checker_id": "java.gradle.dependency_check",
+            "configuration": "unknown",
+            "configuration_ref": "build.gradle",
+            "next_action": "\u89e3\u6790\u751f\u6548 Gradle \u6a21\u578b\u4ee5\u786e\u5b9a\u68c0\u67e5\u914d\u7f6e",
+            "reason": "gradle_model_not_resolved"
+          },
+          {
+            "build_root": ".",
+            "category": "security",
+            "checker_id": "java.gradle.findsecbugs",
+            "configuration": "unknown",
+            "configuration_ref": "build.gradle",
+            "next_action": "\u89e3\u6790\u751f\u6548 Gradle \u6a21\u578b\u4ee5\u786e\u5b9a\u68c0\u67e5\u914d\u7f6e",
+            "reason": "gradle_model_not_resolved"
+          }
+        ],
+        "declared_versions": {},
+        "languages": [
+          {
+            "id": "java",
+            "manifests": [
+              "build.gradle",
+              "settings.gradle"
+            ],
+            "source_files": [
+              "src/main/java/Sample.java"
+            ]
+          }
+        ],
+        "lockfiles": [],
+        "manifest_sha256": {
+          "build.gradle": "46f603e292b5568476f749c4f601958e097a6056fec78ee4d70d4c5d3be17ebc",
+          "settings.gradle": "64527a18f1aaec8fefd72fea73faf5c778333c4ca6e0e3d50b09486c68d73c07"
+        },
+        "native_tool_candidates": [],
+        "observation_complete": true,
+        "observed_entries": 6,
+        "report_type": "discovery",
+        "root": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-gradle-javadoc-64057-0",
+        "schema_version": "0.4.0",
+        "scope_summary": {
+          "configuration_exception_files_observed": 0,
+          "dependency_roots_excluded": 0,
+          "dot_prefix_roots_excluded": 0,
+          "git_safety_status": "not_evaluated",
+          "ordinary_scan_policy": "project_sources_default_v2"
+        },
+        "source_set_candidates": [
+          {
+            "basis": "directory_convention",
+            "language": "java",
+            "path": "src/main/java",
+            "role": "main"
+          }
+        ],
+        "unknown_conditions": [
+          "build_model_not_evaluated",
+          "some_manifest_metadata_not_parsed",
+          "source_sets_not_fully_classified",
+          "dialects_not_classified"
+        ]
+      },
+      "execution_budget": {
+        "enforcement": "native_execution_only",
+        "jobs_limit": 4,
+        "jobs_source": "builtin_default",
+        "native_task_count": 2,
+        "source": "builtin_default",
+        "started_native_task_count": 2,
+        "timeout_ms": 1800000
+      },
+      "execution_tasks": [
+        {
+          "id": "java.gradle.javadoc",
+          "status": "native_incomplete"
+        },
+        {
+          "id": "java.p3c",
+          "status": "native_incomplete"
+        }
+      ],
+      "exit_code": 3,
+      "export": {
+        "reason_code": null,
+        "status": "not_requested"
+      },
+      "native_results": {
+        "erlang_lint": null,
+        "go_lint": null,
+        "java_cve": null,
+        "java_dependencies": null,
+        "java_gradle_javadoc": {
+          "authority": "local_unverified",
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "findings": [],
+          "gradle_bundle_sha256": null,
+          "init_scripts_sha256": "f759fb2fde664dbf316a17f752630f5f78b4b98dac5131f2ac43133e763ba309",
+          "java_entry_sha256": null,
+          "jdk_release_sha256": null,
+          "model_report_sha256": null,
+          "native_status": "incomplete",
+          "native_stderr_sha256": null,
+          "native_stdout_sha256": null,
+          "reason": "native_prerequisite_unavailable",
+          "report_type": "gradle_javadoc_probe",
+          "rule_configuration_complete": false,
+          "schema_version": "0.1.0",
+          "selected_java_file_count": 0,
+          "source_snapshot_sha256": "c6cabe95d0e6a72d9dc2ffef9094881bd637677bb974432a20dc0f3f5a7cbd12",
+          "task_paths": []
+        },
+        "java_javadoc": null,
+        "java_p3c": {
+          "authority": "local_unverified",
+          "backlog_status": "not_initialized",
+          "backlog_sync": null,
+          "category": "lint",
+          "checker_id": "java.maven.p3c",
+          "command_status": "incomplete",
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "exit_code": 3,
+          "files": [
+            {
+              "build_root": ".",
+              "configuration": "unknown",
+              "configuration_ref": null,
+              "configuration_sha256": null,
+              "observation": null,
+              "path": "src/main/java/Sample.java",
+              "reason": "p3c_configuration_not_confirmed"
+            }
+          ],
+          "finding_count": 0,
+          "findings": [],
+          "language": "java",
+          "local_observation_complete": false,
+          "next": null,
+          "observed_file_count": 0,
+          "operation": "lint",
+          "report_type": "java_p3c_project_observation",
+          "rulepack_approval": "unverified",
+          "run_id": "java-p3c-64286-1791282910239833000-0",
+          "schema_version": "0.2.0",
+          "source_file_count": 1,
+          "tool_approval": "unverified",
+          "workspace_binding": "uninitialized",
+          "workspace_id": null
+        },
+        "kotlin_lint": null,
+        "node_lint": null,
+        "npm_cve": [],
+        "python_cve": [],
+        "python_lint": null,
+        "ruby_lint": null,
+        "rust_build": null,
+        "rust_comments": null,
+        "rust_cve": null,
+        "rust_lint": null,
+        "shell_lint": null,
+        "swift_lint": null,
+        "zig_lint": null
+      },
+      "next": null,
+      "obligation_status": "unresolved",
+      "operation": "check",
+      "reason": "java_selection_obligations_and_trusted_policy_unavailable",
+      "report_type": "check_feedback",
+      "required_obligations": null,
+      "schema_version": "0.64.0",
+      "selection": "java",
+      "syntax_candidates": {
+        "authority": "candidate_unqualified",
+        "delivery_decision": "incomplete",
+        "execution_phase": "after_native",
+        "native_preferred_count": 0,
+        "next_action": "\u4f7f\u7528\u5305\u542b\u56fa\u5b9a\u8bed\u6cd5\u8d44\u4ea7\u7684\u53d1\u884c\u5305\u8fd0\u884c\u5019\u9009\u521d\u68c0\uff0c\u5e76\u5b8c\u6210\u9002\u7528\u539f\u751f\u68c0\u67e5",
+        "observations": [],
+        "reason": "binary_without_wasm_precheck",
+        "skipped_count": 0,
+        "source_file_count": 1,
+        "status": "not_run",
+        "unrouted_count": 0
+      },
+      "syntax_tasks": {
+        "failures": [],
+        "new_blockers": 0,
+        "status": "synced_partial",
+        "tasks": []
+      },
+      "unresolved_conditions": [
+        "build_model_not_evaluated",
+        "dialects_not_classified",
+        "gradle_detailed_documentation_rules_and_repair_closure_unverified",
+        "gradle_native_javadoc_incomplete",
+        "gradle_selected_configuration_model_and_quality_coverage_unverified",
+        "java_p3c_task_incomplete",
+        "required_obligations_unresolved",
+        "some_manifest_metadata_not_parsed",
+        "source_sets_not_fully_classified",
+        "tool_lock_unverified",
+        "trusted_policy_unavailable"
+      ]
+    }
+  },
+  {
+    "case": "missing-native",
+    "report": {
+      "authority": "local_unverified",
+      "category_candidates": [
+        {
+          "capability_status": "gap",
+          "category": "lint",
+          "checker_id": null,
+          "language": "java",
+          "legacy_status": "stable",
+          "next_action": null,
+          "reason": "native_scan_incomplete",
+          "status": "native_incomplete"
+        },
+        {
+          "capability_status": "gap",
+          "category": "comments",
+          "checker_id": "java.gradle.javadoc",
+          "language": "java",
+          "legacy_status": "stable",
+          "next_action": "\u8bfb\u53d6 native_results.java_gradle_javadoc \u7684\u539f\u751f\u8bca\u65ad\uff1b\u6309\u7528\u9014\u3001\u53c2\u6570\u548c\u8fd4\u56de\u7b49\u89c4\u5219\u4fee\u590d\uff0c\u7528\u76f8\u540c Gradle/JDK/\u9009\u5b9a\u8f93\u5165\u590d\u68c0\uff1b\u65e0\u8bca\u65ad\u4ecd\u987b\u6838\u9a8c\u539f\u9879\u76ee doclint\u3001\u6e90\u96c6\u548c\u5b8c\u6574\u89c4\u5219\uff0c\u4e0d\u7b7e\u53d1\u5408\u89c4",
+          "reason": "gradle_javadoc_selected_inputs_and_rules_unverified",
+          "status": "observed_unverified"
+        },
+        {
+          "capability_status": "gap",
+          "category": "dependencies",
+          "checker_id": null,
+          "language": "java",
+          "legacy_status": "stable",
+          "next_action": "\u89e3\u6790\u76ee\u6807\u6784\u5efa\u6839\u7684 Gradle \u751f\u6548\u6a21\u578b\u540e\u91cd\u65b0\u68c0\u67e5",
+          "reason": "gradle_model_not_resolved",
+          "status": "configuration_unresolved"
+        },
+        {
+          "capability_status": "gap",
+          "category": "cve",
+          "checker_id": null,
+          "language": "java",
+          "legacy_status": "stable",
+          "next_action": "\u89e3\u6790\u76ee\u6807\u6784\u5efa\u6839\u7684 Gradle \u751f\u6548\u6a21\u578b\u540e\u91cd\u65b0\u68c0\u67e5",
+          "reason": "gradle_model_not_resolved",
+          "status": "configuration_unresolved"
+        },
+        {
+          "capability_status": "gap",
+          "category": "security",
+          "checker_id": null,
+          "language": "java",
+          "legacy_status": "stable",
+          "next_action": "\u89e3\u6790\u76ee\u6807\u6784\u5efa\u6839\u7684 Gradle \u751f\u6548\u6a21\u578b\u540e\u91cd\u65b0\u68c0\u67e5",
+          "reason": "gradle_model_not_resolved",
+          "status": "configuration_unresolved"
+        },
+        {
+          "capability_status": "gap",
+          "category": "build",
+          "checker_id": null,
+          "language": "java",
+          "legacy_status": "stable",
+          "next_action": null,
+          "reason": "native_adapter_not_integrated",
+          "status": "not_integrated"
+        }
+      ],
+      "command_status": "incomplete",
+      "delivery_decision": "not_evaluated",
+      "discovery": {
+        "blocked_paths": [],
+        "build_roots": [
+          {
+            "manifests": [
+              "build.gradle",
+              "settings.gradle"
+            ],
+            "path": "."
+          }
+        ],
+        "checker_configurations": [
+          {
+            "build_root": ".",
+            "category": "lint",
+            "checker_id": "java.gradle.pmd",
+            "configuration": "unknown",
+            "configuration_ref": "build.gradle",
+            "next_action": "\u89e3\u6790\u751f\u6548 Gradle \u6a21\u578b\u4ee5\u786e\u5b9a\u68c0\u67e5\u914d\u7f6e",
+            "reason": "gradle_model_not_resolved"
+          },
+          {
+            "build_root": ".",
+            "category": "lint",
+            "checker_id": "java.gradle.p3c",
+            "configuration": "unknown",
+            "configuration_ref": "build.gradle",
+            "next_action": "\u89e3\u6790\u751f\u6548 Gradle \u6a21\u578b\u4ee5\u786e\u5b9a\u68c0\u67e5\u914d\u7f6e",
+            "reason": "gradle_model_not_resolved"
+          },
+          {
+            "build_root": ".",
+            "category": "lint",
+            "checker_id": "java.gradle.checkstyle",
+            "configuration": "unknown",
+            "configuration_ref": "build.gradle",
+            "next_action": "\u89e3\u6790\u751f\u6548 Gradle \u6a21\u578b\u4ee5\u786e\u5b9a\u68c0\u67e5\u914d\u7f6e",
+            "reason": "gradle_model_not_resolved"
+          },
+          {
+            "build_root": ".",
+            "category": "comments",
+            "checker_id": "java.gradle.javadoc",
+            "configuration": "unknown",
+            "configuration_ref": "build.gradle",
+            "next_action": "\u89e3\u6790\u751f\u6548 Gradle \u6a21\u578b\u4ee5\u786e\u5b9a\u68c0\u67e5\u914d\u7f6e",
+            "reason": "gradle_model_not_resolved"
+          },
+          {
+            "build_root": ".",
+            "category": "dependencies",
+            "checker_id": "java.gradle.dependency",
+            "configuration": "unknown",
+            "configuration_ref": "build.gradle",
+            "next_action": "\u89e3\u6790\u751f\u6548 Gradle \u6a21\u578b\u4ee5\u786e\u5b9a\u68c0\u67e5\u914d\u7f6e",
+            "reason": "gradle_model_not_resolved"
+          },
+          {
+            "build_root": ".",
+            "category": "cve",
+            "checker_id": "java.gradle.dependency_check",
+            "configuration": "unknown",
+            "configuration_ref": "build.gradle",
+            "next_action": "\u89e3\u6790\u751f\u6548 Gradle \u6a21\u578b\u4ee5\u786e\u5b9a\u68c0\u67e5\u914d\u7f6e",
+            "reason": "gradle_model_not_resolved"
+          },
+          {
+            "build_root": ".",
+            "category": "security",
+            "checker_id": "java.gradle.findsecbugs",
+            "configuration": "unknown",
+            "configuration_ref": "build.gradle",
+            "next_action": "\u89e3\u6790\u751f\u6548 Gradle \u6a21\u578b\u4ee5\u786e\u5b9a\u68c0\u67e5\u914d\u7f6e",
+            "reason": "gradle_model_not_resolved"
+          }
+        ],
+        "declared_versions": {},
+        "languages": [
+          {
+            "id": "java",
+            "manifests": [
+              "build.gradle",
+              "settings.gradle"
+            ],
+            "source_files": [
+              "src/main/java/Sample.java"
+            ]
+          }
+        ],
+        "lockfiles": [],
+        "manifest_sha256": {
+          "build.gradle": "46f603e292b5568476f749c4f601958e097a6056fec78ee4d70d4c5d3be17ebc",
+          "settings.gradle": "64527a18f1aaec8fefd72fea73faf5c778333c4ca6e0e3d50b09486c68d73c07"
+        },
+        "native_tool_candidates": [],
+        "observation_complete": true,
+        "observed_entries": 6,
+        "report_type": "discovery",
+        "root": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-gradle-javadoc-67710-0",
+        "schema_version": "0.4.0",
+        "scope_summary": {
+          "configuration_exception_files_observed": 0,
+          "dependency_roots_excluded": 0,
+          "dot_prefix_roots_excluded": 0,
+          "git_safety_status": "not_evaluated",
+          "ordinary_scan_policy": "project_sources_default_v2"
+        },
+        "source_set_candidates": [
+          {
+            "basis": "directory_convention",
+            "language": "java",
+            "path": "src/main/java",
+            "role": "main"
+          }
+        ],
+        "unknown_conditions": [
+          "build_model_not_evaluated",
+          "some_manifest_metadata_not_parsed",
+          "source_sets_not_fully_classified",
+          "dialects_not_classified"
+        ]
+      },
+      "execution_budget": {
+        "enforcement": "native_execution_only",
+        "jobs_limit": 4,
+        "jobs_source": "builtin_default",
+        "native_task_count": 2,
+        "source": "builtin_default",
+        "started_native_task_count": 2,
+        "timeout_ms": 1800000
+      },
+      "execution_tasks": [
+        {
+          "id": "java.gradle.javadoc",
+          "status": "native_observed_unverified"
+        },
+        {
+          "id": "java.p3c",
+          "status": "native_incomplete"
+        }
+      ],
+      "exit_code": 3,
+      "export": {
+        "reason_code": null,
+        "status": "not_requested"
+      },
+      "native_results": {
+        "erlang_lint": null,
+        "go_lint": null,
+        "java_cve": null,
+        "java_dependencies": null,
+        "java_gradle_javadoc": {
+          "authority": "local_unverified",
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "findings": [
+            {
+              "column": 8,
+              "line": 1,
+              "path": "src/main/java/Sample.java",
+              "rule_id": "JavadocMissingComment"
+            },
+            {
+              "column": 12,
+              "line": 2,
+              "path": "src/main/java/Sample.java",
+              "rule_id": "JavadocMissingComment"
+            },
+            {
+              "column": 16,
+              "line": 3,
+              "path": "src/main/java/Sample.java",
+              "rule_id": "JavadocMissingComment"
+            }
+          ],
+          "gradle_bundle_sha256": "915f28e8fd4f7133e51321c688bf59dbc4c18da8748a297913010d245ddd3651",
+          "init_scripts_sha256": "f759fb2fde664dbf316a17f752630f5f78b4b98dac5131f2ac43133e763ba309",
+          "java_entry_sha256": "e820b09ad7e80bf14ec6803d9ade8abc02dfbfe9d0540f9b0e8c6d334706bc5e",
+          "jdk_release_sha256": "9e5f483cd7a0b0bd3524139fb7e08dae750bd9b60336004fa70cd2d00bcc0583",
+          "model_report_sha256": "4b6e4673bc26d43ebf422edc7e6dba28f4ad91a20a8166dba6f0a4029580a664",
+          "native_status": "findings_observed_unverified",
+          "native_stderr_sha256": "6f6274133fa7b867cb9046db53f55dc8743f235e280e53998f8aab87e066a4cc",
+          "native_stdout_sha256": "345ad3994d7c90d240429a29e59cb1259cfe81aee908c46c2404f510c7c9d830",
+          "reason": "selected_sources_and_complete_documentation_rules_unverified",
+          "report_type": "gradle_javadoc_probe",
+          "rule_configuration_complete": false,
+          "schema_version": "0.1.0",
+          "selected_java_file_count": 1,
+          "source_snapshot_sha256": "7eca284f3a6816722d9b05bb10a21083f2e2ee0e41b112e2b0325ae1a4c47966",
+          "task_paths": [
+            ":javadoc"
+          ]
+        },
+        "java_javadoc": null,
+        "java_p3c": {
+          "authority": "local_unverified",
+          "backlog_status": "not_initialized",
+          "backlog_sync": null,
+          "category": "lint",
+          "checker_id": "java.maven.p3c",
+          "command_status": "incomplete",
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "exit_code": 3,
+          "files": [
+            {
+              "build_root": ".",
+              "configuration": "unknown",
+              "configuration_ref": null,
+              "configuration_sha256": null,
+              "observation": null,
+              "path": "src/main/java/Sample.java",
+              "reason": "p3c_configuration_not_confirmed"
+            }
+          ],
+          "finding_count": 0,
+          "findings": [],
+          "language": "java",
+          "local_observation_complete": false,
+          "next": null,
+          "observed_file_count": 0,
+          "operation": "lint",
+          "report_type": "java_p3c_project_observation",
+          "rulepack_approval": "unverified",
+          "run_id": "java-p3c-67711-1791282930418968000-0",
+          "schema_version": "0.2.0",
+          "source_file_count": 1,
+          "tool_approval": "unverified",
+          "workspace_binding": "uninitialized",
+          "workspace_id": null
+        },
+        "kotlin_lint": null,
+        "node_lint": null,
+        "npm_cve": [],
+        "python_cve": [],
+        "python_lint": null,
+        "ruby_lint": null,
+        "rust_build": null,
+        "rust_comments": null,
+        "rust_cve": null,
+        "rust_lint": null,
+        "shell_lint": null,
+        "swift_lint": null,
+        "zig_lint": null
+      },
+      "next": null,
+      "obligation_status": "unresolved",
+      "operation": "check",
+      "reason": "java_selection_obligations_and_trusted_policy_unavailable",
+      "report_type": "check_feedback",
+      "required_obligations": null,
+      "schema_version": "0.64.0",
+      "selection": "java",
+      "syntax_candidates": {
+        "authority": "candidate_unqualified",
+        "delivery_decision": "incomplete",
+        "execution_phase": "after_native",
+        "native_preferred_count": 0,
+        "next_action": "\u4f7f\u7528\u5305\u542b\u56fa\u5b9a\u8bed\u6cd5\u8d44\u4ea7\u7684\u53d1\u884c\u5305\u8fd0\u884c\u5019\u9009\u521d\u68c0\uff0c\u5e76\u5b8c\u6210\u9002\u7528\u539f\u751f\u68c0\u67e5",
+        "observations": [],
+        "reason": "binary_without_wasm_precheck",
+        "skipped_count": 0,
+        "source_file_count": 1,
+        "status": "not_run",
+        "unrouted_count": 0
+      },
+      "syntax_tasks": {
+        "failures": [],
+        "new_blockers": 0,
+        "status": "synced_partial",
+        "tasks": []
+      },
+      "unresolved_conditions": [
+        "build_model_not_evaluated",
+        "dialects_not_classified",
+        "gradle_detailed_documentation_rules_and_repair_closure_unverified",
+        "gradle_selected_configuration_model_and_quality_coverage_unverified",
+        "java_p3c_task_incomplete",
+        "required_obligations_unresolved",
+        "some_manifest_metadata_not_parsed",
+        "source_sets_not_fully_classified",
+        "tool_lock_unverified",
+        "trusted_policy_unavailable"
+      ]
+    }
+  },
+  {
+    "case": "sigint",
+    "report": {
+      "authority": "local_unverified",
+      "category_candidates": [
+        {
+          "capability_status": "gap",
+          "category": "lint",
+          "checker_id": null,
+          "language": "java",
+          "legacy_status": "stable",
+          "next_action": null,
+          "reason": "native_scan_incomplete",
+          "status": "native_incomplete"
+        },
+        {
+          "capability_status": "gap",
+          "category": "comments",
+          "checker_id": "java.gradle.javadoc",
+          "language": "java",
+          "legacy_status": "stable",
+          "next_action": "\u8bfb\u53d6 native_results.java_gradle_javadoc \u7684\u5177\u4f53\u963b\u585e\uff0c\u6062\u590d\u5df2\u6709 Gradle/JDK\u3001\u9009\u5b9a\u6784\u5efa\u548c Java \u8f93\u5165\u6216\u53d6\u6d88/\u8d85\u65f6\u539f\u56e0\uff0c\u518d\u7528\u76f8\u540c\u539f\u751f\u4efb\u52a1\u590d\u68c0\uff1b\u4e0d\u80fd\u636e\u6267\u884c\u6545\u969c\u5224\u65ad\u914d\u7f6e\u7f3a\u5931\u6216\u4fee\u6539\u65e0\u5173\u6e90\u7801",
+          "reason": "gradle_javadoc_native_incomplete",
+          "status": "native_incomplete"
+        },
+        {
+          "capability_status": "gap",
+          "category": "dependencies",
+          "checker_id": null,
+          "language": "java",
+          "legacy_status": "stable",
+          "next_action": "\u89e3\u6790\u76ee\u6807\u6784\u5efa\u6839\u7684 Gradle \u751f\u6548\u6a21\u578b\u540e\u91cd\u65b0\u68c0\u67e5",
+          "reason": "gradle_model_not_resolved",
+          "status": "configuration_unresolved"
+        },
+        {
+          "capability_status": "gap",
+          "category": "cve",
+          "checker_id": null,
+          "language": "java",
+          "legacy_status": "stable",
+          "next_action": "\u89e3\u6790\u76ee\u6807\u6784\u5efa\u6839\u7684 Gradle \u751f\u6548\u6a21\u578b\u540e\u91cd\u65b0\u68c0\u67e5",
+          "reason": "gradle_model_not_resolved",
+          "status": "configuration_unresolved"
+        },
+        {
+          "capability_status": "gap",
+          "category": "security",
+          "checker_id": null,
+          "language": "java",
+          "legacy_status": "stable",
+          "next_action": "\u89e3\u6790\u76ee\u6807\u6784\u5efa\u6839\u7684 Gradle \u751f\u6548\u6a21\u578b\u540e\u91cd\u65b0\u68c0\u67e5",
+          "reason": "gradle_model_not_resolved",
+          "status": "configuration_unresolved"
+        },
+        {
+          "capability_status": "gap",
+          "category": "build",
+          "checker_id": null,
+          "language": "java",
+          "legacy_status": "stable",
+          "next_action": null,
+          "reason": "native_adapter_not_integrated",
+          "status": "not_integrated"
+        }
+      ],
+      "command_status": "cancelled",
+      "delivery_decision": "not_evaluated",
+      "discovery": {
+        "blocked_paths": [],
+        "build_roots": [
+          {
+            "manifests": [
+              "build.gradle",
+              "settings.gradle"
+            ],
+            "path": "."
+          }
+        ],
+        "checker_configurations": [
+          {
+            "build_root": ".",
+            "category": "lint",
+            "checker_id": "java.gradle.pmd",
+            "configuration": "unknown",
+            "configuration_ref": "build.gradle",
+            "next_action": "\u89e3\u6790\u751f\u6548 Gradle \u6a21\u578b\u4ee5\u786e\u5b9a\u68c0\u67e5\u914d\u7f6e",
+            "reason": "gradle_model_not_resolved"
+          },
+          {
+            "build_root": ".",
+            "category": "lint",
+            "checker_id": "java.gradle.p3c",
+            "configuration": "unknown",
+            "configuration_ref": "build.gradle",
+            "next_action": "\u89e3\u6790\u751f\u6548 Gradle \u6a21\u578b\u4ee5\u786e\u5b9a\u68c0\u67e5\u914d\u7f6e",
+            "reason": "gradle_model_not_resolved"
+          },
+          {
+            "build_root": ".",
+            "category": "lint",
+            "checker_id": "java.gradle.checkstyle",
+            "configuration": "unknown",
+            "configuration_ref": "build.gradle",
+            "next_action": "\u89e3\u6790\u751f\u6548 Gradle \u6a21\u578b\u4ee5\u786e\u5b9a\u68c0\u67e5\u914d\u7f6e",
+            "reason": "gradle_model_not_resolved"
+          },
+          {
+            "build_root": ".",
+            "category": "comments",
+            "checker_id": "java.gradle.javadoc",
+            "configuration": "unknown",
+            "configuration_ref": "build.gradle",
+            "next_action": "\u89e3\u6790\u751f\u6548 Gradle \u6a21\u578b\u4ee5\u786e\u5b9a\u68c0\u67e5\u914d\u7f6e",
+            "reason": "gradle_model_not_resolved"
+          },
+          {
+            "build_root": ".",
+            "category": "dependencies",
+            "checker_id": "java.gradle.dependency",
+            "configuration": "unknown",
+            "configuration_ref": "build.gradle",
+            "next_action": "\u89e3\u6790\u751f\u6548 Gradle \u6a21\u578b\u4ee5\u786e\u5b9a\u68c0\u67e5\u914d\u7f6e",
+            "reason": "gradle_model_not_resolved"
+          },
+          {
+            "build_root": ".",
+            "category": "cve",
+            "checker_id": "java.gradle.dependency_check",
+            "configuration": "unknown",
+            "configuration_ref": "build.gradle",
+            "next_action": "\u89e3\u6790\u751f\u6548 Gradle \u6a21\u578b\u4ee5\u786e\u5b9a\u68c0\u67e5\u914d\u7f6e",
+            "reason": "gradle_model_not_resolved"
+          },
+          {
+            "build_root": ".",
+            "category": "security",
+            "checker_id": "java.gradle.findsecbugs",
+            "configuration": "unknown",
+            "configuration_ref": "build.gradle",
+            "next_action": "\u89e3\u6790\u751f\u6548 Gradle \u6a21\u578b\u4ee5\u786e\u5b9a\u68c0\u67e5\u914d\u7f6e",
+            "reason": "gradle_model_not_resolved"
+          }
+        ],
+        "declared_versions": {},
+        "languages": [
+          {
+            "id": "java",
+            "manifests": [
+              "build.gradle",
+              "settings.gradle"
+            ],
+            "source_files": [
+              "src/main/java/Sample.java"
+            ]
+          }
+        ],
+        "lockfiles": [],
+        "manifest_sha256": {
+          "build.gradle": "46f603e292b5568476f749c4f601958e097a6056fec78ee4d70d4c5d3be17ebc",
+          "settings.gradle": "64527a18f1aaec8fefd72fea73faf5c778333c4ca6e0e3d50b09486c68d73c07"
+        },
+        "native_tool_candidates": [],
+        "observation_complete": true,
+        "observed_entries": 13,
+        "report_type": "discovery",
+        "root": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-gradle-javadoc-64057-3",
+        "schema_version": "0.4.0",
+        "scope_summary": {
+          "configuration_exception_files_observed": 0,
+          "dependency_roots_excluded": 0,
+          "dot_prefix_roots_excluded": 0,
+          "git_safety_status": "not_evaluated",
+          "ordinary_scan_policy": "project_sources_default_v2"
+        },
+        "source_set_candidates": [
+          {
+            "basis": "directory_convention",
+            "language": "java",
+            "path": "src/main/java",
+            "role": "main"
+          }
+        ],
+        "unknown_conditions": [
+          "build_model_not_evaluated",
+          "some_manifest_metadata_not_parsed",
+          "source_sets_not_fully_classified",
+          "dialects_not_classified"
+        ]
+      },
+      "execution_budget": {
+        "enforcement": "native_execution_only",
+        "jobs_limit": 4,
+        "jobs_source": "builtin_default",
+        "native_task_count": 2,
+        "source": "builtin_default",
+        "started_native_task_count": 2,
+        "timeout_ms": 1800000
+      },
+      "execution_tasks": [
+        {
+          "id": "java.gradle.javadoc",
+          "status": "cancelled"
+        },
+        {
+          "id": "java.p3c",
+          "status": "native_incomplete"
+        }
+      ],
+      "exit_code": 130,
+      "export": {
+        "reason_code": null,
+        "status": "not_requested"
+      },
+      "native_results": {
+        "erlang_lint": null,
+        "go_lint": null,
+        "java_cve": null,
+        "java_dependencies": null,
+        "java_gradle_javadoc": {
+          "authority": "local_unverified",
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "findings": [],
+          "gradle_bundle_sha256": "a6ef7ed8eb7ac1dfac6cee9c17b0942addb50d50e7057575b5ef82cda75cbe81",
+          "init_scripts_sha256": "f759fb2fde664dbf316a17f752630f5f78b4b98dac5131f2ac43133e763ba309",
+          "java_entry_sha256": "350f881cea1c0325efc08903159eae75a3cdcc832669403329ee24f9701458c9",
+          "jdk_release_sha256": "e2069654862fbf6ba95b156b752e8e229943ca8016ff7d4e065e5fdf57134e3a",
+          "model_report_sha256": null,
+          "native_status": "incomplete",
+          "native_stderr_sha256": null,
+          "native_stdout_sha256": null,
+          "reason": "request_cancelled",
+          "report_type": "gradle_javadoc_probe",
+          "rule_configuration_complete": false,
+          "schema_version": "0.1.0",
+          "selected_java_file_count": 1,
+          "source_snapshot_sha256": "c6cabe95d0e6a72d9dc2ffef9094881bd637677bb974432a20dc0f3f5a7cbd12",
+          "task_paths": []
+        },
+        "java_javadoc": null,
+        "java_p3c": {
+          "authority": "local_unverified",
+          "backlog_status": "not_initialized",
+          "backlog_sync": null,
+          "category": "lint",
+          "checker_id": "java.maven.p3c",
+          "command_status": "incomplete",
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "exit_code": 3,
+          "files": [
+            {
+              "build_root": ".",
+              "configuration": "unknown",
+              "configuration_ref": null,
+              "configuration_sha256": null,
+              "observation": null,
+              "path": "src/main/java/Sample.java",
+              "reason": "p3c_configuration_not_confirmed"
+            }
+          ],
+          "finding_count": 0,
+          "findings": [],
+          "language": "java",
+          "local_observation_complete": false,
+          "next": null,
+          "observed_file_count": 0,
+          "operation": "lint",
+          "report_type": "java_p3c_project_observation",
+          "rulepack_approval": "unverified",
+          "run_id": "java-p3c-64287-1791282910239893000-0",
+          "schema_version": "0.2.0",
+          "source_file_count": 1,
+          "tool_approval": "unverified",
+          "workspace_binding": "uninitialized",
+          "workspace_id": null
+        },
+        "kotlin_lint": null,
+        "node_lint": null,
+        "npm_cve": [],
+        "python_cve": [],
+        "python_lint": null,
+        "ruby_lint": null,
+        "rust_build": null,
+        "rust_comments": null,
+        "rust_cve": null,
+        "rust_lint": null,
+        "shell_lint": null,
+        "swift_lint": null,
+        "zig_lint": null
+      },
+      "next": null,
+      "obligation_status": "unresolved",
+      "operation": "check",
+      "reason": "request_cancelled",
+      "report_type": "check_feedback",
+      "required_obligations": null,
+      "schema_version": "0.64.0",
+      "selection": "java",
+      "syntax_candidates": {
+        "authority": "candidate_unqualified",
+        "delivery_decision": "incomplete",
+        "execution_phase": "after_native",
+        "native_preferred_count": 0,
+        "next_action": "\u4f7f\u7528\u5305\u542b\u56fa\u5b9a\u8bed\u6cd5\u8d44\u4ea7\u7684\u53d1\u884c\u5305\u8fd0\u884c\u5019\u9009\u521d\u68c0\uff0c\u5e76\u5b8c\u6210\u9002\u7528\u539f\u751f\u68c0\u67e5",
+        "observations": [],
+        "reason": "binary_without_wasm_precheck",
+        "skipped_count": 0,
+        "source_file_count": 1,
+        "status": "not_run",
+        "unrouted_count": 0
+      },
+      "syntax_tasks": {
+        "failures": [],
+        "new_blockers": 0,
+        "status": "synced_partial",
+        "tasks": []
+      },
+      "unresolved_conditions": [
+        "build_model_not_evaluated",
+        "dialects_not_classified",
+        "gradle_detailed_documentation_rules_and_repair_closure_unverified",
+        "gradle_native_javadoc_incomplete",
+        "gradle_selected_configuration_model_and_quality_coverage_unverified",
+        "java_p3c_task_incomplete",
+        "request_cancelled",
+        "required_obligations_unresolved",
+        "some_manifest_metadata_not_parsed",
+        "source_sets_not_fully_classified",
+        "tool_lock_unverified",
+        "trusted_policy_unavailable"
+      ]
+    }
+  },
+  {
+    "case": "static-unknown",
+    "report": {
+      "authority": "local_unverified",
+      "category_candidates": [
+        {
+          "capability_status": "gap",
+          "category": "lint",
+          "checker_id": null,
+          "language": "java",
+          "legacy_status": "stable",
+          "next_action": null,
+          "reason": "native_scan_incomplete",
+          "status": "native_incomplete"
+        },
+        {
+          "capability_status": "gap",
+          "category": "comments",
+          "checker_id": null,
+          "language": "java",
+          "legacy_status": "stable",
+          "next_action": "\u6309\u6e90\u7801\u6700\u8fd1\u6784\u5efa\u6839\u6838\u9a8c Maven/Gradle \u7684\u751f\u6548 Javadoc \u914d\u7f6e\u3001doclint/doclet \u548c\u6e90\u96c6\uff1b\u5f53\u524d\u9759\u6001\u89c2\u5bdf\u672a\u77e5\uff0c\u4e0d\u5224\u914d\u7f6e\u7f3a\u5931\uff0c\u4e5f\u4e0d\u8981\u6c42\u4fee\u6539\u65e0\u5173\u6784\u5efa\u5668",
+          "reason": "javadoc_configuration_unresolved",
+          "status": "configuration_unresolved"
+        },
+        {
+          "capability_status": "gap",
+          "category": "dependencies",
+          "checker_id": null,
+          "language": "java",
+          "legacy_status": "stable",
+          "next_action": "\u89e3\u6790\u76ee\u6807\u6784\u5efa\u6839\u7684 Gradle \u751f\u6548\u6a21\u578b\u540e\u91cd\u65b0\u68c0\u67e5",
+          "reason": "gradle_model_not_resolved",
+          "status": "configuration_unresolved"
+        },
+        {
+          "capability_status": "gap",
+          "category": "cve",
+          "checker_id": null,
+          "language": "java",
+          "legacy_status": "stable",
+          "next_action": "\u89e3\u6790\u76ee\u6807\u6784\u5efa\u6839\u7684 Gradle \u751f\u6548\u6a21\u578b\u540e\u91cd\u65b0\u68c0\u67e5",
+          "reason": "gradle_model_not_resolved",
+          "status": "configuration_unresolved"
+        },
+        {
+          "capability_status": "gap",
+          "category": "security",
+          "checker_id": null,
+          "language": "java",
+          "legacy_status": "stable",
+          "next_action": "\u89e3\u6790\u76ee\u6807\u6784\u5efa\u6839\u7684 Gradle \u751f\u6548\u6a21\u578b\u540e\u91cd\u65b0\u68c0\u67e5",
+          "reason": "gradle_model_not_resolved",
+          "status": "configuration_unresolved"
+        },
+        {
+          "capability_status": "gap",
+          "category": "build",
+          "checker_id": null,
+          "language": "java",
+          "legacy_status": "stable",
+          "next_action": null,
+          "reason": "native_adapter_not_integrated",
+          "status": "not_integrated"
+        }
+      ],
+      "command_status": "incomplete",
+      "delivery_decision": "not_evaluated",
+      "discovery": {
+        "blocked_paths": [],
+        "build_roots": [
+          {
+            "manifests": [
+              "build.gradle",
+              "settings.gradle"
+            ],
+            "path": "."
+          }
+        ],
+        "checker_configurations": [
+          {
+            "build_root": ".",
+            "category": "lint",
+            "checker_id": "java.gradle.pmd",
+            "configuration": "unknown",
+            "configuration_ref": "build.gradle",
+            "next_action": "\u89e3\u6790\u751f\u6548 Gradle \u6a21\u578b\u4ee5\u786e\u5b9a\u68c0\u67e5\u914d\u7f6e",
+            "reason": "gradle_model_not_resolved"
+          },
+          {
+            "build_root": ".",
+            "category": "lint",
+            "checker_id": "java.gradle.p3c",
+            "configuration": "unknown",
+            "configuration_ref": "build.gradle",
+            "next_action": "\u89e3\u6790\u751f\u6548 Gradle \u6a21\u578b\u4ee5\u786e\u5b9a\u68c0\u67e5\u914d\u7f6e",
+            "reason": "gradle_model_not_resolved"
+          },
+          {
+            "build_root": ".",
+            "category": "lint",
+            "checker_id": "java.gradle.checkstyle",
+            "configuration": "unknown",
+            "configuration_ref": "build.gradle",
+            "next_action": "\u89e3\u6790\u751f\u6548 Gradle \u6a21\u578b\u4ee5\u786e\u5b9a\u68c0\u67e5\u914d\u7f6e",
+            "reason": "gradle_model_not_resolved"
+          },
+          {
+            "build_root": ".",
+            "category": "comments",
+            "checker_id": "java.gradle.javadoc",
+            "configuration": "unknown",
+            "configuration_ref": "build.gradle",
+            "next_action": "\u89e3\u6790\u751f\u6548 Gradle \u6a21\u578b\u4ee5\u786e\u5b9a\u68c0\u67e5\u914d\u7f6e",
+            "reason": "gradle_model_not_resolved"
+          },
+          {
+            "build_root": ".",
+            "category": "dependencies",
+            "checker_id": "java.gradle.dependency",
+            "configuration": "unknown",
+            "configuration_ref": "build.gradle",
+            "next_action": "\u89e3\u6790\u751f\u6548 Gradle \u6a21\u578b\u4ee5\u786e\u5b9a\u68c0\u67e5\u914d\u7f6e",
+            "reason": "gradle_model_not_resolved"
+          },
+          {
+            "build_root": ".",
+            "category": "cve",
+            "checker_id": "java.gradle.dependency_check",
+            "configuration": "unknown",
+            "configuration_ref": "build.gradle",
+            "next_action": "\u89e3\u6790\u751f\u6548 Gradle \u6a21\u578b\u4ee5\u786e\u5b9a\u68c0\u67e5\u914d\u7f6e",
+            "reason": "gradle_model_not_resolved"
+          },
+          {
+            "build_root": ".",
+            "category": "security",
+            "checker_id": "java.gradle.findsecbugs",
+            "configuration": "unknown",
+            "configuration_ref": "build.gradle",
+            "next_action": "\u89e3\u6790\u751f\u6548 Gradle \u6a21\u578b\u4ee5\u786e\u5b9a\u68c0\u67e5\u914d\u7f6e",
+            "reason": "gradle_model_not_resolved"
+          }
+        ],
+        "declared_versions": {},
+        "languages": [
+          {
+            "id": "java",
+            "manifests": [
+              "build.gradle",
+              "settings.gradle"
+            ],
+            "source_files": [
+              "src/main/java/Sample.java"
+            ]
+          }
+        ],
+        "lockfiles": [],
+        "manifest_sha256": {
+          "build.gradle": "46f603e292b5568476f749c4f601958e097a6056fec78ee4d70d4c5d3be17ebc",
+          "settings.gradle": "64527a18f1aaec8fefd72fea73faf5c778333c4ca6e0e3d50b09486c68d73c07"
+        },
+        "native_tool_candidates": [],
+        "observation_complete": true,
+        "observed_entries": 6,
+        "report_type": "discovery",
+        "root": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-gradle-javadoc-64057-4",
+        "schema_version": "0.4.0",
+        "scope_summary": {
+          "configuration_exception_files_observed": 0,
+          "dependency_roots_excluded": 0,
+          "dot_prefix_roots_excluded": 0,
+          "git_safety_status": "not_evaluated",
+          "ordinary_scan_policy": "project_sources_default_v2"
+        },
+        "source_set_candidates": [
+          {
+            "basis": "directory_convention",
+            "language": "java",
+            "path": "src/main/java",
+            "role": "main"
+          }
+        ],
+        "unknown_conditions": [
+          "build_model_not_evaluated",
+          "some_manifest_metadata_not_parsed",
+          "source_sets_not_fully_classified",
+          "dialects_not_classified"
+        ]
+      },
+      "execution_budget": {
+        "enforcement": "native_execution_only",
+        "jobs_limit": 4,
+        "jobs_source": "builtin_default",
+        "native_task_count": 1,
+        "source": "builtin_default",
+        "started_native_task_count": 1,
+        "timeout_ms": 1800000
+      },
+      "execution_tasks": [
+        {
+          "id": "java.p3c",
+          "status": "native_incomplete"
+        }
+      ],
+      "exit_code": 3,
+      "export": {
+        "reason_code": null,
+        "status": "not_requested"
+      },
+      "native_results": {
+        "erlang_lint": null,
+        "go_lint": null,
+        "java_cve": null,
+        "java_dependencies": null,
+        "java_javadoc": null,
+        "java_p3c": {
+          "authority": "local_unverified",
+          "backlog_status": "not_initialized",
+          "backlog_sync": null,
+          "category": "lint",
+          "checker_id": "java.maven.p3c",
+          "command_status": "incomplete",
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "exit_code": 3,
+          "files": [
+            {
+              "build_root": ".",
+              "configuration": "unknown",
+              "configuration_ref": null,
+              "configuration_sha256": null,
+              "observation": null,
+              "path": "src/main/java/Sample.java",
+              "reason": "p3c_configuration_not_confirmed"
+            }
+          ],
+          "finding_count": 0,
+          "findings": [],
+          "language": "java",
+          "local_observation_complete": false,
+          "next": null,
+          "observed_file_count": 0,
+          "operation": "lint",
+          "report_type": "java_p3c_project_observation",
+          "rulepack_approval": "unverified",
+          "run_id": "java-p3c-64284-1791282910239705000-0",
+          "schema_version": "0.2.0",
+          "source_file_count": 1,
+          "tool_approval": "unverified",
+          "workspace_binding": "uninitialized",
+          "workspace_id": null
+        },
+        "kotlin_lint": null,
+        "node_lint": null,
+        "npm_cve": [],
+        "python_cve": [],
+        "python_lint": null,
+        "ruby_lint": null,
+        "rust_build": null,
+        "rust_comments": null,
+        "rust_cve": null,
+        "rust_lint": null,
+        "shell_lint": null,
+        "swift_lint": null,
+        "zig_lint": null
+      },
+      "next": null,
+      "obligation_status": "unresolved",
+      "operation": "check",
+      "reason": "java_selection_obligations_and_trusted_policy_unavailable",
+      "report_type": "check_feedback",
+      "required_obligations": null,
+      "schema_version": "0.61.0",
+      "selection": "java",
+      "syntax_candidates": {
+        "authority": "candidate_unqualified",
+        "delivery_decision": "incomplete",
+        "execution_phase": "after_native",
+        "native_preferred_count": 0,
+        "next_action": "\u4f7f\u7528\u5305\u542b\u56fa\u5b9a\u8bed\u6cd5\u8d44\u4ea7\u7684\u53d1\u884c\u5305\u8fd0\u884c\u5019\u9009\u521d\u68c0\uff0c\u5e76\u5b8c\u6210\u9002\u7528\u539f\u751f\u68c0\u67e5",
+        "observations": [],
+        "reason": "binary_without_wasm_precheck",
+        "skipped_count": 0,
+        "source_file_count": 1,
+        "status": "not_run",
+        "unrouted_count": 0
+      },
+      "syntax_tasks": {
+        "failures": [],
+        "new_blockers": 0,
+        "status": "synced_partial",
+        "tasks": []
+      },
+      "unresolved_conditions": [
+        "build_model_not_evaluated",
+        "dialects_not_classified",
+        "java_p3c_task_incomplete",
+        "required_obligations_unresolved",
+        "some_manifest_metadata_not_parsed",
+        "source_sets_not_fully_classified",
+        "tool_lock_unverified",
+        "trusted_policy_unavailable"
+      ]
+    }
+  }
+]

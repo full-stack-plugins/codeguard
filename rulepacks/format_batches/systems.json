@@ -1,0 +1,144 @@
+{
+  "schema_version": "0.1.0",
+  "batch": "systems",
+  "languages": [
+    {
+      "language": "zig",
+      "status": "integrated",
+      "formatter": "zig",
+      "tool_key": "zig",
+      "check_argv": [
+        "fmt",
+        "--check",
+        "{file}"
+      ],
+      "apply_argv": [
+        "fmt",
+        "{file}"
+      ],
+      "config_markers": [],
+      "extensions": [
+        ".zig",
+        ".zon"
+      ],
+      "dialects": {},
+      "notes": "zig fmt 是 Zig 工具链内置官方格式化器（可执行文件为 zig，通过 fmt 子命令调用）。已在本机实跑验证（zig 0.16.0）：check 退出 0=合规、1=不合规（文件名打到 stdout，不影响 B 类退出码判定），apply 成功退出 0。zig fmt 没有任何配置文件，官方固定风格不可调；不检查语义与 lint；语法错误的文件 check 与不存在文件同样退出 1（会被判为不合规，随后 apply 阶段以非 0 失败兜底，不会静默通过）；除 .zig 外也支持 .zon（已实测）。",
+      "unparsable_detection": "clang_format_xml",
+      "unformatted_exit_codes": [
+        1
+      ]
+    },
+    {
+      "language": "nim",
+      "status": "integrated",
+      "formatter": "nph",
+      "tool_key": "nph",
+      "check_argv": [
+        "--check",
+        "{file}"
+      ],
+      "apply_argv": [
+        "{file}"
+      ],
+      "config_markers": [
+        ".nph.toml"
+      ],
+      "extensions": [
+        ".nim",
+        ".nims",
+        ".nimble"
+      ],
+      "dialects": {},
+      "notes": "Nim 官方自带的 nimpretty 已实测无 --check/只读检查模式（--check 被当未知参数：打印 usage 后退出 0 且不改文件，无法满足退出码契约），故选用社区事实标准 nph（nimble install nph）。已在本机实跑验证（nph 0.7.0 prerelease）：nph --check {file} 退出 0=合规、1=不合规（摘要走 stderr，stdout 为空），语法错误退出 3（按工具故障处理，与不合规可区分），nph {file} 就地格式化退出 0。读取项目 .nph.toml 配置。nph 尚为 prerelease 成熟度，只判格式不检查语义，极端用例建议配合版本控制使用；不在 PATH 时需用 --tool 绑定绝对路径。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
+    },
+    {
+      "language": "crystal",
+      "status": "integrated",
+      "formatter": "crystal",
+      "tool_key": "crystal",
+      "check_argv": [
+        "tool",
+        "format",
+        "--check",
+        "{file}"
+      ],
+      "apply_argv": [
+        "tool",
+        "format",
+        "{file}"
+      ],
+      "config_markers": [],
+      "extensions": [
+        ".cr"
+      ],
+      "dialects": {},
+      "notes": "crystal tool format 是 Crystal 官方内置格式化器（可执行文件为 crystal，通过 tool format 子命令调用）。已在本机实跑验证（crystal 1.21.1）：check 退出 0=合规、1=不合规（提示语走 stderr），apply 成功退出 0。没有任何配置文件，官方固定风格不可调；不检查语义与 lint；注意文件不存在时 --check 也退出 0（本运行时会预先过滤不存在的文件，因此无静默放行路径），语法错误文件会以非 0 退出。",
+      "unparsable_detection": "clang_format_xml",
+      "unformatted_exit_codes": [
+        1
+      ]
+    },
+    {
+      "language": "solidity",
+      "status": "integrated",
+      "formatter": "forge",
+      "tool_key": "forge",
+      "check_argv": [
+        "fmt",
+        "--check",
+        "{file}"
+      ],
+      "apply_argv": [
+        "fmt",
+        "{file}"
+      ],
+      "config_markers": [
+        "foundry.toml"
+      ],
+      "extensions": [
+        ".sol"
+      ],
+      "dialects": {},
+      "notes": "forge fmt 是 Foundry 工具链官方格式化器。已在本机实跑验证（forge 1.8.5）：forge fmt --check {file} 退出 0=合规、1=不合规（diff 打到 stdout，不影响 B 类退出码判定），forge fmt {file} 就地格式化退出 0。风格经项目 foundry.toml 的 [fmt] 段配置；会做风格归一化（如 uint 归一为 uint256、补空行），属风格改动不改语义；只判格式不检查语义与 lint（lint 由 solhint 等负责）；文件不存在时也退出 1（与不合规同码，运行时会预先过滤不存在文件）；需要安装 Foundry 工具链，不在 PATH 时需用 --tool 绑定绝对路径。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
+    },
+    {
+      "language": "csharp",
+      "status": "integrated",
+      "formatter": "csharpier",
+      "tool_key": "csharpier",
+      "check_argv": [
+        "check",
+        "--log-level",
+        "Warning",
+        "{file}"
+      ],
+      "apply_argv": [
+        "format",
+        "{file}"
+      ],
+      "config_markers": [
+        ".csharpierrc",
+        ".csharpierrc.json",
+        ".csharpierrc.yaml",
+        ".editorconfig"
+      ],
+      "extensions": [
+        ".cs"
+      ],
+      "dialects": {},
+      "notes": "官方 dotnet format 已实测（.NET 10 SDK 10.0.401）其 --verify-no-changes 在检测到需格式化时退出码为 2（官方文档明示行为），不满足本契约 A/B 退出码语义（退出 ≥2 视为工具故障，永不判不合规），故改选社区事实标准 CSharpier（dotnet tool install -g csharpier，类似 prettier 的 C# 官方外主流格式化器）。已在本机实跑验证（CSharpier 1.3.0）：csharpier check {file} --log-level Warning 退出 0=合规、1=不合规（--log-level Warning 用于抑制默认打在 stdout 的 Checked 摘要，避免合规文件被误判为不合规），csharpier format {file} 就地格式化退出 0；无 csproj 的裸目录同样可用（已实测）。配置读 .csharpierrc/.csharpierrc.json/.csharpierrc.yaml 或 .editorconfig；需要 .NET 运行时；语法错误文件 check 退出 1（与不合规同码，随后 apply 阶段会失败兜底）；clang-format 方案因默认按 C++ 规则处理 .cs（需项目内 Language: CSharp 配置才正确）而弃用。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
+    }
+  ]
+}

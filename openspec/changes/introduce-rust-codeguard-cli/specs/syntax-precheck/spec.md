@@ -192,6 +192,14 @@ Rust runtime MUST 按需加载 grammar，在受控解析工作进程中限制输
 - **WHEN** 用户取消初检
 - **THEN** 回收工作进程并保留取消状态，不缓存或签发 clean
 
+#### Scenario: An error branch has a large number of normal siblings
+- **WHEN** 恢复扫描为定位错误检查宽语法树中的正常子节点
+- **THEN** 每次子节点检查同样消耗遍历预算；不得只统计进入错误分支的节点。超过预算保留已有观察并报告扫描未完成，不伪称完整或增加无位置依据的恢复节点；兄弟遍历避免反复按索引从头查找
+
+#### Scenario: Structural scanning exhausts its child-inspection budget
+- **WHEN** 空语句块扫描检查子节点或为判断块是否为空而检查命名子节点
+- **THEN** 子节点检查与节点取出均消耗访问预算；超限保留已经取得的结构事实并标记扫描未完成，不根据未遍历完的块生成空块事实；正常规模合法语句、注释及其它语言的空块仍只按原规则观察
+
 #### Scenario: A host cannot enforce a declared bound
 - **WHEN** 平台无法提供声明的隔离/预算能力
 - **THEN** 如实登记缺口，不将该平台标为已通过运行验收
@@ -716,3 +724,178 @@ Go syntax-confirmation task resolution SHALL use host-verified approval policy 1
 #### Scenario: Companion changes or native counterevidence prevent closure
 - **WHEN** gofmt content/path differs from approval, changes during verification, or the original bytes have no native diagnostics
 - **THEN** approval mismatch is rejected before native execution or current-input/native-incomplete evidence is preserved; zero original diagnostics requires false-positive review rather than code-fixed closure
+
+### Requirement: SQL grammar disagreements SHALL retain explicit database dialect context
+CFQuery grammar evaluation SHALL NOT promote provisional generic SQL labels to confirmed invalid source or language qualification without an applicable database dialect and native context. Explicit dialect counterevidence SHALL be archived separately from frozen generic corpora, preserving undecided labels and original metrics. Native SQL syntax evidence SHALL identify the engine version and fixture identity; fixture query preparation SHALL NOT be presented as executing project queries or proving full CFML/project lint.
+
+#### Scenario: PostgreSQL empty projection disagrees with a generic SQL assumption
+- **WHEN** a fixed isolated PostgreSQL parser accepts `SELECT FROM users` and rejects `SELECT DISTINCT FROM users`, while the pinned CFQuery grammar reports zero recoveries for both
+- **THEN** retain the generic empty-projection case as pending, record the distinct-query disagreement with PostgreSQL context, preserve both sources and tool identities, and keep grammar qualification and delivery approval false
+
+### Requirement: CFQuery keyword candidates SHALL preserve native dialect uncertainty
+
+Fixed CFQuery grammar direct AST keyword sequence SELECT/DISTINCT/FROM MAY produce a separately versioned structural candidate with fixed rule digest. Quotes, identifiers, interpolation and other AST nodes MUST interrupt the sequence; comments MAY be ignored. SELECT/FROM without DISTINCT MUST NOT be flagged by this rule. ERROR/MISSING, asset identities and historical grammar metrics MUST remain unchanged. Candidate reports, selected-file feedback and stable confirmation tasks MUST bind whole-file identity and restore embedded fragment coordinates; neither candidate absence nor task deletion grants delivery permission. Dynamic templates and database dialect/schema context MUST be resolved by applicable native confirmation, not by guessing source edits.
+
+#### Scenario: PostgreSQL rejects DISTINCT with no projection
+
+- **WHEN** the same frozen SELECT DISTINCT FROM users has zero raw grammar recovery and PostgreSQL18.6 PREPARE returns SQLSTATE42601
+- **THEN** the public probe and selected-file check show an independent structure candidate and require applicable native confirmation; repeated scans share one task, while raw grammar observations remain zero
+- **AND** quoted literals, interpolated projection and the PostgreSQL-accepted SELECT FROM users do not match this rule
+
+### Requirement: Rust formatter parser comparisons SHALL retain explicit syntax scope
+
+Development Rust differential replay SHALL accept an explicitly selected absolute Rustfmt 1.9.0-stable executable and frozen UTF-8 stdin using a private fixed edition2024 configuration, empty environment and the shared deadline/cancellation/output budget. It SHALL verify executable path/content and private configuration continuity before the second invocation and after parsing. It SHALL NOT use `--check` formatting differences as syntax violations, read project formatter configuration, install an SDK, write formatted source, or grant Clippy/build/project coverage. The fixed edition SHALL remain an explicit replay condition, not an inferred project edition.
+
+Diagnostics SHALL require a recognized error header and bounded positions referring to the same stdin. Exit101 alone SHALL NOT prove a source violation: located parser errors MAY be retained, while panic, foreign-file, unlocated, invalid-coordinate, unknown-version, timeout and changed-input observations SHALL remain incomplete. A bounded EOF coordinate exception SHALL be limited to the observed unclosed-delimiter/trailing-newline case. Public observations SHALL expose safe rule IDs and validated line numbers without raw source, arbitrary diagnostics or guessed columns. Grammar and combined structural metrics SHALL remain separate; historical corpora/reports SHALL remain immutable and replay SHALL NOT grant language qualification or task closure.
+
+#### Scenario: Valid unformatted Rust and external modules remain parser observations
+- **WHEN** frozen edition2024 source is valid but unformatted, or names an out-of-line module containing invalid code
+- **THEN** the controlled stdin parser returns no syntax diagnostics for the selected source without formatting files, reading the module as project coverage, or claiming lint/build completion
+
+#### Scenario: Located parser exit101 differs from a native crash
+- **WHEN** the fixed parser returns E0765 at a validated stdin location, or an unclosed delimiter at the bounded EOF location
+- **THEN** record the scoped syntax diagnostic without raw source; a panic, missing location or out-of-range coordinate remains incomplete
+
+#### Scenario: Tool or private configuration changes during version detection
+- **WHEN** the selected executable alias/content or private configuration changes after version observation
+- **THEN** reject the observation before invoking the parser and preserve incomplete evidence without replacement-tool fallback
+
+### Requirement: Rust edit parsing SHALL resolve Cargo edition before native syntax observation
+
+Project Rust parser selection SHALL distinguish package edition, explicit workspace inheritance, absent package edition and standalone source. A valid package with no edition uses Cargo's backward-compatible 2015 default, not the newest formatter edition. Explicit `edition.workspace=true` SHALL require a supplied valid workspace package edition; false inheritance, unknown editions, malformed/duplicate TOML and virtual-workspace-only source SHALL remain unresolved. Static declaration parsing SHALL be bounded, shall not execute Cargo or project scripts, and shall retain an explicit package.workspace locator for the filesystem layer to resolve. A missing Cargo manifest SHALL NOT default standalone source to any edition. Declaration parsing alone SHALL NOT prove workspace membership, source ownership, tool suitability or project lint coverage.
+
+#### Scenario: Package and workspace editions differ
+- **WHEN** a package explicitly declares edition2018 while its surrounding workspace declares2024
+- **THEN** the package uses2018; only an explicit workspace inheritance declaration resolves to2024
+
+#### Scenario: Omitted or unresolved edition is handled without guessing
+- **WHEN** a valid package omits edition, a standalone file lacks a manifest, or workspace inheritance has no valid edition provider
+- **THEN** only the valid package defaults to2015; the other contexts remain unresolved and no incompatible fixed-edition parser is invoked
+
+#### Scenario: Declaration changes during tool version detection
+- **WHEN** a nearer manifest appears or package/workspace declaration or source bytes change during the native version invocation
+- **THEN** withdraw current diagnostics and do not start the second parser invocation; retain an incomplete observation without task closure
+
+
+### Requirement: 隐藏解析错误必须指导原生确认
+
+语法树存在错误但公开恢复遍历无法定位时 MUST 保留初检未完成，不生成虚构 ERROR/MISSING 位置或将零恢复当作通过。私有工作进程 SHALL 用独立版本区分不可定位错误与资源预算耗尽；显式 grammar probe SHALL 提供同字节原生确认和 grammar 复核指引。此观察不独立证明源码违规，也不提升 grammar 资格。
+
+#### Scenario: 隐藏错误与合法反例
+- **WHEN** 固定 Kotlin/Swift grammar 产生隐藏 MISSING 且公开遍历没有恢复节点
+- **THEN** SHALL 返回 parser_error_location_unavailable=true 和原生确认动作，保持原字节、零虚构位置、incomplete/not_evaluated
+
+#### Scenario: 预算耗尽不冒充隐藏错误
+- **WHEN** 正常兄弟节点检查耗尽扫描预算且没有已确认的不可定位错误
+- **THEN** SHALL 保留截断未完成状态，不声称存在隐藏 token；旧工作进程版本不得携带新字段，新字段矛盾时 SHALL 拒绝报告
+
+#### Scenario: 项目检查与智能体入口的未完成解析指引
+- **WHEN** 项目检查、编辑Hook或稳定任务反馈包含 syntax_recovery_incomplete，包括不可定位错误或扫描预算耗尽
+- **THEN** 人类输出不得仅凭截断声称grammar已确认错误；反馈、任务正文和next SHALL 要求对原始源码使用适用原生工具确认，原生确认合法时调查grammar版本/兼容性或扫描预算，原生诊断成立时才按真实位置修复；保留无位置、未完成和既有任务身份
+
+#### Scenario: 原始WASM候选与原生零诊断保持同一源码
+- **WHEN** 有效且当前的局部原生复检没有语法诊断，绑定的源码摘要仍等于首次WASM候选摘要，且原始grammar引用可核对
+- **THEN** next/task show SHALL 将此作为grammar反证候选处理，指导兼容性/预算调查而不是声称源码已修复；输入变化或原生首次来源不得套用同字节WASM反证描述，任务仍保留既有复检和关闭权威
+
+### Requirement: Duplicate binding facts SHALL preserve lexical scope and parser evidence
+有界AST事实扫描 SHALL 只在调用方指定的同一直接父作用域内比较明确的声明与简单标识符节点，返回重复声明的原始位置，不将事实伪造为ERROR/MISSING。所有访问和记录有预算，截断不证明不存在重复；不通过文本搜索把注释、字符串或嵌套作用域当作声明。该事实不单独批准JavaScript检查完整或替代原生确认。
+
+#### Scenario: Direct JavaScript lexical declarations repeat the same simple name
+- **WHEN** 固定JavaScript grammar对`const x=1; const x=2;`没有恢复节点
+- **THEN** 直接program下lexical_declaration的简单identifier重复事实可独立观察；保留原始parser零恢复和语言未验收状态
+
+#### Scenario: Scope or declaration semantics differ
+- **WHEN** 同名声明位于嵌套块或函数、仅为var重复声明、出现在字符串/注释，或需解构/export/转义归一化和模块上下文解释
+- **THEN** 简单直接绑定事实扫描不把这些情况猜成相同作用域违规；未接线的语言规则与范围不声明已完成
+
+#### Scenario: Explicit probe exposes a bounded duplicate binding candidate
+- **WHEN** `grammar probe javascript FILE`观察到重复直接简单lexical绑定
+- **THEN** SHALL 输出独立版本化结构候选及固定规则配置摘要，保留原始恢复、grammar未验收和退出3，要求适用原生工具确认；旧版本消费者不猜成原生违规或普通通过。项目check/Hook/任务接线须分别验收，不能借probe结果宣称完成
+
+#### Scenario: JavaScript direct binding candidates reuse the project and edit confirmation task
+- **WHEN** an initialized workspace contains duplicate direct simple JavaScript lexical bindings outside proven native coverage
+- **THEN** project and confirmed edit checks SHALL preserve structural observations separately from parser recoveries and sync the same ESLint confirmation task
+- **AND** next SHALL identify the bounded candidate rule and require applicable native checking with the original dialect and configuration
+- **AND** a later candidate observation without duplicates SHALL NOT close the existing task
+- **AND** forged rule, grammar, position or cross-language protocol identities SHALL be rejected by the report importer
+
+#### Scenario: Standalone JavaScript feedback preserves pending native confirmation
+- **WHEN** the ESLint unified entry checks a JavaScript source without usable native context
+- **THEN** it SHALL use the JavaScript grammar and the same bounded observation and task synchronization services as project checks
+- **AND** a candidate-free observation SHALL recommend native lint only when no validated open confirmation task remains for that workspace and scope
+- **AND** an existing open task SHALL retain its identity and required native confirmation even when the latest candidate observation contains no issue
+- **AND** automatic native discovery SHALL NOT search or execute beyond the selected workspace boundary
+
+#### Scenario: JavaScript 零候选不能隐藏损坏的历史确认任务
+- **WHEN** 独立 JavaScript 初检没有当前候选，但同范围历史任务的事实、投影、父目录或工作区身份无法核验
+- **THEN** 保留 required 原生确认要求，将工作台同步报告标记 incomplete，并输出具体记录恢复原因；不把读取失败当作没有任务，不读取链接目标的指令，不虚构任务引用或将本地 closed 字段当作有效关闭
+- **AND** 只有可核验工作区中同范围事实目录及任务投影确实均不存在，才按当前有界零候选观察提供推荐安装建议；后续完整门禁仍独立核对全部义务
+
+### Requirement: Erlang form termination observations remain separate from parser recovery
+The system SHALL inspect direct function-form terminal tokens in the pinned Erlang AST without classifying punctuation in strings, characters or comments as terminators. A semicolon followed by another function form SHALL remain a possible clause continuation; a missing terminator or final semicolon SHALL create a structural candidate requiring original native confirmation. Bounded traversal SHALL preserve incomplete status rather than infer termination across unvisited siblings.
+
+#### Scenario: Missing period with no parser error
+- **WHEN** pinned WASM parses a function without a terminal period without ERROR/MISSING
+- **THEN** the worker and explicit probe preserve a versioned structural candidate, source/grammar/rule identity and original byte position, without promoting it to native lint or language qualification
+
+#### Scenario: Legal punctuation and multiple clauses
+- **WHEN** literal punctuation, comments, or a semicolon continuing the next function clause occurs
+- **THEN** only direct AST punctuation determines the candidate, and legal forms do not receive a termination candidate
+
+#### Scenario: Erlang structural candidates enter project and edit repair workflow
+- **WHEN** native Erlang is unavailable and project scanning or a confirmed edit discovers a direct function form termination candidate
+- **THEN** the shared bounded worker emits the same versioned structural evidence and updates one stable native-confirmation task, with original-tool recheck instructions and preserved attempt history
+- **AND** subsequent zero candidates cannot close that task, changed source retains its original consumed evidence, and forged rule/source/position reports cannot be imported
+
+#### Scenario: Current full replay measures structural candidates separately
+- **WHEN** the fixed 32-language corpus is replayed with the same structural rules used by project checks, including explicit JavaScript and Erlang rules
+- **THEN** a versioned report preserves the original parser classification and separate combined classifications, rule identities and per-language/source-group counts; truncation, cancellation or program changes remain unknown, pending labels remain unevaluated, and no language qualification is granted
+
+### Requirement: JavaScript native differential SHALL measure the project binding candidate separately from parser recovery
+
+The native differential SHALL use the same frozen JavaScript binding worker as project checking for its combined observation. Raw recovery classification and counts SHALL remain unchanged. Versioned reports SHALL preserve the pinned rule identity and reject structures attributed to another language. Explicit Node module syntax SHALL NOT turn unknown project or CommonJS context into unconditional source violations.
+
+#### Scenario: Native-invalid duplicate declaration has a combined candidate
+- **WHEN** a frozen direct lexical duplicate is rejected by the selected Node syntax observer but has no parser recovery
+- **THEN** the raw comparison remains false_negative, the combined comparison is true_positive with the project rule evidence, and no grammar qualification or delivery permission is issued
+
+### Requirement: Module-only return candidates SHALL use bounded AST facts and explicit mode
+
+The implementation SHALL derive return-outside-function facts from bounded AST traversal, including returns nested in control-flow blocks, and SHALL skip function declarations, expressions, generators, arrows and methods. Facts SHALL retain byte locations and incomplete traversal. The presence of these facts alone SHALL NOT classify CommonJS or unknown-mode input as invalid. Activation of a module-only candidate SHALL require an explicit applicable module context.
+
+#### Scenario: Returns in functions remain legal candidates
+- **WHEN** a JavaScript AST contains function, generator, arrow or method returns and an outer control-flow return
+- **THEN** only the return outside function boundaries is retained as an AST fact
+- **AND** record or traversal exhaustion remains visibly truncated
+- **AND** no grammar qualification, native completion or project delivery permission is granted
+
+#### Scenario: Explicit module probe preserves mode-bound candidates
+- **WHEN** `grammar probe javascript FILE --module --format=json` is requested
+- **THEN** the private worker and probe bind `javascript_mode=module`, source identity and the fixed module-return rule identity
+- **AND** function-external returns are candidate structures, separate from raw parser recoveries
+- **AND** a probe without `--module` never activates this rule, while other-language or contradictory mode arguments fail before parsing
+- **AND** old worker/probe consumers reject unsupported context instead of interpreting candidates as complete lint
+
+#### Scenario: Module differential uses the same explicit candidate scope
+- **WHEN** the developer differential selects the fixed Node observer that always runs `--input-type=module`
+- **THEN** each JavaScript row binds `javascript_mode=module` and uses the explicit module worker
+- **AND** raw parser false negatives remain unchanged while duplicate binding and outer-return rules contribute only to combined candidates
+- **AND** wrong-mode/cross-language structure evidence or fabricated qualification is rejected by the versioned report contract
+
+### Requirement: Project JavaScript mode observation SHALL bind only bounded local evidence
+
+Before automatically activating module-only candidates, the implementation SHALL observe the exact source path and bytes within the selected physical workspace. `.mjs` SHALL identify module and `.cjs` SHALL identify CommonJS without package inheritance. For `.js`, only the nearest bounded readable ordinary `package.json` with an explicit unique `type` of `module` or `commonjs` SHALL identify the declared mode. Missing, invalid, duplicate, linked, ambiguous or unsupported input SHALL retain unknown mode, without inheriting past the nearest package or reading outside the selected root. Source and package digests, searched directories and incomplete reasons SHALL remain available for pre/post-scan continuity comparison. This static observation SHALL NOT prove native execution or project quality.
+
+#### Scenario: Nested package boundaries and negative evidence remain current
+- **WHEN** a source is inside a nested package or a previously absent nearer package is created
+- **THEN** the nearest package determines explicit declared mode or unknown state
+- **AND** creation/removal/change of the mode evidence changes the observation used to validate the scan
+- **AND** package/default uncertainty never produces a source violation or fabricated clean result
+
+#### Scenario: Project fallback binds module evidence to stable native-confirmation tasks
+- **WHEN** a JavaScript candidate scan lacks applicable native lint and current bounded mode evidence declares module
+- **THEN** it selects the explicit module worker and verifies the same source/mode evidence after scanning
+- **AND** visible observations and persisted native-confirmation reports retain that evidence and rule identities
+- **AND** repeated project/lint/edit checks reuse one task, while a later zero candidate does not close it
+- **AND** CommonJS or unknown-mode sources never activate the module-return candidate
+- **AND** changed mode evidence or forged context remains incomplete and cannot create an accepted source finding

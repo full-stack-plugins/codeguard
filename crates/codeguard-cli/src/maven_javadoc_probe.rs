@@ -9,7 +9,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::{Instant, SystemTime, UNIX_EPOCH};
 
 use codeguard_adapters::{
-    MavenJavadocParseState, javadoc_pom_direct_replay_eligible, parse_maven_javadoc_output,
+    MavenJavadocParseState, javadoc_pom_direct_replay_eligible, parse_detailed_maven_javadoc_output,
 };
 use codeguard_runtime::{
     ProcessSpec, SourceSnapshot, Termination, read_bounded_regular_file, run_process_recorded,
@@ -23,6 +23,7 @@ const SETTINGS: &str = include_str!("../resources/isolated_maven_settings.xml");
 
 /// 多文件探针输入；所有路径相对同一个构建根。
 pub(crate) struct Request<'a> {
+    pub observer: Option<&'a crate::maven_capture_observer::MavenCaptureObserver<'a>>,
     pub build_root: &'a Path,
     pub sources: &'a BTreeSet<String>,
     pub expected_pom_sha256: &'a str,
@@ -160,10 +161,12 @@ pub(crate) fn observe(request: &Request<'_>) -> Value {
         deadline: request.deadline,
         output_limit_bytes: 2 * 1024 * 1024,
     };
+    let dispatch_requested_at = SystemTime::now();
     let outcome = match run_process_recorded(&spec, request.cancelled, &evidence, "javadoc.log") {
         Ok(outcome) => outcome,
         Err(_) => return with_reason(report, "native_process_incomplete"),
     };
+    let process_observed_finished_at = SystemTime::now();
     if snapshot.verify_unchanged(&project).ok() != Some(true)
         || read_bounded_regular_file(&project.join("settings.xml"), 64 * 1024)
             .ok()
@@ -180,6 +183,10 @@ pub(crate) fn observe(request: &Request<'_>) -> Value {
             .ok()
             .as_deref()
             != Some(java_bytes.as_slice())
+        || read_bounded_regular_file(&java_home.join("release"), 64 * 1024)
+            .ok()
+            .as_deref()
+            != Some(release_bytes.as_slice())
         || hash_bundle_tree(&repo).ok().as_deref() != Some(repo_digest)
     {
         return with_reason(report, "native_identity_changed_during_scan");
@@ -204,7 +211,7 @@ pub(crate) fn observe(request: &Request<'_>) -> Value {
             )
         })
         .collect();
-    let parsed = parse_maven_javadoc_output(&outcome.stdout, exit, "3.12.0", &source_map);
+    let parsed = parse_detailed_maven_javadoc_output(&outcome.stdout, exit, "3.12.0", &source_map);
     if parsed.state == MavenJavadocParseState::Incomplete {
         return with_reason(
             report,
@@ -248,13 +255,40 @@ pub(crate) fn observe(request: &Request<'_>) -> Value {
         MavenJavadocParseState::CleanLogUnverified => "clean_log_unverified",
         MavenJavadocParseState::Incomplete => unreachable!(),
     });
-    with_reason(report, "direct_pom_scope_and_effective_model_unverified")
+    let report = with_reason(report, "direct_pom_scope_and_effective_model_unverified");
+    if let Some(observer) = request.observer {
+        let sources = snapshot
+            .files()
+            .iter()
+            .filter(|(path, _)| path.as_path() != Path::new("pom.xml"))
+            .map(|(path, bytes)| {
+                (
+                    path.to_string_lossy().into_owned(),
+                    (
+                        project.join(path).to_string_lossy().into_owned(),
+                        bytes.clone(),
+                    ),
+                )
+            })
+            .collect();
+        // 此时输入、工具身份与原生诊断位置均已复验；回调只读取私有快照，不改变产品报告。
+        let capture = crate::maven_native_capture::MavenNativeCapture {
+            native_report: report.clone(),
+            sources,
+            outcome,
+            dispatch_requested_at,
+            process_observed_finished_at,
+        };
+        // run_observed包装器负责收集Err；默认observe调用没有观察者。
+        let _ = observer(&capture);
+    }
+    report
 }
 
 /// 为检查前配置变化生成同形状的未完成观察，避免宿主得到无法解析的局部对象。
 pub(crate) fn incomplete_observation(reason: &'static str, source_count: usize) -> Value {
     json!({
-        "schema_version":"0.1.0", "report_type":"maven_javadoc_multifile_probe",
+        "schema_version":"0.2.0", "report_type":"maven_javadoc_multifile_probe",
         "checker_id":"java.maven.javadoc", "native_status":"incomplete",
         "reason":reason, "source_count":source_count,
         "observed_source_count":0, "findings":[], "native_plan_sha256":null,
@@ -320,6 +354,7 @@ mod tests {
         let sources = BTreeSet::from(["src/main/java/Demo.java".to_owned()]);
         let cancelled = AtomicBool::new(false);
         let request = Request {
+            observer: None,
             build_root: &root,
             sources: &sources,
             expected_pom_sha256: &format!(
@@ -339,10 +374,96 @@ mod tests {
         assert_eq!(report["findings"], serde_json::json!([]));
         assert_eq!(report["pom_mode"], "unverified");
         let changed = observe(&Request {
+            observer: None,
             expected_pom_sha256: &"f".repeat(64),
             ..request
         });
         assert_eq!(changed["reason"], "project_pom_changed_before_scan");
         assert_eq!(changed["findings"], serde_json::json!([]));
+    }
+
+    /// 生成代码（如 target/generated-sources）不在原 POM 主源码范围内；
+    /// 探针必须拒绝启动而不是为其合成诊断。
+    #[test]
+    fn generated_sources_outside_main_java_never_launch_the_probe() {
+        let scratch = private_scratch().unwrap();
+        let root = scratch.0.join("project");
+        fs::create_dir_all(root.join("src/main/java")).unwrap();
+        fs::write(
+            root.join("src/main/java/Demo.java"),
+            b"public class Demo {}\n",
+        )
+        .unwrap();
+        fs::write(root.join("pom.xml"), b"<project><modelVersion>4.0.0</modelVersion><groupId>demo</groupId><artifactId>demo</artifactId><version>1</version><build><plugins><plugin><artifactId>maven-javadoc-plugin</artifactId><version>3.12.0</version><configuration><doclint>missing</doclint></configuration></plugin></plugins></build></project>").unwrap();
+        let cancelled = AtomicBool::new(false);
+        let pom_digest = format!(
+            "{:x}",
+            sha2::Sha256::digest(fs::read(root.join("pom.xml")).unwrap())
+        );
+        for generated in [
+            "target/generated-sources/Gen.java",
+            "src/test/java/Gen.java",
+            "Gen.java",
+        ] {
+            let sources =
+                BTreeSet::from(["src/main/java/Demo.java".to_owned(), generated.to_owned()]);
+            let request = Request {
+                observer: None,
+                build_root: &root,
+                sources: &sources,
+                expected_pom_sha256: &pom_digest,
+                maven_tool: Some(Path::new("/nonexistent/maven")),
+                java_home: Some(Path::new("/nonexistent/jdk")),
+                maven_repo: Some(Path::new("/nonexistent/repo")),
+                repo_sha256: Some("0"),
+                deadline: Instant::now() + Duration::from_secs(5),
+                cancelled: &cancelled,
+            };
+            let report = observe(&request);
+            assert_eq!(
+                report["native_status"], "incomplete",
+                "{generated}: {report}"
+            );
+            assert_eq!(report["reason"], "main_java_source_scope_invalid");
+            assert_eq!(report["findings"], serde_json::json!([]));
+            assert_eq!(report["observed_source_count"], 0);
+            // native_plan_sha256 未设置说明从未进入原生执行路径。
+            assert!(report["native_plan_sha256"].is_null(), "{generated}");
+        }
+    }
+
+    /// 快照条目数超过 2001 上限时保持未完成，不裁剪输入。
+    #[test]
+    fn more_than_two_thousand_entries_exceed_the_snapshot_budget() {
+        let scratch = private_scratch().unwrap();
+        let root = scratch.0.join("project");
+        fs::create_dir_all(root.join("src/main/java")).unwrap();
+        let mut sources = BTreeSet::new();
+        for index in 0..2002 {
+            let path = root.join(format!("src/main/java/S{index:04}.java"));
+            fs::write(&path, b"public class S {}\n").unwrap();
+            sources.insert(format!("src/main/java/S{index:04}.java"));
+        }
+        fs::write(root.join("pom.xml"), b"<project><modelVersion>4.0.0</modelVersion><groupId>demo</groupId><artifactId>demo</artifactId><version>1</version></project>").unwrap();
+        let cancelled = AtomicBool::new(false);
+        let pom_digest = format!(
+            "{:x}",
+            sha2::Sha256::digest(fs::read(root.join("pom.xml")).unwrap())
+        );
+        let report = observe(&Request {
+            observer: None,
+            build_root: &root,
+            sources: &sources,
+            expected_pom_sha256: &pom_digest,
+            maven_tool: Some(Path::new("/nonexistent/maven")),
+            java_home: Some(Path::new("/nonexistent/jdk")),
+            maven_repo: Some(Path::new("/nonexistent/repo")),
+            repo_sha256: Some("0"),
+            deadline: Instant::now() + Duration::from_secs(30),
+            cancelled: &cancelled,
+        });
+        assert_eq!(report["native_status"], "incomplete", "{report}");
+        assert_eq!(report["reason"], "source_snapshot_unavailable");
+        assert_eq!(report["findings"], serde_json::json!([]));
     }
 }

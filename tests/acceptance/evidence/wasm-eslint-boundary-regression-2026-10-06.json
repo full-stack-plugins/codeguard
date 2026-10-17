@@ -1,0 +1,69 @@
+{
+  "date": "2026-10-06",
+  "base": "8fcf0aa3fe668f76000299f02104167b3fb62b79",
+  "foundation": {
+    "passed": 420,
+    "failed": 0,
+    "ignored": 10
+  },
+  "interrupted_cli": {
+    "passed": 546,
+    "failed": 2,
+    "ignored": 48,
+    "exit_code": 101
+  },
+  "targeted_wasm": {
+    "passed": 12,
+    "failed": 0,
+    "ignored": 4
+  },
+  "targeted_default": {
+    "passed": 6,
+    "failed": 0,
+    "ignored": 4
+  },
+  "full_wasm_qualified": false,
+  "protected_draft_excluded": true,
+  "logs": [
+    {
+      "path": "/private/tmp/cg-wasm-foundation-current.log",
+      "sha256": "54bfff7f8f6b533ad07fe2ea8bdf0d93f68b1f46aa044930e4fcfe123746bf56"
+    },
+    {
+      "path": "/private/tmp/cg-wasm-cli-current.log",
+      "sha256": "708a64a7398f17827a3d56675de38079b54f5bc4ab327b0a98c5b3773ae4b553"
+    },
+    {
+      "path": "/private/tmp/cg-wasm-regression-targets.json",
+      "sha256": "c93fd5273e13d3843d6e466ae370ff3b9fff274bbdf294f4681018a2bde66ee2"
+    },
+    {
+      "path": "/private/tmp/cg-wasm-regression-argv.json",
+      "sha256": "3856043398118e03b0116c1ca74bff1618f2d9633d0447284f4d81ffe1ead1d7"
+    },
+    {
+      "path": "/private/tmp/cg-wasm-eslint-boundary-green.log",
+      "sha256": "a219158e71ff378ed7c06ee9773df8180507314ec8b13e37d8a0e8c45ff9807d"
+    },
+    {
+      "path": "/private/tmp/cg-wasm-eslint-boundary-final.log",
+      "sha256": "b730e3545b1662d232bc8a801f0b99e4ffd72e4d5e29cbb81c27f51693747178"
+    },
+    {
+      "path": "/private/tmp/cg-default-eslint-boundary.log",
+      "sha256": "c16e08921da40994a2c970cd39c67b5049f5e020b0fa8eb0230946069c6e0314"
+    },
+    {
+      "path": "/private/tmp/cg-wasm-eslint-boundary-clippy.log",
+      "sha256": "db4a72e2004bf58721ebaf466f41ed99f932940102bb7718fc51e2fc30e7c9e6"
+    },
+    {
+      "path": "/private/tmp/cg-wasm-eslint-boundary-actual.json",
+      "sha256": "aaf5182ee52dc94d5e73b424f66f73c251ae53be4eabce226f390696d4d13e58"
+    },
+    {
+      "path": "/private/tmp/cg-ci-8fcf0aa-current.json",
+      "sha256": "dd3d1a52b4bca1f0c72f2b1b2b631ccdca8a1aac7574799b3ef3748a83cb54ec"
+    }
+  ]
+}

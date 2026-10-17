@@ -442,3 +442,75 @@ fn module_extensions_keep_native_priority_and_independent_fallback_scope() {
     }
     assert_eq!(report["delivery_decision"], "incomplete");
 }
+
+#[test]
+#[cfg(feature = "wasm-precheck")]
+fn standalone_javascript_prefers_local_eslint_and_does_not_fallback_on_selected_failure() {
+    let p = Project::new("standalone-js-priority");
+    let source = p.0.join("frontend/app.js");
+    fs::write(&source, "const x=1; const x=2;\n").unwrap();
+    let scan = || {
+        let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+            .args(["lint", "typescript"])
+            .arg(&source)
+            .args(["--format=json", "--timeout=30s"])
+            .env("PATH", &p.0)
+            .output()
+            .unwrap();
+        assert_eq!(output.status.code(), Some(3), "{output:?}");
+        serde_json::from_slice::<Value>(&output.stdout).unwrap()
+    };
+    let native = scan();
+    assert!(native.get("syntax_candidates").is_none(), "{native}");
+    assert!(native.get("syntax_precheck").is_none(), "{native}");
+    assert_eq!(native["findings"][0]["rule_id"], "no-debugger", "{native}");
+    fs::write(p.0.join("node"), "#!/bin/sh\nexit 99\n").unwrap();
+    let failed = scan();
+    assert!(failed.get("syntax_candidates").is_none(), "{failed}");
+    assert!(failed.get("syntax_precheck").is_none(), "{failed}");
+    assert_eq!(failed["local_coherent"], false);
+    assert_eq!(
+        fs::read_to_string(source).unwrap(),
+        "const x=1; const x=2;\n"
+    );
+}
+
+#[test]
+#[cfg(feature = "wasm-precheck")]
+fn standalone_selected_workspace_cannot_execute_parent_checker_or_outside_source() {
+    let p = Project::new("standalone-js-boundary");
+    let child = p.0.join("frontend/child");
+    fs::create_dir(&child).unwrap();
+    let source = child.join("app.js");
+    fs::write(&source, "const x=1; const x=2;\n").unwrap();
+    let marker = p.0.join("native-executed");
+    let node = p.0.join("node");
+    fs::write(
+        &node,
+        format!("#!/bin/sh\nprintf used > '{}'\nexit 99\n", marker.display()),
+    )
+    .unwrap();
+    let scan = |target: &std::path::Path| {
+        let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+            .args(["lint", "typescript"])
+            .arg(target)
+            .arg("--workspace")
+            .arg(&child)
+            .arg("--format=json")
+            .env("PATH", &p.0)
+            .output()
+            .unwrap();
+        assert_eq!(output.status.code(), Some(3), "{output:?}");
+        serde_json::from_slice::<Value>(&output.stdout).unwrap()
+    };
+    let within = scan(&source);
+    assert!(!marker.exists(), "ancestor checker executed: {within}");
+    assert_eq!(within["schema_version"], "0.6.0");
+    assert_eq!(
+        within["syntax_candidates"]["observations"][0]["structural_observation_count"],
+        1
+    );
+    let outside = scan(&p.0.join("frontend/app.js"));
+    assert!(!marker.exists(), "outside source executed: {outside}");
+    assert_eq!(outside["syntax_candidates"]["status"], "not_run");
+}

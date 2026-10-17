@@ -71,14 +71,7 @@ fn public_go_package_candidate_reuses_one_task_across_checks_and_save() {
     let mut task = None;
     for selection in ["go", "all", "go"] {
         let report = command(&["check", selection, path, "--format=json"], None);
-        assert_eq!(
-            report["schema_version"],
-            if report["next"]["schema_version"] == "0.14.0" {
-                "0.50.0"
-            } else {
-                "0.49.0"
-            }
-        );
+        assert_eq!(report["schema_version"], "0.73.0");
         let row = report["syntax_candidates"]["observations"]
             .as_array()
             .unwrap()
@@ -124,7 +117,13 @@ fn public_go_package_candidate_reuses_one_task_across_checks_and_save() {
     assert!(text.contains("package"), "{text}");
     assert!(text.contains("原生"));
     let initial = codeguard_cli::next_command::read_task_brief(&root, &task).unwrap();
-    assert_eq!(initial["schema_version"], "0.14.0", "{initial}");
+    assert_eq!(initial["schema_version"], "0.18.0", "{initial}");
+    assert!(
+        initial["native_confirmation_ref"]["run_id"]
+            .as_str()
+            .unwrap()
+            .starts_with("syntax-confirm-")
+    );
     assert!(initial["step"].as_str().unwrap().contains("Go"));
     assert!(!initial["step"].as_str().unwrap().contains("尚未接入"));
     let unavailable = command(&["task", "verify", &task, path, "--format=json"], None);

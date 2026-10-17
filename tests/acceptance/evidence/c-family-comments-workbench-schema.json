@@ -1,0 +1,30 @@
+{
+  "qualification": "not_granted",
+  "evidence_kind": "development_schema_regression",
+  "default": {
+    "qualification": "not_granted",
+    "evidence_kind": "development_schema_regression",
+    "schemas_valid": 481,
+    "historical_schemas_unchanged": 478,
+    "reports_valid": {
+      "c_family_comments_feedback": 15,
+      "repair_brief_preview": 3,
+      "clang_documentation_workbench_observation": 19
+    },
+    "negative_cases_rejected": 12,
+    "old_consumer_rejects_new_version": true
+  },
+  "wasm": {
+    "qualification": "not_granted",
+    "evidence_kind": "development_schema_regression",
+    "schemas_valid": 481,
+    "historical_schemas_unchanged": 478,
+    "reports_valid": {
+      "c_family_comments_feedback": 15,
+      "repair_brief_preview": 3,
+      "clang_documentation_workbench_observation": 19
+    },
+    "negative_cases_rejected": 12,
+    "old_consumer_rejects_new_version": true
+  }
+}

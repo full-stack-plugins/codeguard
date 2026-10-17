@@ -1,0 +1,66 @@
+{
+  "authority": "local_unverified",
+  "command_status": "complete",
+  "delivery_decision": "not_evaluated",
+  "event_chain_status": "unverified",
+  "evidence_freshness": "unverified",
+  "exit_code": 0,
+  "next_actions": [
+    [
+      "codeguard",
+      "task",
+      "verify",
+      "CG-9e3be727dbf76c8e55a5ca543cc21506",
+      "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-shell-show-ghir50tx",
+      "--shellcheck-tool",
+      "<已核验的绝对路径>",
+      "--format=json"
+    ]
+  ],
+  "operation": "task_show",
+  "report_type": "task_show_preview",
+  "request_id": "view-81035-1791221040173183000",
+  "schema_version": "0.3.0",
+  "state": "open",
+  "task": {
+    "action_id": "repair-source",
+    "authority": "local_unverified",
+    "checker_id": "shell.shellcheck",
+    "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+    "constraints": [
+      "仅修改目标源码",
+      "不得忽略规则或将任务勾选当作复检"
+    ],
+    "disposition": "actionable",
+    "evidence_ref": {
+      "first_report_sha256": "f6dd9522f70da5ff5b868826b3633c59351a6c8682f1f77bc7a61bf79370a9db",
+      "first_run_id": "shellcheck-1791221040109571000-81032-0"
+    },
+    "history": {
+      "attempt_count": 0,
+      "awaiting_verification": false,
+      "budget": 2,
+      "no_progress_count": 0,
+      "open_attempt_id": null,
+      "recent": []
+    },
+    "kind": "finding",
+    "native_rule_id": "SC2086",
+    "recheck_argv": [
+      "codeguard",
+      "task",
+      "verify",
+      "CG-9e3be727dbf76c8e55a5ca543cc21506",
+      "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-shell-show-ghir50tx",
+      "--shellcheck-tool",
+      "<已核验的绝对路径>",
+      "--format=json"
+    ],
+    "schema_version": "0.17.0",
+    "scope": "app.sh",
+    "source_sha256": "00400e6bf65ec46ff1d85a7494ac3f11a3ca09d56c5e0792941ff5ba67908968",
+    "step": "按当前原生SC规则和位置组修复目标源码，保持行为；源码变化后先重跑同方言同原配置检查，不关闭规则代替修复，按任务指引运行task verify；候选消失仍需可信政策和覆盖才能正式关闭。",
+    "task_id": "CG-9e3be727dbf76c8e55a5ca543cc21506"
+  },
+  "task_id": "CG-9e3be727dbf76c8e55a5ca543cc21506"
+}

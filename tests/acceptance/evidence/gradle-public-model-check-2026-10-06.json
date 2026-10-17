@@ -1,0 +1,56 @@
+{
+  "schema_version": "0.1.0",
+  "report_type": "gradle_public_model_check_acceptance",
+  "production_qualified": false,
+  "default_tests": {
+    "passed": 12,
+    "failed": 0,
+    "ignored": 3
+  },
+  "entry_regression": {
+    "passed": 18,
+    "failed": 0,
+    "ignored": 1
+  },
+  "actual_public_gradle": {
+    "passed": 1,
+    "failed": 0,
+    "ignored": 0
+  },
+  "unit_aggregate_tests": {
+    "passed": 4,
+    "failed": 0,
+    "ignored": 0
+  },
+  "wasm_overlapping_tests": {
+    "passed": 7,
+    "failed": 0,
+    "ignored": 3
+  },
+  "actual_cli_reports": 3,
+  "unit_constructed_reports": 1,
+  "forgery_rejected": 7,
+  "old_consumer_rejected": 1,
+  "schema_meta_count": 412,
+  "public_scope": [
+    "check java",
+    "check all"
+  ],
+  "quality_tasks_executed_by_model_probe": false,
+  "source_sha256": {
+    "crates/codeguard-cli/src/check_command.rs": "794094609fe90a05058aa4738a59a0fc293097571e66fc111db6ce3b15c0c0b1",
+    "crates/codeguard-cli/tests/gradle_model_probe.rs": "6356a62c38f7448f988781a9c99f5e01c9f8e173b0797502482461a239f8ca11",
+    "crates/codeguard-cli/src/command_examples.rs": "5e8be31f3d1b9035fedca90541edab1524f11d8400aa7827b80e97f9063133fd",
+    "schemas/check-feedback-v0.62.schema.json": "453003a2b440f583f283645051043891784b16510426e263c20bbcd891fe33fd",
+    "schemas/check-aborted-v0.16.schema.json": "1e5a81cf8991ba81168add17ede112ff27250bfd6308ae098ddf9bde72a7e668",
+    "tests/acceptance/evidence/gradle-public-model-check-reports-2026-10-06.json": "09364035089981b3a79a01e6e393f3d5e46974b8e85fa0817cfa623b0f43a09d",
+    "tests/acceptance/evidence/gradle-public-model-check-additional-reports-2026-10-06.json": "75923a59ebe1da8fe40becfcc91579bd7a7c7ead5c4a6600f1273851a134f6f9"
+  },
+  "remaining": [
+    "complete_project_and_jdk_identity",
+    "native_quality_and_vulnerability_execution",
+    "dependency_graph_database_freshness",
+    "stable_repair_closure",
+    "independent_holdout_platform_host_acceptance"
+  ]
+}

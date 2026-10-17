@@ -4,8 +4,8 @@ use std::fs;
 use std::path::Path;
 use std::process::Command;
 
-fn corpus() -> [(&'static str, &'static str, bool); 13] {
-    [
+fn corpus() -> Vec<(String, String, bool)> {
+    let mut cases = vec![
         ("simple", "-module(sample).\nf() -> ok.\n", true),
         ("argument", "-module(sample).\nf(X) -> X + 1.\n", true),
         (
@@ -40,6 +40,23 @@ fn corpus() -> [(&'static str, &'static str, bool); 13] {
             false,
         ),
     ]
+    .into_iter()
+    .map(|(name, source, valid)| (name.to_owned(), source.to_owned(), valid))
+    .collect::<Vec<_>>();
+    // 固定源文件语料覆盖分号、注释、字符串/字符中的点，以及 Unicode/CRLF。
+    // 预处理例仅做候选解析和 erlc 对照，不冒充单文件原生 forms 已完成。
+    let extra: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../tests/fixtures/erlang_source_forms.json"
+    ))
+    .unwrap();
+    for case in extra.as_array().unwrap() {
+        cases.push((
+            case["name"].as_str().unwrap().to_owned(),
+            case["source"].as_str().unwrap().to_owned(),
+            case["valid"].as_bool().unwrap(),
+        ));
+    }
+    cases
 }
 
 fn candidate_validity(root: &Path, source: &str) -> Option<bool> {
@@ -63,6 +80,28 @@ fn candidate_validity(root: &Path, source: &str) -> Option<bool> {
     }
 }
 
+/// 固定 grammar 对「缺少 form 终止符」的已知差异集合。
+///
+/// `WhatsApp/tree-sitter-erlang` 的 0.19→0.20 只改了 `array.h`（C 头文件严格别名 UB
+/// 修复），`grammar.js` 与生成的 `src/parser.c` 逐字节相同。2026-10-07 用
+/// tree-sitter-cli 0.27.0 对缺句点样本实测：退出码 0、语法树无 ERROR 节点。
+/// 也就是说这是 grammar 的语法定义行为，重建 WASM 无法改变它。
+///
+/// 这里锁住现状而不是把它们藏起来：差异集合一旦变化（上游修复，或候选资产被更换）
+/// 本测试即失败，提示重新裁定这批样本的期望，而不是静默地把新差异当成正常。
+const KNOWN_UNLOCATED_DIVERGENCES: [&str; 10] = [
+    "missing_period",
+    "missing_period_eof",
+    "missing_period_comment",
+    "missing_period_unicode_crlf",
+    "missing_period_after_float",
+    "missing_period_after_dot_character",
+    "missing_period_after_string",
+    "final_semicolon",
+    "multi_clause_final_semicolon",
+    "missing_middle_period",
+];
+
 #[test]
 fn erlang_candidate_retains_labeled_syntax_corpus() {
     let root = std::env::temp_dir()
@@ -73,14 +112,22 @@ fn erlang_candidate_retains_labeled_syntax_corpus() {
     let mut disagreements = Vec::new();
     let mut unresolved = Vec::new();
     for (name, source, expected_valid) in corpus() {
-        match candidate_validity(&root, source) {
+        match candidate_validity(&root, &source) {
             Some(valid) if valid != expected_valid => disagreements.push(name),
             None => unresolved.push(name),
             _ => {}
         }
     }
     fs::remove_dir_all(root).unwrap();
-    assert_eq!(disagreements, ["missing_period"]);
+    // 按集合比较而非顺序，避免语料重排造成假失败；新增或消失的差异都会被抓到。
+    let mut actual = disagreements.clone();
+    actual.sort_unstable();
+    let mut expected = KNOWN_UNLOCATED_DIVERGENCES.to_vec();
+    expected.sort_unstable();
+    assert_eq!(
+        actual, expected,
+        "固定 grammar 的已知差异集合发生变化，需重新裁定这些样本的期望：{disagreements:?}"
+    );
     assert!(unresolved.is_empty(), "unresolved: {unresolved:?}");
 }
 
@@ -108,7 +155,7 @@ fn pinned_erlang_worker_matches_native_compiler() {
     let mut unresolved = Vec::new();
     for (name, source, expected_valid) in corpus() {
         let file = root.join("sample.erl");
-        fs::write(&file, source).unwrap();
+        fs::write(&file, &source).unwrap();
         let output_dir = root.join(format!("out-{name}"));
         fs::create_dir_all(&output_dir).unwrap();
         let native = Command::new(&erlc)
@@ -135,7 +182,9 @@ fn pinned_erlang_worker_matches_native_compiler() {
         let feedback: serde_json::Value = serde_json::from_slice(&lint.stdout).unwrap();
         assert_eq!(
             feedback["native"]["status"],
-            if expected_valid {
+            if matches!(name.as_str(), "macro" | "conditional_forms") {
+                "incomplete"
+            } else if expected_valid {
                 "completed"
             } else {
                 "diagnostics_observed"
@@ -145,13 +194,16 @@ fn pinned_erlang_worker_matches_native_compiler() {
         assert_eq!(feedback["syntax_precheck"], serde_json::Value::Null);
         assert_eq!(feedback["delivery_decision"], "not_evaluated");
         assert_eq!(fs::read_to_string(&file).unwrap(), source);
-        match candidate_validity(&root, source) {
+        match candidate_validity(&root, &source) {
             Some(valid) if valid != native.status.success() => disagreements.push(name),
             None => unresolved.push(name),
             _ => {}
         }
     }
     fs::remove_dir_all(root).unwrap();
-    assert_eq!(disagreements, ["missing_period"]);
+    assert!(
+        disagreements.is_empty(),
+        "syntax disagreements: {disagreements:?}"
+    );
     assert!(unresolved.is_empty(), "unresolved: {unresolved:?}");
 }

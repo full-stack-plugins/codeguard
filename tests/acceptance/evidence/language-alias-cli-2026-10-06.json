@@ -1,0 +1,39 @@
+{
+  "schema_version": "0.1.0",
+  "scope": "public_cli_language_alias_routing",
+  "aliases": {
+    "py": "python",
+    "rs": "rust",
+    "ts": "typescript",
+    "rb": "ruby",
+    "kt": "kotlin",
+    "erl": "erlang",
+    "golang": "go",
+    "c++": "cpp",
+    "c#": "csharp"
+  },
+  "cli_tests": {
+    "passed": 10,
+    "failed": 0,
+    "ignored": 0
+  },
+  "unit_tests": {
+    "passed": 3,
+    "failed": 0,
+    "ignored": 0
+  },
+  "native_capability_acceptance": false,
+  "published_package_changed": false,
+  "source_sha256": {
+    "crates/codeguard-cli/src/language_alias.rs": "13385503aa2641d53d6596a1e936d8ba73260b2f8a4323613023950f60f29dcd",
+    "crates/codeguard-cli/src/main.rs": "d87d2104fb9b3e1cace8e3ec90e5acda2fd6121bd2e2e954bd89c19a025e71a7",
+    "crates/codeguard-cli/tests/language_alias_cli.rs": "deee92ea5cd52faa8b81ce1c5e51e38354fd7cf20e5a90c095624a8803181073"
+  },
+  "logs_sha256": {
+    "cg-language-alias-red.log": "d3b469fa3609cbd22153c8af3cd71b4c7311a8cb0c76a8ec716c4420e13bd7d5",
+    "cg-language-alias-green.log": "eac7fb7277b6a55648dc2f975cfc1fc59bf6e829c50b024d5901122034f0e239",
+    "cg-language-alias-final.log": "e28e06bea64ed20e45a8270023d2cedadbc95aba8b99c34733cf925512f22a91",
+    "cg-language-alias-unit.log": "738c2efe0c239e9741a7103f2b11048461c9f6ad45ed19e9ed9613932350a539",
+    "cg-language-alias-clippy.log": "75415a5900dc78e89f7de88d6606b7dfb401a45154cf3c18ddeb9e9644500815"
+  }
+}

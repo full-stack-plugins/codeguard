@@ -121,6 +121,55 @@ fn stable_native_diagnostic_keeps_original_source_binding() {
 }
 
 #[test]
+fn new_rust_source_with_no_native_diagnostics_withdraws_completion() {
+    let p = Project::new();
+    let report = p.scan("printf '%s\\n' 'pub fn added() {}' > src/added.rs", false);
+    assert_eq!(report["local_scan_complete"], false, "{report}");
+    assert_eq!(report["reason"], "rust_inputs_changed_during_scan");
+}
+
+#[test]
+fn changed_nested_cargo_manifest_withdraws_current_diagnostic() {
+    let p = Project::new();
+    fs::create_dir(p.0.join("member")).unwrap();
+    fs::write(
+        p.0.join("member/Cargo.toml"),
+        "[package]\nname='member'\nversion='0.1.0'\nedition='2021'\n",
+    )
+    .unwrap();
+    let report = p.scan("printf '%s\\n' '[package]' \"name='member'\" \"version='0.1.0'\" \"edition='2024'\" > member/Cargo.toml", true);
+    assert_eq!(report["local_scan_complete"], false, "{report}");
+    assert_eq!(report["reason"], "rust_inputs_changed_during_scan");
+    assert_eq!(report["findings"], serde_json::json!([]));
+}
+
+#[test]
+fn changed_other_observed_source_or_renamed_source_withdraws_completion() {
+    for mutation in [
+        "printf '%s\\n' 'pub fn changed() {}' > src/other.rs",
+        "mv src/other.rs src/renamed.rs",
+        "rm src/other.rs",
+    ] {
+        let p = Project::new();
+        fs::write(p.0.join("src/other.rs"), "pub fn other() {}\n").unwrap();
+        let report = p.scan(mutation, false);
+        assert_eq!(report["local_scan_complete"], false, "{mutation}: {report}");
+        assert_eq!(report["reason"], "rust_inputs_changed_during_scan");
+    }
+}
+
+#[test]
+fn excluded_workbench_records_do_not_invalidate_rust_inputs() {
+    let p = Project::new();
+    let report = p.scan(
+        "mkdir -p .codeguard/reports; printf '{}' > .codeguard/reports/current.json",
+        false,
+    );
+    assert_eq!(report["local_scan_complete"], true, "{report}");
+    assert_eq!(report["delivery_decision"], "not_evaluated");
+}
+
+#[test]
 fn stable_partial_native_report_keeps_valid_diagnostic() {
     let p = Project::new();
     let report = p.scan("printf '%s\\n' '{\"reason\":\"compiler-message\",\"message\":{\"level\":\"warning\",\"code\":{\"code\":\"clippy::needless_return\"},\"spans\":[{\"file_name\":\"src/lib.rs\",\"line_start\":1,\"column_start\":1,\"is_primary\":true}]}}' 'bad-json'", false);
@@ -161,6 +210,47 @@ fn real_clippy_output_is_withdrawn_when_source_changes_after_native_execution() 
         fs::create_dir_all(&dir).unwrap();
         fs::write(
             PathBuf::from(dir).join("real-clippy-stale-source.json"),
+            serde_json::to_vec_pretty(&report).unwrap(),
+        )
+        .unwrap();
+    }
+}
+
+#[test]
+#[ignore = "requires installed native Cargo Clippy; set CODEGUARD_CARGO_BIN"]
+fn real_clippy_output_is_withdrawn_when_new_source_appears_after_execution() {
+    let tool = std::env::var("CODEGUARD_CARGO_BIN").expect("原生 Cargo 路径");
+    assert!(std::path::Path::new(&tool).is_absolute());
+    let quoted = format!("'{}'", tool.replace('\'', "'\\''"));
+    let p = Project::new();
+    let wrapper = p.0.join("cargo-original");
+    fs::write(&wrapper,format!("#!/bin/sh\n{quoted} \"$@\" > native-output.jsonl\nresult=$?\ncat native-output.jsonl\nif [ \"$result\" = 0 ]; then printf '%s\\n' 'pub fn added() {{}}' > src/added.rs; fi\nexit \"$result\"\n")).unwrap();
+    fs::set_permissions(&wrapper, fs::Permissions::from_mode(0o700)).unwrap();
+    let report = observe_cargo_clippy(
+        &p.0,
+        &BTreeSet::from(["src/lib.rs".into()]),
+        Some(&wrapper),
+        Instant::now() + Duration::from_secs(60),
+        &AtomicBool::new(false),
+    );
+    let native = codeguard_adapters::parse_cargo_clippy_json(
+        &fs::read(p.0.join("native-output.jsonl")).unwrap(),
+    );
+    assert!(native.issue.is_none());
+    assert!(
+        native
+            .findings
+            .iter()
+            .any(|f| f.rule_id == "clippy::needless_return")
+    );
+    assert!(p.0.join("src/added.rs").is_file());
+    assert_eq!(report["reason"], "rust_inputs_changed_during_scan");
+    assert_eq!(report["local_scan_complete"], false);
+    assert_eq!(report["findings"], serde_json::json!([]));
+    if let Ok(dir) = std::env::var("CODEGUARD_CLIPPY_REPORT_DIR") {
+        fs::create_dir_all(&dir).unwrap();
+        fs::write(
+            PathBuf::from(dir).join("real-clippy-new-source.json"),
             serde_json::to_vec_pretty(&report).unwrap(),
         )
         .unwrap();

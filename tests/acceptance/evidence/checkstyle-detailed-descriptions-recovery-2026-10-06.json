@@ -1,0 +1,428 @@
+{
+  "blocked": {
+    "authority": "local_unverified",
+    "category": "comments",
+    "checker_identity": "unverified",
+    "command_status": "incomplete",
+    "coverage_proven": false,
+    "delivery_decision": "not_evaluated",
+    "exit_code": 3,
+    "findings": [],
+    "language": "java",
+    "local_status": "incomplete",
+    "next_actions": [
+      "verify_original_checkstyle_configuration_and_source_scope",
+      "bind_approved_tool_and_quality_policy"
+    ],
+    "operation": "lint",
+    "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-2/Foo.java",
+    "reason": "prerequisites_missing",
+    "recheck_argv": [],
+    "report_type": "java_checkstyle_local_feedback",
+    "schema_version": "0.4.0",
+    "workbench": {
+      "new_blockers": 1,
+      "new_findings": 0,
+      "next": {
+        "authority": "local_unverified",
+        "command_status": "complete",
+        "delivery_decision": "not_evaluated",
+        "disposition": "actionable",
+        "exit_code": 0,
+        "next_actions": [],
+        "operation": "next",
+        "reason": "local_task_selected",
+        "repair_brief": {
+          "action_id": "restore-checker-environment",
+          "affected_paths": [
+            "Foo.java"
+          ],
+          "authority": "local_unverified",
+          "build_root": ".",
+          "checker_id": "java.checkstyle.preparation",
+          "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+          "constraints": [
+            "先恢复检查完整性",
+            "不得关闭检查器或修改无关源码"
+          ],
+          "disposition": "actionable",
+          "evidence_ref": {
+            "first_report_sha256": "52a09584d17a7fbcb9acb9b6c2029b109bd94fd740138a8b281d09460d95c072",
+            "first_run_id": "checkstyle-preparation-18632-1791296248657180000"
+          },
+          "first_diagnostic_reason": "prerequisites_missing",
+          "history": {
+            "attempt_count": 0,
+            "awaiting_verification": false,
+            "budget": 2,
+            "no_progress_count": 0,
+            "open_attempt_id": null,
+            "recent": []
+          },
+          "kind": "blocker",
+          "preparation_guidance": {
+            "affected_paths": [
+              "Foo.java"
+            ],
+            "authority": "local_unverified",
+            "diagnostic_reason": "prerequisites_missing",
+            "later_native_observation": null,
+            "recheck_argv": [
+              "codeguard",
+              "lint",
+              "java",
+              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-2/Foo.java",
+              "--checker=checkstyle",
+              "--workspace",
+              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-2",
+              "--config",
+              "<核对后的原配置绝对路径>",
+              "--java-tool",
+              "<核对后的 Java 绝对路径>",
+              "--checkstyle-jar",
+              "<核对后的 JAR 绝对路径>",
+              "--format=json"
+            ],
+            "report_sha256": "52a09584d17a7fbcb9acb9b6c2029b109bd94fd740138a8b281d09460d95c072",
+            "run_id": "checkstyle-preparation-18632-1791296248657180000",
+            "source_current": true
+          },
+          "reason_code": "checkstyle_prerequisites_require_review",
+          "recheck_argv": [
+            "codeguard",
+            "lint",
+            "java",
+            "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-2/Foo.java",
+            "--checker=checkstyle",
+            "--workspace",
+            "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-2",
+            "--config",
+            "<核对后的原配置绝对路径>",
+            "--java-tool",
+            "<核对后的 Java 绝对路径>",
+            "--checkstyle-jar",
+            "<核对后的 JAR 绝对路径>",
+            "--format=json"
+          ],
+          "schema_version": "0.1.0",
+          "scope": ".",
+          "step": "恢复 Checkstyle 原工具/配置前置并按简报复扫；不要修改无关源码",
+          "task_id": "CG-B-887a1390c8debee24f4da2ff4f6fc623"
+        },
+        "report_type": "repair_brief_preview",
+        "schema_version": "0.1.0"
+      },
+      "status": "synced_partial"
+    }
+  },
+  "evidence_kind": "controlled_checkstyle_xml_transport_recovery_not_native_qualification",
+  "next": {
+    "authority": "local_unverified",
+    "command_status": "complete",
+    "delivery_decision": "not_evaluated",
+    "disposition": "actionable",
+    "exit_code": 0,
+    "next_actions": [],
+    "operation": "next",
+    "reason": "local_task_selected",
+    "repair_brief": {
+      "action_id": "repair-source",
+      "authority": "local_unverified",
+      "checker_id": "java.checkstyle",
+      "checkstyle_guidance": {
+        "checker_class": "com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocStyleCheck",
+        "configuration_current": true,
+        "observed_inputs": {
+          "config": {
+            "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-2/checks.xml",
+            "sha256": "0084cefcef4a156bfe1cc898fb639faed38b4b787ab9855e3f07081860bf7e5d"
+          },
+          "jar": {
+            "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-2/fixture.jar",
+            "sha256": "294fbce99942fcf856f72354f4d677e332494c8ac01e43726b5b1caec9f22f2d"
+          },
+          "java": {
+            "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-2/transport",
+            "sha256": "3e065c068bd41d1a6b886609ad246bdee8b58576441fca89e447ad59b14325b2"
+          },
+          "source": {
+            "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-2/Foo.java",
+            "sha256": "626d55c191ca3a9f4467cc0564a4dffce3a4f3febd92d0df79814eeb4d8fec0d"
+          }
+        },
+        "original_configuration_input": {
+          "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-2/checks.xml",
+          "sha256": "0084cefcef4a156bfe1cc898fb639faed38b4b787ab9855e3f07081860bf7e5d"
+        },
+        "original_tool_inputs": {
+          "jar": {
+            "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-2/fixture.jar",
+            "sha256": "294fbce99942fcf856f72354f4d677e332494c8ac01e43726b5b1caec9f22f2d"
+          },
+          "java": {
+            "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-2/transport",
+            "sha256": "3e065c068bd41d1a6b886609ad246bdee8b58576441fca89e447ad59b14325b2"
+          }
+        },
+        "recheck_argv": [
+          "codeguard",
+          "lint",
+          "java",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-2/Foo.java",
+          "--checker=checkstyle",
+          "--workspace",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-2",
+          "--config",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-2/checks.xml",
+          "--java-tool",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-2/transport",
+          "--checkstyle-jar",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-2/fixture.jar",
+          "--format=json"
+        ],
+        "repair_steps": [
+          "按原配置补充类型、字段、方法或构造器的用途说明，核对首句、HTML与空描述；保留原规则参数，不用裸标签或关闭检查逃避复检",
+          "使用同一原配置和原检查器复检；零诊断不单独作为项目交付或任务关闭条件"
+        ],
+        "rule_reference": "https://checkstyle.org/checks/javadoc/javadocstyle.html",
+        "rule_summary": "Javadoc描述或格式不完整",
+        "source_sha256": "626d55c191ca3a9f4467cc0564a4dffce3a4f3febd92d0df79814eeb4d8fec0d"
+      },
+      "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+      "constraints": [
+        "仅修改目标源码",
+        "不得忽略规则或将任务勾选当作复检"
+      ],
+      "disposition": "actionable",
+      "evidence_ref": {
+        "first_report_sha256": "d26ad61e079465ac5ac154eac24755cf2f19010f4a35ada335fdf17f24850b32",
+        "first_run_id": "checkstyle-preparation-verify-18635-1791296248723475000"
+      },
+      "history": {
+        "attempt_count": 0,
+        "awaiting_verification": false,
+        "budget": 2,
+        "no_progress_count": 0,
+        "open_attempt_id": null,
+        "recent": []
+      },
+      "kind": "finding",
+      "native_rule_id": "detailDocs",
+      "recheck_argv": [
+        "codeguard",
+        "lint",
+        "java",
+        "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-2/Foo.java",
+        "--checker=checkstyle",
+        "--workspace",
+        "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-2",
+        "--config",
+        "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-2/checks.xml",
+        "--java-tool",
+        "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-2/transport",
+        "--checkstyle-jar",
+        "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-2/fixture.jar",
+        "--format=json"
+      ],
+      "schema_version": "0.25.0",
+      "scope": "Foo.java",
+      "source_sha256": "626d55c191ca3a9f4467cc0564a4dffce3a4f3febd92d0df79814eeb4d8fec0d",
+      "step": "按原配置补充类型、字段、方法或构造器的用途说明，核对首句、HTML与空描述；保留原规则参数，不用裸标签或关闭检查逃避复检",
+      "task_id": "CG-12e1811806015abdc977259d3721c4b7"
+    },
+    "report_type": "repair_brief_preview",
+    "schema_version": "0.25.0"
+  },
+  "present": {
+    "authority": "local_unverified",
+    "command_status": "incomplete",
+    "delivery_decision": "not_evaluated",
+    "event_persisted": true,
+    "execution_budget": {
+      "enforcement": "native_execution_only",
+      "source": "builtin_default",
+      "timeout_ms": 1800000
+    },
+    "exit_code": 3,
+    "kind": "finding",
+    "native_scan": {
+      "authority": "local_unverified",
+      "checker_id": "java.checkstyle",
+      "coverage_proven": false,
+      "current_rule_class": "com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocStyleCheck",
+      "delivery_decision": "not_evaluated",
+      "local_status": "observed",
+      "reason": "project_configuration_and_quality_policy_unverified",
+      "report_type": "checkstyle_task_recheck",
+      "run_id": "checkstyle-task-18643-1791296249545598000",
+      "scan": {
+        "authority": "local_unverified",
+        "checker_id": "java.checkstyle",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "findings": [
+          {
+            "finding_fingerprint": "12e1811806015abdc977259d3721c4b7aaac132a348a6add67d55ef4133ae477",
+            "finding_id": "CG-12e1811806015abdc977259d3721c4b7",
+            "line": 1,
+            "native": {
+              "checker_class": "com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocStyleCheck",
+              "column": 1,
+              "line": 1,
+              "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-2/Foo.java",
+              "repair_steps": [
+                "按原配置补充类型、字段、方法或构造器的用途说明，核对首句、HTML与空描述；保留原规则参数，不用裸标签或关闭检查逃避复检",
+                "使用同一原配置和原检查器复检；零诊断不单独作为项目交付或任务关闭条件"
+              ],
+              "rule_id": "detailDocs",
+              "rule_reference": "https://checkstyle.org/checks/javadoc/javadocstyle.html",
+              "rule_summary": "Javadoc描述或格式不完整",
+              "severity": "warning"
+            },
+            "path": "Foo.java",
+            "rule_id": "detailDocs",
+            "source_sha256": "626d55c191ca3a9f4467cc0564a4dffce3a4f3febd92d0df79814eeb4d8fec0d"
+          }
+        ],
+        "inputs": {
+          "config": {
+            "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-2/checks.xml",
+            "sha256": "0084cefcef4a156bfe1cc898fb639faed38b4b787ab9855e3f07081860bf7e5d"
+          },
+          "jar": {
+            "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-2/fixture.jar",
+            "sha256": "294fbce99942fcf856f72354f4d677e332494c8ac01e43726b5b1caec9f22f2d"
+          },
+          "java": {
+            "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-2/transport",
+            "sha256": "3e065c068bd41d1a6b886609ad246bdee8b58576441fca89e447ad59b14325b2"
+          },
+          "source": {
+            "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-2/Foo.java",
+            "sha256": "626d55c191ca3a9f4467cc0564a4dffce3a4f3febd92d0df79814eeb4d8fec0d"
+          }
+        },
+        "report_type": "java_checkstyle_workbench_observation",
+        "run_id": "checkstyle-task-18643-1791296249545598000",
+        "schema_version": "0.2.0",
+        "source_path": "Foo.java",
+        "workspace_binding": "bound",
+        "workspace_id": "ws-76894ce45750f84d6505ef08f1f3b9d0"
+      },
+      "schema_version": "0.2.0",
+      "target": {
+        "checker_class": "com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocStyleCheck",
+        "path": "Foo.java",
+        "rule_id": "detailDocs",
+        "task_id": "CG-12e1811806015abdc977259d3721c4b7"
+      },
+      "task_input_stable": true,
+      "tool_identity_matches": true,
+      "workspace_binding": "bound",
+      "workspace_id": "ws-76894ce45750f84d6505ef08f1f3b9d0"
+    },
+    "next_actions": [
+      "inspect_native_recheck_and_policy_before_closure"
+    ],
+    "observation": "still_present",
+    "operation": "task_verify",
+    "reason": null,
+    "report_type": "task_verification_preview",
+    "schema_version": "0.33.0",
+    "task_id": "CG-12e1811806015abdc977259d3721c4b7"
+  },
+  "recovered": {
+    "authority": "local_unverified",
+    "command_status": "incomplete",
+    "delivery_decision": "not_evaluated",
+    "event_persisted": true,
+    "execution_budget": {
+      "enforcement": "native_execution_only",
+      "source": "builtin_default",
+      "timeout_ms": 1800000
+    },
+    "exit_code": 3,
+    "kind": "blocker",
+    "native_scan": {
+      "authority": "local_unverified",
+      "checker_id": "java.checkstyle.preparation",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "local_status": "observed",
+      "reason": "original_selection_and_quality_policy_unverified",
+      "report_type": "checkstyle_preparation_recheck",
+      "run_id": "checkstyle-preparation-verify-18635-1791296248723475000",
+      "scan": {
+        "authority": "local_unverified",
+        "checker_id": "java.checkstyle",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "findings": [
+          {
+            "finding_fingerprint": "12e1811806015abdc977259d3721c4b7aaac132a348a6add67d55ef4133ae477",
+            "finding_id": "CG-12e1811806015abdc977259d3721c4b7",
+            "line": 1,
+            "native": {
+              "checker_class": "com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocStyleCheck",
+              "column": 1,
+              "line": 1,
+              "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-2/Foo.java",
+              "repair_steps": [
+                "按原配置补充类型、字段、方法或构造器的用途说明，核对首句、HTML与空描述；保留原规则参数，不用裸标签或关闭检查逃避复检",
+                "使用同一原配置和原检查器复检；零诊断不单独作为项目交付或任务关闭条件"
+              ],
+              "rule_id": "detailDocs",
+              "rule_reference": "https://checkstyle.org/checks/javadoc/javadocstyle.html",
+              "rule_summary": "Javadoc描述或格式不完整",
+              "severity": "warning"
+            },
+            "path": "Foo.java",
+            "rule_id": "detailDocs",
+            "source_sha256": "626d55c191ca3a9f4467cc0564a4dffce3a4f3febd92d0df79814eeb4d8fec0d"
+          }
+        ],
+        "inputs": {
+          "config": {
+            "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-2/checks.xml",
+            "sha256": "0084cefcef4a156bfe1cc898fb639faed38b4b787ab9855e3f07081860bf7e5d"
+          },
+          "jar": {
+            "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-2/fixture.jar",
+            "sha256": "294fbce99942fcf856f72354f4d677e332494c8ac01e43726b5b1caec9f22f2d"
+          },
+          "java": {
+            "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-2/transport",
+            "sha256": "3e065c068bd41d1a6b886609ad246bdee8b58576441fca89e447ad59b14325b2"
+          },
+          "source": {
+            "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-2/Foo.java",
+            "sha256": "626d55c191ca3a9f4467cc0564a4dffce3a4f3febd92d0df79814eeb4d8fec0d"
+          }
+        },
+        "report_type": "java_checkstyle_workbench_observation",
+        "run_id": "checkstyle-preparation-verify-18635-1791296248723475000",
+        "schema_version": "0.2.0",
+        "source_path": "Foo.java",
+        "workspace_binding": "bound",
+        "workspace_id": "ws-76894ce45750f84d6505ef08f1f3b9d0"
+      },
+      "schema_version": "0.2.0",
+      "target": {
+        "path": "Foo.java",
+        "task_id": "CG-B-887a1390c8debee24f4da2ff4f6fc623"
+      },
+      "task_input_stable": true,
+      "workspace_binding": "bound",
+      "workspace_id": "ws-76894ce45750f84d6505ef08f1f3b9d0"
+    },
+    "next_actions": [
+      "inspect_native_recheck_and_policy_before_closure"
+    ],
+    "observation": "environment_restored_unverified_policy",
+    "operation": "task_verify",
+    "reason": null,
+    "report_type": "task_verification_preview",
+    "schema_version": "0.34.0",
+    "task_id": "CG-B-887a1390c8debee24f4da2ff4f6fc623"
+  }
+}

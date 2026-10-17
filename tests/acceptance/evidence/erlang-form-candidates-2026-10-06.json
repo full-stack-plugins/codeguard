@@ -1,0 +1,980 @@
+{
+  "schema_version": "development-evidence-1",
+  "candidate_binary_sha256": "612ae9865e87f4ea397c9654ec4d042fbff021b8ac688338338b6f009c367a08",
+  "rule_sha256": "8c797b005ecd7a388c395d5534aab701c04433f519b6f08d13a6c3f8a3cfae93",
+  "explicit_probe_only": true,
+  "native_oracle_executed": false,
+  "project_hook_workbench_integrated": false,
+  "grammar_qualified": false,
+  "reports": [
+    {
+      "name": "multi_clause",
+      "report": {
+        "delivery_decision": "not_evaluated",
+        "grammar_qualified": false,
+        "grammar_sha256": "dbab33f03e07b89f4385fcdd48d87d86ba35c82a0a426788d55b8c25410bc491",
+        "language": "erlang",
+        "native": {
+          "reason": "explicit_candidate_probe",
+          "status": "not_run"
+        },
+        "next_action": "run_or_configure_applicable_native_lint_before_delivery",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-erlang-form-candidates-67724/multi_clause.erl",
+        "precheck": {
+          "cancelled": false,
+          "checked_files": 1,
+          "incomplete_files": 0,
+          "scope_complete": true,
+          "selected_files": 1,
+          "status": "incomplete",
+          "suspected_recoveries": 0,
+          "truncated_files": 0,
+          "unqualified_files": 1,
+          "unsupported_files": 0
+        },
+        "recoveries": [],
+        "report_type": "grammar_candidate_probe",
+        "schema_version": "0.1.0",
+        "source_sha256": "467722312ce615bf23ab978310aafd039efa1f0c293afae2eaebb9b3790bf335",
+        "status": "incomplete"
+      },
+      "valid": true
+    },
+    {
+      "name": "multiple_functions",
+      "report": {
+        "delivery_decision": "not_evaluated",
+        "grammar_qualified": false,
+        "grammar_sha256": "dbab33f03e07b89f4385fcdd48d87d86ba35c82a0a426788d55b8c25410bc491",
+        "language": "erlang",
+        "native": {
+          "reason": "explicit_candidate_probe",
+          "status": "not_run"
+        },
+        "next_action": "run_or_configure_applicable_native_lint_before_delivery",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-erlang-form-candidates-67724/multiple_functions.erl",
+        "precheck": {
+          "cancelled": false,
+          "checked_files": 1,
+          "incomplete_files": 0,
+          "scope_complete": true,
+          "selected_files": 1,
+          "status": "incomplete",
+          "suspected_recoveries": 0,
+          "truncated_files": 0,
+          "unqualified_files": 1,
+          "unsupported_files": 0
+        },
+        "recoveries": [],
+        "report_type": "grammar_candidate_probe",
+        "schema_version": "0.1.0",
+        "source_sha256": "52fdecb8d0939ac60cd0c8e08127125fe647a0ad77136d81fcfd4446231366f5",
+        "status": "incomplete"
+      },
+      "valid": true
+    },
+    {
+      "name": "final_comment",
+      "report": {
+        "delivery_decision": "not_evaluated",
+        "grammar_qualified": false,
+        "grammar_sha256": "dbab33f03e07b89f4385fcdd48d87d86ba35c82a0a426788d55b8c25410bc491",
+        "language": "erlang",
+        "native": {
+          "reason": "explicit_candidate_probe",
+          "status": "not_run"
+        },
+        "next_action": "run_or_configure_applicable_native_lint_before_delivery",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-erlang-form-candidates-67724/final_comment.erl",
+        "precheck": {
+          "cancelled": false,
+          "checked_files": 1,
+          "incomplete_files": 0,
+          "scope_complete": true,
+          "selected_files": 1,
+          "status": "incomplete",
+          "suspected_recoveries": 0,
+          "truncated_files": 0,
+          "unqualified_files": 1,
+          "unsupported_files": 0
+        },
+        "recoveries": [],
+        "report_type": "grammar_candidate_probe",
+        "schema_version": "0.1.0",
+        "source_sha256": "1519eaae49d90099eb428e0ab532641bfc7ec698ee8ef6f2a5e406dd01ee61f6",
+        "status": "incomplete"
+      },
+      "valid": true
+    },
+    {
+      "name": "comment_before_period",
+      "report": {
+        "delivery_decision": "not_evaluated",
+        "grammar_qualified": false,
+        "grammar_sha256": "dbab33f03e07b89f4385fcdd48d87d86ba35c82a0a426788d55b8c25410bc491",
+        "language": "erlang",
+        "native": {
+          "reason": "explicit_candidate_probe",
+          "status": "not_run"
+        },
+        "next_action": "run_or_configure_applicable_native_lint_before_delivery",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-erlang-form-candidates-67724/comment_before_period.erl",
+        "precheck": {
+          "cancelled": false,
+          "checked_files": 1,
+          "incomplete_files": 0,
+          "scope_complete": true,
+          "selected_files": 1,
+          "status": "incomplete",
+          "suspected_recoveries": 0,
+          "truncated_files": 0,
+          "unqualified_files": 1,
+          "unsupported_files": 0
+        },
+        "recoveries": [],
+        "report_type": "grammar_candidate_probe",
+        "schema_version": "0.1.0",
+        "source_sha256": "6d92aab08315efb129282a40f2f39a6d17a20d3307c9192b4d23c180a54c03f4",
+        "status": "incomplete"
+      },
+      "valid": true
+    },
+    {
+      "name": "dot_in_string",
+      "report": {
+        "delivery_decision": "not_evaluated",
+        "grammar_qualified": false,
+        "grammar_sha256": "dbab33f03e07b89f4385fcdd48d87d86ba35c82a0a426788d55b8c25410bc491",
+        "language": "erlang",
+        "native": {
+          "reason": "explicit_candidate_probe",
+          "status": "not_run"
+        },
+        "next_action": "run_or_configure_applicable_native_lint_before_delivery",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-erlang-form-candidates-67724/dot_in_string.erl",
+        "precheck": {
+          "cancelled": false,
+          "checked_files": 1,
+          "incomplete_files": 0,
+          "scope_complete": true,
+          "selected_files": 1,
+          "status": "incomplete",
+          "suspected_recoveries": 0,
+          "truncated_files": 0,
+          "unqualified_files": 1,
+          "unsupported_files": 0
+        },
+        "recoveries": [],
+        "report_type": "grammar_candidate_probe",
+        "schema_version": "0.1.0",
+        "source_sha256": "8efbc565bab27ceb69eec9c2ec7ecaf76b684651394492958025376dcc12fdfa",
+        "status": "incomplete"
+      },
+      "valid": true
+    },
+    {
+      "name": "dot_in_float",
+      "report": {
+        "delivery_decision": "not_evaluated",
+        "grammar_qualified": false,
+        "grammar_sha256": "dbab33f03e07b89f4385fcdd48d87d86ba35c82a0a426788d55b8c25410bc491",
+        "language": "erlang",
+        "native": {
+          "reason": "explicit_candidate_probe",
+          "status": "not_run"
+        },
+        "next_action": "run_or_configure_applicable_native_lint_before_delivery",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-erlang-form-candidates-67724/dot_in_float.erl",
+        "precheck": {
+          "cancelled": false,
+          "checked_files": 1,
+          "incomplete_files": 0,
+          "scope_complete": true,
+          "selected_files": 1,
+          "status": "incomplete",
+          "suspected_recoveries": 0,
+          "truncated_files": 0,
+          "unqualified_files": 1,
+          "unsupported_files": 0
+        },
+        "recoveries": [],
+        "report_type": "grammar_candidate_probe",
+        "schema_version": "0.1.0",
+        "source_sha256": "4187dd409b6b44ca73b60b3c55848ad561174b59809fba46ca28ec498989b65f",
+        "status": "incomplete"
+      },
+      "valid": true
+    },
+    {
+      "name": "dot_character",
+      "report": {
+        "delivery_decision": "not_evaluated",
+        "grammar_qualified": false,
+        "grammar_sha256": "dbab33f03e07b89f4385fcdd48d87d86ba35c82a0a426788d55b8c25410bc491",
+        "language": "erlang",
+        "native": {
+          "reason": "explicit_candidate_probe",
+          "status": "not_run"
+        },
+        "next_action": "run_or_configure_applicable_native_lint_before_delivery",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-erlang-form-candidates-67724/dot_character.erl",
+        "precheck": {
+          "cancelled": false,
+          "checked_files": 1,
+          "incomplete_files": 0,
+          "scope_complete": true,
+          "selected_files": 1,
+          "status": "incomplete",
+          "suspected_recoveries": 0,
+          "truncated_files": 0,
+          "unqualified_files": 1,
+          "unsupported_files": 0
+        },
+        "recoveries": [],
+        "report_type": "grammar_candidate_probe",
+        "schema_version": "0.1.0",
+        "source_sha256": "02cacea6e51bb30fbaade41b13e22b3cd4ab2d6bde01313d88f7dafb021f065e",
+        "status": "incomplete"
+      },
+      "valid": true
+    },
+    {
+      "name": "quoted_atom_dot",
+      "report": {
+        "delivery_decision": "not_evaluated",
+        "grammar_qualified": false,
+        "grammar_sha256": "dbab33f03e07b89f4385fcdd48d87d86ba35c82a0a426788d55b8c25410bc491",
+        "language": "erlang",
+        "native": {
+          "reason": "explicit_candidate_probe",
+          "status": "not_run"
+        },
+        "next_action": "run_or_configure_applicable_native_lint_before_delivery",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-erlang-form-candidates-67724/quoted_atom_dot.erl",
+        "precheck": {
+          "cancelled": false,
+          "checked_files": 1,
+          "incomplete_files": 0,
+          "scope_complete": true,
+          "selected_files": 1,
+          "status": "incomplete",
+          "suspected_recoveries": 0,
+          "truncated_files": 0,
+          "unqualified_files": 1,
+          "unsupported_files": 0
+        },
+        "recoveries": [],
+        "report_type": "grammar_candidate_probe",
+        "schema_version": "0.1.0",
+        "source_sha256": "253b1446dc58c6181f9041c2635901df7dac2700e33d52c5930ff9df8dcb8cfc",
+        "status": "incomplete"
+      },
+      "valid": true
+    },
+    {
+      "name": "unicode_crlf",
+      "report": {
+        "delivery_decision": "not_evaluated",
+        "grammar_qualified": false,
+        "grammar_sha256": "dbab33f03e07b89f4385fcdd48d87d86ba35c82a0a426788d55b8c25410bc491",
+        "language": "erlang",
+        "native": {
+          "reason": "explicit_candidate_probe",
+          "status": "not_run"
+        },
+        "next_action": "run_or_configure_applicable_native_lint_before_delivery",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-erlang-form-candidates-67724/unicode_crlf.erl",
+        "precheck": {
+          "cancelled": false,
+          "checked_files": 1,
+          "incomplete_files": 0,
+          "scope_complete": true,
+          "selected_files": 1,
+          "status": "incomplete",
+          "suspected_recoveries": 0,
+          "truncated_files": 0,
+          "unqualified_files": 1,
+          "unsupported_files": 0
+        },
+        "recoveries": [],
+        "report_type": "grammar_candidate_probe",
+        "schema_version": "0.1.0",
+        "source_sha256": "0378f007f2f8b3d18b40134c122af941d8dc2ce4e6f35687648acf5b4f4ffc9a",
+        "status": "incomplete"
+      },
+      "valid": true
+    },
+    {
+      "name": "nested_fun",
+      "report": {
+        "delivery_decision": "not_evaluated",
+        "grammar_qualified": false,
+        "grammar_sha256": "dbab33f03e07b89f4385fcdd48d87d86ba35c82a0a426788d55b8c25410bc491",
+        "language": "erlang",
+        "native": {
+          "reason": "explicit_candidate_probe",
+          "status": "not_run"
+        },
+        "next_action": "run_or_configure_applicable_native_lint_before_delivery",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-erlang-form-candidates-67724/nested_fun.erl",
+        "precheck": {
+          "cancelled": false,
+          "checked_files": 1,
+          "incomplete_files": 0,
+          "scope_complete": true,
+          "selected_files": 1,
+          "status": "incomplete",
+          "suspected_recoveries": 0,
+          "truncated_files": 0,
+          "unqualified_files": 1,
+          "unsupported_files": 0
+        },
+        "recoveries": [],
+        "report_type": "grammar_candidate_probe",
+        "schema_version": "0.1.0",
+        "source_sha256": "04bc1168b063eb7a28852ed7df44932300f7e0e28a7aba76c1eb363954f54601",
+        "status": "incomplete"
+      },
+      "valid": true
+    },
+    {
+      "name": "spec",
+      "report": {
+        "delivery_decision": "not_evaluated",
+        "grammar_qualified": false,
+        "grammar_sha256": "dbab33f03e07b89f4385fcdd48d87d86ba35c82a0a426788d55b8c25410bc491",
+        "language": "erlang",
+        "native": {
+          "reason": "explicit_candidate_probe",
+          "status": "not_run"
+        },
+        "next_action": "run_or_configure_applicable_native_lint_before_delivery",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-erlang-form-candidates-67724/spec.erl",
+        "precheck": {
+          "cancelled": false,
+          "checked_files": 1,
+          "incomplete_files": 0,
+          "scope_complete": true,
+          "selected_files": 1,
+          "status": "incomplete",
+          "suspected_recoveries": 0,
+          "truncated_files": 0,
+          "unqualified_files": 1,
+          "unsupported_files": 0
+        },
+        "recoveries": [],
+        "report_type": "grammar_candidate_probe",
+        "schema_version": "0.1.0",
+        "source_sha256": "a9e010b53ce3311d2572b56ac56a4fe7d5f626c2cebd343ae0adfa8acea94dce",
+        "status": "incomplete"
+      },
+      "valid": true
+    },
+    {
+      "name": "macro",
+      "report": {
+        "delivery_decision": "not_evaluated",
+        "grammar_qualified": false,
+        "grammar_sha256": "dbab33f03e07b89f4385fcdd48d87d86ba35c82a0a426788d55b8c25410bc491",
+        "language": "erlang",
+        "native": {
+          "reason": "explicit_candidate_probe",
+          "status": "not_run"
+        },
+        "next_action": "run_or_configure_applicable_native_lint_before_delivery",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-erlang-form-candidates-67724/macro.erl",
+        "precheck": {
+          "cancelled": false,
+          "checked_files": 1,
+          "incomplete_files": 0,
+          "scope_complete": true,
+          "selected_files": 1,
+          "status": "incomplete",
+          "suspected_recoveries": 0,
+          "truncated_files": 0,
+          "unqualified_files": 1,
+          "unsupported_files": 0
+        },
+        "recoveries": [],
+        "report_type": "grammar_candidate_probe",
+        "schema_version": "0.1.0",
+        "source_sha256": "1829a3f619d996a3c650632fd3fe17ab9bc274f0773b8656363e4c957df15455",
+        "status": "incomplete"
+      },
+      "valid": true
+    },
+    {
+      "name": "conditional_forms",
+      "report": {
+        "delivery_decision": "not_evaluated",
+        "grammar_qualified": false,
+        "grammar_sha256": "dbab33f03e07b89f4385fcdd48d87d86ba35c82a0a426788d55b8c25410bc491",
+        "language": "erlang",
+        "native": {
+          "reason": "explicit_candidate_probe",
+          "status": "not_run"
+        },
+        "next_action": "run_or_configure_applicable_native_lint_before_delivery",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-erlang-form-candidates-67724/conditional_forms.erl",
+        "precheck": {
+          "cancelled": false,
+          "checked_files": 1,
+          "incomplete_files": 0,
+          "scope_complete": true,
+          "selected_files": 1,
+          "status": "incomplete",
+          "suspected_recoveries": 0,
+          "truncated_files": 0,
+          "unqualified_files": 1,
+          "unsupported_files": 0
+        },
+        "recoveries": [],
+        "report_type": "grammar_candidate_probe",
+        "schema_version": "0.1.0",
+        "source_sha256": "7c12dacdbfab1ab49e141bbcac2c2a72e30a3836ba05cb02cfead9c7e45cfbe1",
+        "status": "incomplete"
+      },
+      "valid": true
+    },
+    {
+      "name": "missing_period_eof",
+      "report": {
+        "delivery_decision": "not_evaluated",
+        "grammar_qualified": false,
+        "grammar_sha256": "dbab33f03e07b89f4385fcdd48d87d86ba35c82a0a426788d55b8c25410bc491",
+        "language": "erlang",
+        "native": {
+          "reason": "explicit_candidate_probe",
+          "status": "not_run"
+        },
+        "next_action": "confirm_candidate_structure_with_applicable_native_tool",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-erlang-form-candidates-67724/missing_period_eof.erl",
+        "precheck": {
+          "cancelled": false,
+          "checked_files": 1,
+          "incomplete_files": 0,
+          "scope_complete": true,
+          "selected_files": 1,
+          "status": "incomplete",
+          "suspected_recoveries": 0,
+          "truncated_files": 0,
+          "unqualified_files": 1,
+          "unsupported_files": 0
+        },
+        "precheck_scope": "raw_parser_recoveries_and_observation_budgets",
+        "recoveries": [],
+        "report_type": "grammar_candidate_probe",
+        "schema_version": "0.7.0",
+        "source_scope": "direct_function_forms",
+        "source_sha256": "8cad2f133c6b3f22870bc69be59a9c6c4cfee9208ba2202f05bbb57e99b0020e",
+        "status": "incomplete",
+        "structural_observations": [
+          {
+            "basis": "codeguard_structure_rule",
+            "end_byte": 26,
+            "end_column_byte": 9,
+            "end_row": 1,
+            "parent_syntax_kind": "fun_decl",
+            "rule_id": "codeguard.erlang.form_terminator",
+            "rule_sha256": "8c797b005ecd7a388c395d5534aab701c04433f519b6f08d13a6c3f8a3cfae93",
+            "rule_version": "1.0.0",
+            "start_byte": 26,
+            "start_column_byte": 9,
+            "start_row": 1
+          }
+        ]
+      },
+      "valid": false
+    },
+    {
+      "name": "missing_period_comment",
+      "report": {
+        "delivery_decision": "not_evaluated",
+        "grammar_qualified": false,
+        "grammar_sha256": "dbab33f03e07b89f4385fcdd48d87d86ba35c82a0a426788d55b8c25410bc491",
+        "language": "erlang",
+        "native": {
+          "reason": "explicit_candidate_probe",
+          "status": "not_run"
+        },
+        "next_action": "confirm_candidate_structure_with_applicable_native_tool",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-erlang-form-candidates-67724/missing_period_comment.erl",
+        "precheck": {
+          "cancelled": false,
+          "checked_files": 1,
+          "incomplete_files": 0,
+          "scope_complete": true,
+          "selected_files": 1,
+          "status": "incomplete",
+          "suspected_recoveries": 0,
+          "truncated_files": 0,
+          "unqualified_files": 1,
+          "unsupported_files": 0
+        },
+        "precheck_scope": "raw_parser_recoveries_and_observation_budgets",
+        "recoveries": [],
+        "report_type": "grammar_candidate_probe",
+        "schema_version": "0.7.0",
+        "source_scope": "direct_function_forms",
+        "source_sha256": "ae4925b99ad08110cbbd1a6a2e86ecf91ef93503d0d851d12acba93bd7e133c9",
+        "status": "incomplete",
+        "structural_observations": [
+          {
+            "basis": "codeguard_structure_rule",
+            "end_byte": 26,
+            "end_column_byte": 9,
+            "end_row": 1,
+            "parent_syntax_kind": "fun_decl",
+            "rule_id": "codeguard.erlang.form_terminator",
+            "rule_sha256": "8c797b005ecd7a388c395d5534aab701c04433f519b6f08d13a6c3f8a3cfae93",
+            "rule_version": "1.0.0",
+            "start_byte": 26,
+            "start_column_byte": 9,
+            "start_row": 1
+          }
+        ]
+      },
+      "valid": false
+    },
+    {
+      "name": "missing_period_unicode_crlf",
+      "report": {
+        "delivery_decision": "not_evaluated",
+        "grammar_qualified": false,
+        "grammar_sha256": "dbab33f03e07b89f4385fcdd48d87d86ba35c82a0a426788d55b8c25410bc491",
+        "language": "erlang",
+        "native": {
+          "reason": "explicit_candidate_probe",
+          "status": "not_run"
+        },
+        "next_action": "confirm_candidate_structure_with_applicable_native_tool",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-erlang-form-candidates-67724/missing_period_unicode_crlf.erl",
+        "precheck": {
+          "cancelled": false,
+          "checked_files": 1,
+          "incomplete_files": 0,
+          "scope_complete": true,
+          "selected_files": 1,
+          "status": "incomplete",
+          "suspected_recoveries": 0,
+          "truncated_files": 0,
+          "unqualified_files": 1,
+          "unsupported_files": 0
+        },
+        "precheck_scope": "raw_parser_recoveries_and_observation_budgets",
+        "recoveries": [],
+        "report_type": "grammar_candidate_probe",
+        "schema_version": "0.7.0",
+        "source_scope": "direct_function_forms",
+        "source_sha256": "b81a25734cb617c6e964fdd565630b745a6e09e9869266effd0f1798f1aa9e8d",
+        "status": "incomplete",
+        "structural_observations": [
+          {
+            "basis": "codeguard_structure_rule",
+            "end_byte": 32,
+            "end_column_byte": 15,
+            "end_row": 1,
+            "parent_syntax_kind": "fun_decl",
+            "rule_id": "codeguard.erlang.form_terminator",
+            "rule_sha256": "8c797b005ecd7a388c395d5534aab701c04433f519b6f08d13a6c3f8a3cfae93",
+            "rule_version": "1.0.0",
+            "start_byte": 32,
+            "start_column_byte": 15,
+            "start_row": 1
+          }
+        ]
+      },
+      "valid": false
+    },
+    {
+      "name": "missing_period_after_float",
+      "report": {
+        "delivery_decision": "not_evaluated",
+        "grammar_qualified": false,
+        "grammar_sha256": "dbab33f03e07b89f4385fcdd48d87d86ba35c82a0a426788d55b8c25410bc491",
+        "language": "erlang",
+        "native": {
+          "reason": "explicit_candidate_probe",
+          "status": "not_run"
+        },
+        "next_action": "confirm_candidate_structure_with_applicable_native_tool",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-erlang-form-candidates-67724/missing_period_after_float.erl",
+        "precheck": {
+          "cancelled": false,
+          "checked_files": 1,
+          "incomplete_files": 0,
+          "scope_complete": true,
+          "selected_files": 1,
+          "status": "incomplete",
+          "suspected_recoveries": 0,
+          "truncated_files": 0,
+          "unqualified_files": 1,
+          "unsupported_files": 0
+        },
+        "precheck_scope": "raw_parser_recoveries_and_observation_budgets",
+        "recoveries": [],
+        "report_type": "grammar_candidate_probe",
+        "schema_version": "0.7.0",
+        "source_scope": "direct_function_forms",
+        "source_sha256": "3b934ea729c0fe0dbd64316e8b04a58f587ffe13793852077238b50a76613eb2",
+        "status": "incomplete",
+        "structural_observations": [
+          {
+            "basis": "codeguard_structure_rule",
+            "end_byte": 28,
+            "end_column_byte": 11,
+            "end_row": 1,
+            "parent_syntax_kind": "fun_decl",
+            "rule_id": "codeguard.erlang.form_terminator",
+            "rule_sha256": "8c797b005ecd7a388c395d5534aab701c04433f519b6f08d13a6c3f8a3cfae93",
+            "rule_version": "1.0.0",
+            "start_byte": 28,
+            "start_column_byte": 11,
+            "start_row": 1
+          }
+        ]
+      },
+      "valid": false
+    },
+    {
+      "name": "missing_period_after_dot_character",
+      "report": {
+        "delivery_decision": "not_evaluated",
+        "grammar_qualified": false,
+        "grammar_sha256": "dbab33f03e07b89f4385fcdd48d87d86ba35c82a0a426788d55b8c25410bc491",
+        "language": "erlang",
+        "native": {
+          "reason": "explicit_candidate_probe",
+          "status": "not_run"
+        },
+        "next_action": "confirm_candidate_structure_with_applicable_native_tool",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-erlang-form-candidates-67724/missing_period_after_dot_character.erl",
+        "precheck": {
+          "cancelled": false,
+          "checked_files": 1,
+          "incomplete_files": 0,
+          "scope_complete": true,
+          "selected_files": 1,
+          "status": "incomplete",
+          "suspected_recoveries": 0,
+          "truncated_files": 0,
+          "unqualified_files": 1,
+          "unsupported_files": 0
+        },
+        "precheck_scope": "raw_parser_recoveries_and_observation_budgets",
+        "recoveries": [],
+        "report_type": "grammar_candidate_probe",
+        "schema_version": "0.7.0",
+        "source_scope": "direct_function_forms",
+        "source_sha256": "30df4cb83c16546441e207dcf5c3c311c84513e477323f10cbf5197aee4bb819",
+        "status": "incomplete",
+        "structural_observations": [
+          {
+            "basis": "codeguard_structure_rule",
+            "end_byte": 26,
+            "end_column_byte": 9,
+            "end_row": 1,
+            "parent_syntax_kind": "fun_decl",
+            "rule_id": "codeguard.erlang.form_terminator",
+            "rule_sha256": "8c797b005ecd7a388c395d5534aab701c04433f519b6f08d13a6c3f8a3cfae93",
+            "rule_version": "1.0.0",
+            "start_byte": 26,
+            "start_column_byte": 9,
+            "start_row": 1
+          }
+        ]
+      },
+      "valid": false
+    },
+    {
+      "name": "missing_period_after_string",
+      "report": {
+        "delivery_decision": "not_evaluated",
+        "grammar_qualified": false,
+        "grammar_sha256": "dbab33f03e07b89f4385fcdd48d87d86ba35c82a0a426788d55b8c25410bc491",
+        "language": "erlang",
+        "native": {
+          "reason": "explicit_candidate_probe",
+          "status": "not_run"
+        },
+        "next_action": "confirm_candidate_structure_with_applicable_native_tool",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-erlang-form-candidates-67724/missing_period_after_string.erl",
+        "precheck": {
+          "cancelled": false,
+          "checked_files": 1,
+          "incomplete_files": 0,
+          "scope_complete": true,
+          "selected_files": 1,
+          "status": "incomplete",
+          "suspected_recoveries": 0,
+          "truncated_files": 0,
+          "unqualified_files": 1,
+          "unsupported_files": 0
+        },
+        "precheck_scope": "raw_parser_recoveries_and_observation_budgets",
+        "recoveries": [],
+        "report_type": "grammar_candidate_probe",
+        "schema_version": "0.7.0",
+        "source_scope": "direct_function_forms",
+        "source_sha256": "b93065a0c4b98bc7103b7c3acfba5d558bf2a3e024f4d480b508feaf1006705a",
+        "status": "incomplete",
+        "structural_observations": [
+          {
+            "basis": "codeguard_structure_rule",
+            "end_byte": 40,
+            "end_column_byte": 23,
+            "end_row": 1,
+            "parent_syntax_kind": "fun_decl",
+            "rule_id": "codeguard.erlang.form_terminator",
+            "rule_sha256": "8c797b005ecd7a388c395d5534aab701c04433f519b6f08d13a6c3f8a3cfae93",
+            "rule_version": "1.0.0",
+            "start_byte": 40,
+            "start_column_byte": 23,
+            "start_row": 1
+          }
+        ]
+      },
+      "valid": false
+    },
+    {
+      "name": "final_semicolon",
+      "report": {
+        "delivery_decision": "not_evaluated",
+        "grammar_qualified": false,
+        "grammar_sha256": "dbab33f03e07b89f4385fcdd48d87d86ba35c82a0a426788d55b8c25410bc491",
+        "language": "erlang",
+        "native": {
+          "reason": "explicit_candidate_probe",
+          "status": "not_run"
+        },
+        "next_action": "confirm_candidate_structure_with_applicable_native_tool",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-erlang-form-candidates-67724/final_semicolon.erl",
+        "precheck": {
+          "cancelled": false,
+          "checked_files": 1,
+          "incomplete_files": 0,
+          "scope_complete": true,
+          "selected_files": 1,
+          "status": "incomplete",
+          "suspected_recoveries": 0,
+          "truncated_files": 0,
+          "unqualified_files": 1,
+          "unsupported_files": 0
+        },
+        "precheck_scope": "raw_parser_recoveries_and_observation_budgets",
+        "recoveries": [],
+        "report_type": "grammar_candidate_probe",
+        "schema_version": "0.7.0",
+        "source_scope": "direct_function_forms",
+        "source_sha256": "dc11f4e4b78c3bdff2d74710776f31e8bbdc3250761b5ae7fe7c801910a41542",
+        "status": "incomplete",
+        "structural_observations": [
+          {
+            "basis": "codeguard_structure_rule",
+            "end_byte": 27,
+            "end_column_byte": 10,
+            "end_row": 1,
+            "parent_syntax_kind": "fun_decl",
+            "rule_id": "codeguard.erlang.form_terminator",
+            "rule_sha256": "8c797b005ecd7a388c395d5534aab701c04433f519b6f08d13a6c3f8a3cfae93",
+            "rule_version": "1.0.0",
+            "start_byte": 26,
+            "start_column_byte": 9,
+            "start_row": 1
+          }
+        ]
+      },
+      "valid": false
+    },
+    {
+      "name": "multi_clause_final_semicolon",
+      "report": {
+        "delivery_decision": "not_evaluated",
+        "grammar_qualified": false,
+        "grammar_sha256": "dbab33f03e07b89f4385fcdd48d87d86ba35c82a0a426788d55b8c25410bc491",
+        "language": "erlang",
+        "native": {
+          "reason": "explicit_candidate_probe",
+          "status": "not_run"
+        },
+        "next_action": "confirm_candidate_structure_with_applicable_native_tool",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-erlang-form-candidates-67724/multi_clause_final_semicolon.erl",
+        "precheck": {
+          "cancelled": false,
+          "checked_files": 1,
+          "incomplete_files": 0,
+          "scope_complete": true,
+          "selected_files": 1,
+          "status": "incomplete",
+          "suspected_recoveries": 0,
+          "truncated_files": 0,
+          "unqualified_files": 1,
+          "unsupported_files": 0
+        },
+        "precheck_scope": "raw_parser_recoveries_and_observation_budgets",
+        "recoveries": [],
+        "report_type": "grammar_candidate_probe",
+        "schema_version": "0.7.0",
+        "source_scope": "direct_function_forms",
+        "source_sha256": "cfa7d9789c2681c96491970dd42b5f1998ee16399e3e9232a2027f43e3aee8d9",
+        "status": "incomplete",
+        "structural_observations": [
+          {
+            "basis": "codeguard_structure_rule",
+            "end_byte": 45,
+            "end_column_byte": 14,
+            "end_row": 2,
+            "parent_syntax_kind": "fun_decl",
+            "rule_id": "codeguard.erlang.form_terminator",
+            "rule_sha256": "8c797b005ecd7a388c395d5534aab701c04433f519b6f08d13a6c3f8a3cfae93",
+            "rule_version": "1.0.0",
+            "start_byte": 44,
+            "start_column_byte": 13,
+            "start_row": 2
+          }
+        ]
+      },
+      "valid": false
+    },
+    {
+      "name": "missing_middle_period",
+      "report": {
+        "delivery_decision": "not_evaluated",
+        "grammar_qualified": false,
+        "grammar_sha256": "dbab33f03e07b89f4385fcdd48d87d86ba35c82a0a426788d55b8c25410bc491",
+        "language": "erlang",
+        "native": {
+          "reason": "explicit_candidate_probe",
+          "status": "not_run"
+        },
+        "next_action": "confirm_candidate_structure_with_applicable_native_tool",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-erlang-form-candidates-67724/missing_middle_period.erl",
+        "precheck": {
+          "cancelled": false,
+          "checked_files": 1,
+          "incomplete_files": 0,
+          "scope_complete": true,
+          "selected_files": 1,
+          "status": "incomplete",
+          "suspected_recoveries": 0,
+          "truncated_files": 0,
+          "unqualified_files": 1,
+          "unsupported_files": 0
+        },
+        "precheck_scope": "raw_parser_recoveries_and_observation_budgets",
+        "recoveries": [],
+        "report_type": "grammar_candidate_probe",
+        "schema_version": "0.7.0",
+        "source_scope": "direct_function_forms",
+        "source_sha256": "ed62d3ae3be170d8e7d928149a356a781899d322635e9e19a2d2b0bc3e81f599",
+        "status": "incomplete",
+        "structural_observations": [
+          {
+            "basis": "codeguard_structure_rule",
+            "end_byte": 26,
+            "end_column_byte": 9,
+            "end_row": 1,
+            "parent_syntax_kind": "fun_decl",
+            "rule_id": "codeguard.erlang.form_terminator",
+            "rule_sha256": "8c797b005ecd7a388c395d5534aab701c04433f519b6f08d13a6c3f8a3cfae93",
+            "rule_version": "1.0.0",
+            "start_byte": 26,
+            "start_column_byte": 9,
+            "start_row": 1
+          }
+        ]
+      },
+      "valid": false
+    },
+    {
+      "name": "bare_expression",
+      "report": {
+        "delivery_decision": "not_evaluated",
+        "grammar_qualified": false,
+        "grammar_sha256": "dbab33f03e07b89f4385fcdd48d87d86ba35c82a0a426788d55b8c25410bc491",
+        "language": "erlang",
+        "native": {
+          "reason": "explicit_candidate_probe",
+          "status": "not_run"
+        },
+        "next_action": "confirm_suspected_recoveries_with_applicable_native_tool",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-erlang-form-candidates-67724/bare_expression.erl",
+        "precheck": {
+          "cancelled": false,
+          "checked_files": 1,
+          "incomplete_files": 0,
+          "scope_complete": true,
+          "selected_files": 1,
+          "status": "incomplete",
+          "suspected_recoveries": 1,
+          "truncated_files": 0,
+          "unqualified_files": 1,
+          "unsupported_files": 0
+        },
+        "recoveries": [
+          {
+            "end_byte": 20,
+            "end_column_byte": 3,
+            "end_row": 1,
+            "group_id": 1,
+            "kind": "ERROR",
+            "start_byte": 17,
+            "start_column_byte": 0,
+            "start_row": 1,
+            "syntax_kind": "ERROR"
+          }
+        ],
+        "report_type": "grammar_candidate_probe",
+        "schema_version": "0.1.0",
+        "source_sha256": "36c59287e88cd915379892690029f5d22b12ab69841bba3194ebf2e9c1cc0b7c",
+        "status": "incomplete"
+      },
+      "valid": false
+    },
+    {
+      "name": "bare_call",
+      "report": {
+        "delivery_decision": "not_evaluated",
+        "grammar_qualified": false,
+        "grammar_sha256": "dbab33f03e07b89f4385fcdd48d87d86ba35c82a0a426788d55b8c25410bc491",
+        "language": "erlang",
+        "native": {
+          "reason": "explicit_candidate_probe",
+          "status": "not_run"
+        },
+        "next_action": "confirm_suspected_recoveries_with_applicable_native_tool",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-erlang-form-candidates-67724/bare_call.erl",
+        "precheck": {
+          "cancelled": false,
+          "checked_files": 1,
+          "incomplete_files": 0,
+          "scope_complete": true,
+          "selected_files": 1,
+          "status": "incomplete",
+          "suspected_recoveries": 1,
+          "truncated_files": 0,
+          "unqualified_files": 1,
+          "unsupported_files": 0
+        },
+        "recoveries": [
+          {
+            "end_byte": 35,
+            "end_column_byte": 18,
+            "end_row": 1,
+            "group_id": 1,
+            "kind": "ERROR",
+            "start_byte": 17,
+            "start_column_byte": 0,
+            "start_row": 1,
+            "syntax_kind": "ERROR"
+          }
+        ],
+        "report_type": "grammar_candidate_probe",
+        "schema_version": "0.1.0",
+        "source_sha256": "fd8cc2c9100c4d96719ccf66d6b94552d80171c926a2224b784b5d053eea26af",
+        "status": "incomplete"
+      },
+      "valid": false
+    }
+  ]
+}

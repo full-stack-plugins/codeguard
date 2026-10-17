@@ -1,0 +1,73 @@
+{
+  "date": "2026-10-06",
+  "source_base": "e328f62142e82933b4b2333138e480fd180c6162",
+  "report_schema_version": "0.9.0",
+  "actual_node_version": "v24.18.0",
+  "sample_count": 18,
+  "raw": {
+    "tp": 5,
+    "tn": 11,
+    "fp": 0,
+    "fn": 2
+  },
+  "combined_candidate": {
+    "tp": 6,
+    "tn": 11,
+    "fp": 0,
+    "fn": 1
+  },
+  "remaining_combined_false_negative": "javascript-module_return",
+  "ordinary_related_tests": {
+    "passed": 15,
+    "failed": 0,
+    "ignored": 6
+  },
+  "actual_native_test": {
+    "passed": 1,
+    "failed": 0,
+    "ignored": 0
+  },
+  "strict_clippy": "passed_after_removing_duplicate_schema_condition",
+  "schema_actual": "passed",
+  "rejected_variants": [
+    "wrong_rule_digest",
+    "wrong_language",
+    "grammar_qualified_count"
+  ],
+  "old_0_4_consumer_rejects_new_report": true,
+  "independent_holdout": false,
+  "grammar_qualified_count": 0,
+  "fixed_358_metrics_changed": false,
+  "artifacts": [
+    {
+      "path": "tests/acceptance/evidence/javascript-native-project-binding-input-2026-10-06.json",
+      "sha256": "5f55f18f50b87512d05c75ac64f41e6301e0c88b77a0c4fd5bd953369c2eb435"
+    },
+    {
+      "path": "tests/acceptance/evidence/javascript-native-project-binding-report-2026-10-06.json",
+      "sha256": "af65a293a16173949a6f54736ca9abfb5d7d77dfeb1fc588b2d332f689d8341b"
+    }
+  ],
+  "logs": [
+    {
+      "path": "/private/tmp/cg-js-native-combined-red-current.log",
+      "sha256": "97009b60727ef9026bcc9c2d718e6a8053d7477ab75b80794a6b34ab1dbb06ed"
+    },
+    {
+      "path": "/private/tmp/cg-js-native-combined-regression.log",
+      "sha256": "b279249c5c80e32ef31e4a2994a39c89194b880355cb224edd1bb2f0328d690f"
+    },
+    {
+      "path": "/private/tmp/cg-js-native-combined-actual.log",
+      "sha256": "cc26ab7de38572397e959f40c5973553d9c93e3ac87f68d53f0b830561541e2b"
+    },
+    {
+      "path": "/private/tmp/cg-js-native-combined-clippy.log",
+      "sha256": "69be4cb259117908fda8892e037dc23ced2fd68b09bdec6cd369e3cc50c34e84"
+    },
+    {
+      "path": "/private/tmp/cg-js-native-combined-clippy-green.log",
+      "sha256": "313e8eda09e7969f5477821ad187456dd0db1a043d0a010b2be52031f0141261"
+    }
+  ]
+}

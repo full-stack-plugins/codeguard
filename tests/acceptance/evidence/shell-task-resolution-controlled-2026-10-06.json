@@ -1,0 +1,323 @@
+[
+  {
+    "evidence": {
+      "adapter_sha256": "2b5b72c4af9b65858abbdb8a97f8355320f179d4139f2daf48bc90fb97024470",
+      "current_native": {
+        "configuration_mode": "builtin_without_global_rc",
+        "diagnostics": [],
+        "environment_codes": [],
+        "reason": "shellcheck_no_diagnostics",
+        "report_valid": true,
+        "status": "completed",
+        "tool_sha256": "8a1ebee8007bceafe874f24228ad8b98d99782f82182f70601347da8bb3fd911",
+        "version": "0.11.0"
+      },
+      "current_source_sha256": "77190c368ce9e84805d1cfa0293555f56d6ae4df6345b86e587a4afbd54eb8ff",
+      "dialect": "bash",
+      "grammar_sha256": null,
+      "identity": {
+        "checker_id": "shell.shellcheck",
+        "scope": "app.sh",
+        "task_id": "CG-9e3be727dbf76c8e55a5ca543cc21506",
+        "workspace_id": "ws-e19bb77e2c2b06cbe0e5239e3b6e9f71"
+      },
+      "native_rule_id": "SC2086",
+      "original_native": {
+        "configuration_mode": "builtin_without_global_rc",
+        "diagnostics": [
+          {
+            "column": 6,
+            "end_column": 8,
+            "end_line": 2,
+            "line": 2,
+            "rule_id": "SC2086",
+            "severity": "info"
+          }
+        ],
+        "environment_codes": [],
+        "reason": "shellcheck_diagnostics",
+        "report_valid": true,
+        "status": "diagnostics_observed",
+        "tool_sha256": "8a1ebee8007bceafe874f24228ad8b98d99782f82182f70601347da8bb3fd911",
+        "version": "0.11.0"
+      },
+      "original_report_sha256": "5f8d1ac1b5be6dedd84fe0671ac71c973c45f08b3f9a3f2a1c8607da6dfd52d6",
+      "original_source_sha256": "00400e6bf65ec46ff1d85a7494ac3f11a3ca09d56c5e0792941ff5ba67908968",
+      "outcome": "code_fixed",
+      "policy_revision": "p1",
+      "policy_sha256": "7076b4732b4e45636f7dfb30694ed0c89db319623c18da25371b131b5a20c789",
+      "project_configuration": {
+        "global_configuration": "not_loaded",
+        "reason": null,
+        "sha256": null,
+        "source_path": null,
+        "status": "missing"
+      },
+      "report_type": "task_resolution_evidence",
+      "schema_version": "0.11.0",
+      "tool_sha256": "8a1ebee8007bceafe874f24228ad8b98d99782f82182f70601347da8bb3fd911"
+    },
+    "policy": {
+      "adapter_sha256": "2b5b72c4af9b65858abbdb8a97f8355320f179d4139f2daf48bc90fb97024470",
+      "dialect": "bash",
+      "grammar_sha256": null,
+      "identity": {
+        "checker_id": "shell.shellcheck",
+        "scope": "app.sh",
+        "task_id": "CG-9e3be727dbf76c8e55a5ca543cc21506",
+        "workspace_id": "ws-e19bb77e2c2b06cbe0e5239e3b6e9f71"
+      },
+      "native_rule_id": "SC2086",
+      "native_version": "0.11.0",
+      "original_report_sha256": "5f8d1ac1b5be6dedd84fe0671ac71c973c45f08b3f9a3f2a1c8607da6dfd52d6",
+      "original_source_sha256": "00400e6bf65ec46ff1d85a7494ac3f11a3ca09d56c5e0792941ff5ba67908968",
+      "policy_revision": "p1",
+      "project_configuration": {
+        "global_configuration": "not_loaded",
+        "reason": null,
+        "sha256": null,
+        "source_path": null,
+        "status": "missing"
+      },
+      "report_type": "task_resolution_policy",
+      "schema_version": "1.10.0",
+      "tool_sha256": "8a1ebee8007bceafe874f24228ad8b98d99782f82182f70601347da8bb3fd911"
+    },
+    "receipt": {
+      "authority": "host_context_verified",
+      "delivery_decision": "not_evaluated",
+      "event_ref": ".codeguard/findings/CG-9e3be727dbf76c8e55a5ca543cc21506/events/lifecycle-event-fcff65ccc324d6ac12dcdf624dcdb7158463ef084ab08eef2dfc9fb6e6be510d.json",
+      "evidence_ref": ".codeguard/state/resolution_evidence/ed61653292fca2ee68bef623c89523e43dd163e440be9376b06a1f7f366fa198.json",
+      "evidence_sha256": "ed61653292fca2ee68bef623c89523e43dd163e440be9376b06a1f7f366fa198",
+      "identity": {
+        "checker_id": "shell.shellcheck",
+        "scope": "app.sh",
+        "task_id": "CG-9e3be727dbf76c8e55a5ca543cc21506",
+        "workspace_id": "ws-e19bb77e2c2b06cbe0e5239e3b6e9f71"
+      },
+      "outcome": "code_fixed",
+      "policy_revision": "p1",
+      "policy_sha256": "7076b4732b4e45636f7dfb30694ed0c89db319623c18da25371b131b5a20c789",
+      "report_type": "task_resolution_receipt",
+      "schema_version": "0.2.0",
+      "state": "resolved"
+    }
+  },
+  {
+    "evidence": {
+      "adapter_sha256": "2b5b72c4af9b65858abbdb8a97f8355320f179d4139f2daf48bc90fb97024470",
+      "current_native": {
+        "configuration_mode": "builtin_without_global_rc",
+        "diagnostics": [
+          {
+            "column": 6,
+            "end_column": 8,
+            "end_line": 2,
+            "line": 2,
+            "rule_id": "SC2086",
+            "severity": "info"
+          }
+        ],
+        "environment_codes": [],
+        "reason": "shellcheck_diagnostics",
+        "report_valid": true,
+        "status": "diagnostics_observed",
+        "tool_sha256": "8a1ebee8007bceafe874f24228ad8b98d99782f82182f70601347da8bb3fd911",
+        "version": "0.11.0"
+      },
+      "current_source_sha256": "00400e6bf65ec46ff1d85a7494ac3f11a3ca09d56c5e0792941ff5ba67908968",
+      "dialect": "bash",
+      "grammar_sha256": null,
+      "identity": {
+        "checker_id": "shell.shellcheck",
+        "scope": "app.sh",
+        "task_id": "CG-9e3be727dbf76c8e55a5ca543cc21506",
+        "workspace_id": "ws-e19bb77e2c2b06cbe0e5239e3b6e9f71"
+      },
+      "native_rule_id": "SC2086",
+      "original_native": {
+        "configuration_mode": "builtin_without_global_rc",
+        "diagnostics": [
+          {
+            "column": 6,
+            "end_column": 8,
+            "end_line": 2,
+            "line": 2,
+            "rule_id": "SC2086",
+            "severity": "info"
+          }
+        ],
+        "environment_codes": [],
+        "reason": "shellcheck_diagnostics",
+        "report_valid": true,
+        "status": "diagnostics_observed",
+        "tool_sha256": "8a1ebee8007bceafe874f24228ad8b98d99782f82182f70601347da8bb3fd911",
+        "version": "0.11.0"
+      },
+      "original_report_sha256": "5f8d1ac1b5be6dedd84fe0671ac71c973c45f08b3f9a3f2a1c8607da6dfd52d6",
+      "original_source_sha256": "00400e6bf65ec46ff1d85a7494ac3f11a3ca09d56c5e0792941ff5ba67908968",
+      "outcome": "still_present",
+      "policy_revision": "p1",
+      "policy_sha256": "7076b4732b4e45636f7dfb30694ed0c89db319623c18da25371b131b5a20c789",
+      "project_configuration": {
+        "global_configuration": "not_loaded",
+        "reason": null,
+        "sha256": null,
+        "source_path": null,
+        "status": "missing"
+      },
+      "report_type": "task_resolution_evidence",
+      "schema_version": "0.11.0",
+      "tool_sha256": "8a1ebee8007bceafe874f24228ad8b98d99782f82182f70601347da8bb3fd911"
+    },
+    "policy": {
+      "adapter_sha256": "2b5b72c4af9b65858abbdb8a97f8355320f179d4139f2daf48bc90fb97024470",
+      "dialect": "bash",
+      "grammar_sha256": null,
+      "identity": {
+        "checker_id": "shell.shellcheck",
+        "scope": "app.sh",
+        "task_id": "CG-9e3be727dbf76c8e55a5ca543cc21506",
+        "workspace_id": "ws-e19bb77e2c2b06cbe0e5239e3b6e9f71"
+      },
+      "native_rule_id": "SC2086",
+      "native_version": "0.11.0",
+      "original_report_sha256": "5f8d1ac1b5be6dedd84fe0671ac71c973c45f08b3f9a3f2a1c8607da6dfd52d6",
+      "original_source_sha256": "00400e6bf65ec46ff1d85a7494ac3f11a3ca09d56c5e0792941ff5ba67908968",
+      "policy_revision": "p1",
+      "project_configuration": {
+        "global_configuration": "not_loaded",
+        "reason": null,
+        "sha256": null,
+        "source_path": null,
+        "status": "missing"
+      },
+      "report_type": "task_resolution_policy",
+      "schema_version": "1.10.0",
+      "tool_sha256": "8a1ebee8007bceafe874f24228ad8b98d99782f82182f70601347da8bb3fd911"
+    },
+    "receipt": {
+      "authority": "host_context_verified",
+      "delivery_decision": "not_evaluated",
+      "event_ref": ".codeguard/findings/CG-9e3be727dbf76c8e55a5ca543cc21506/events/lifecycle-event-c904270efd194bf5b9bfadd50900364e3f60e27f993efe09dc9037b43a9e82e0.json",
+      "evidence_ref": ".codeguard/state/resolution_evidence/f123a6488b0497e433d61221b1f09c812264a155c707fe55ed780873d0c54ec0.json",
+      "evidence_sha256": "f123a6488b0497e433d61221b1f09c812264a155c707fe55ed780873d0c54ec0",
+      "identity": {
+        "checker_id": "shell.shellcheck",
+        "scope": "app.sh",
+        "task_id": "CG-9e3be727dbf76c8e55a5ca543cc21506",
+        "workspace_id": "ws-e19bb77e2c2b06cbe0e5239e3b6e9f71"
+      },
+      "outcome": "still_present",
+      "policy_revision": "p1",
+      "policy_sha256": "7076b4732b4e45636f7dfb30694ed0c89db319623c18da25371b131b5a20c789",
+      "report_type": "task_resolution_receipt",
+      "schema_version": "0.2.0",
+      "state": "open"
+    }
+  },
+  {
+    "evidence": {
+      "adapter_sha256": "2b5b72c4af9b65858abbdb8a97f8355320f179d4139f2daf48bc90fb97024470",
+      "current_native": {
+        "configuration_mode": "builtin_without_global_rc",
+        "diagnostics": [],
+        "environment_codes": [],
+        "reason": "shellcheck_no_diagnostics",
+        "report_valid": true,
+        "status": "completed",
+        "tool_sha256": "8a1ebee8007bceafe874f24228ad8b98d99782f82182f70601347da8bb3fd911",
+        "version": "0.11.0"
+      },
+      "current_source_sha256": "7f14df377ac8f82aa5c75f3b1513564453614efd7ce0ce6e02556a030f9dab08",
+      "dialect": "bash",
+      "grammar_sha256": null,
+      "identity": {
+        "checker_id": "shell.shellcheck",
+        "scope": "app.sh",
+        "task_id": "CG-9e3be727dbf76c8e55a5ca543cc21506",
+        "workspace_id": "ws-2260c6467f2d7228ac3831fb98c107c2"
+      },
+      "native_rule_id": "SC2086",
+      "original_native": {
+        "configuration_mode": "builtin_without_global_rc",
+        "diagnostics": [
+          {
+            "column": 6,
+            "end_column": 8,
+            "end_line": 2,
+            "line": 2,
+            "rule_id": "SC2086",
+            "severity": "info"
+          }
+        ],
+        "environment_codes": [],
+        "reason": "shellcheck_diagnostics",
+        "report_valid": true,
+        "status": "diagnostics_observed",
+        "tool_sha256": "8a1ebee8007bceafe874f24228ad8b98d99782f82182f70601347da8bb3fd911",
+        "version": "0.11.0"
+      },
+      "original_report_sha256": "eea84ea4627e395c3941e34361f031bacc83c920d79ed728a12cc5691f8246d3",
+      "original_source_sha256": "00400e6bf65ec46ff1d85a7494ac3f11a3ca09d56c5e0792941ff5ba67908968",
+      "outcome": "suppression_requires_review",
+      "policy_revision": "p1",
+      "policy_sha256": "19cb17976ac300255e525aa0b9d8295c81711751050ce30bb2445d2b05e72a2d",
+      "project_configuration": {
+        "global_configuration": "not_loaded",
+        "reason": null,
+        "sha256": null,
+        "source_path": null,
+        "status": "missing"
+      },
+      "report_type": "task_resolution_evidence",
+      "schema_version": "0.11.0",
+      "tool_sha256": "8a1ebee8007bceafe874f24228ad8b98d99782f82182f70601347da8bb3fd911"
+    },
+    "policy": {
+      "adapter_sha256": "2b5b72c4af9b65858abbdb8a97f8355320f179d4139f2daf48bc90fb97024470",
+      "dialect": "bash",
+      "grammar_sha256": null,
+      "identity": {
+        "checker_id": "shell.shellcheck",
+        "scope": "app.sh",
+        "task_id": "CG-9e3be727dbf76c8e55a5ca543cc21506",
+        "workspace_id": "ws-2260c6467f2d7228ac3831fb98c107c2"
+      },
+      "native_rule_id": "SC2086",
+      "native_version": "0.11.0",
+      "original_report_sha256": "eea84ea4627e395c3941e34361f031bacc83c920d79ed728a12cc5691f8246d3",
+      "original_source_sha256": "00400e6bf65ec46ff1d85a7494ac3f11a3ca09d56c5e0792941ff5ba67908968",
+      "policy_revision": "p1",
+      "project_configuration": {
+        "global_configuration": "not_loaded",
+        "reason": null,
+        "sha256": null,
+        "source_path": null,
+        "status": "missing"
+      },
+      "report_type": "task_resolution_policy",
+      "schema_version": "1.10.0",
+      "tool_sha256": "8a1ebee8007bceafe874f24228ad8b98d99782f82182f70601347da8bb3fd911"
+    },
+    "receipt": {
+      "authority": "host_context_verified",
+      "delivery_decision": "not_evaluated",
+      "event_ref": ".codeguard/findings/CG-9e3be727dbf76c8e55a5ca543cc21506/events/lifecycle-event-5acb44475cc2ec75ef5c31c9e674ed451cd8c0f9be504c50d0b4f1ad0c4f78bc.json",
+      "evidence_ref": ".codeguard/state/resolution_evidence/6a3717a44e1cc320fea5cd9cb4a0b8426fb8a6986586ec87faeedadc9b82df57.json",
+      "evidence_sha256": "6a3717a44e1cc320fea5cd9cb4a0b8426fb8a6986586ec87faeedadc9b82df57",
+      "identity": {
+        "checker_id": "shell.shellcheck",
+        "scope": "app.sh",
+        "task_id": "CG-9e3be727dbf76c8e55a5ca543cc21506",
+        "workspace_id": "ws-2260c6467f2d7228ac3831fb98c107c2"
+      },
+      "outcome": "suppression_requires_review",
+      "policy_revision": "p1",
+      "policy_sha256": "19cb17976ac300255e525aa0b9d8295c81711751050ce30bb2445d2b05e72a2d",
+      "report_type": "task_resolution_receipt",
+      "schema_version": "0.2.0",
+      "state": "verification_required"
+    }
+  }
+]

@@ -1,0 +1,39 @@
+{
+  "date": "2026-10-06",
+  "base_commit": "4e2570094d698fe96754c7ae6b302562c7ad6d26",
+  "scope": "maven_javadoc_runtime_identity_drift",
+  "regression": {
+    "passed": 47,
+    "failed": 0,
+    "ignored": 10
+  },
+  "actual_maven_plugin_executed": false,
+  "delivery_decision": "not_evaluated",
+  "source_sha256": {
+    "crates/codeguard-cli/src/maven_javadoc_probe.rs": "0903ebec9a95cca65dc38fc97705714b9cc9ba2700a5a819a31cb5e34ceb371f",
+    "crates/codeguard-cli/tests/maven_javadoc_input_stability.rs": "3c391d4ce4b188a349a25f9791461cf4ba3cc04caeed04975a381dfd57a88ac8"
+  },
+  "logs": {
+    "red": {
+      "path": "/private/tmp/cg-maven-javadoc-input-red.log",
+      "sha256": "174b0b057dcbcfe42717dbecb5f558cb3a44906ee15cd6105a616fff327be438",
+      "results": [
+        "test result: FAILED. 1 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.31s"
+      ]
+    },
+    "green": {
+      "path": "/private/tmp/cg-maven-javadoc-input-green.log",
+      "sha256": "4a8b22d917ca90dd7ebd0ef8af15cdea001aeade93595a6d661f6eba344ca024",
+      "results": [
+        "test result: ok. 26 passed; 0 failed; 6 ignored; 0 measured; 0 filtered out; finished in 2.69s",
+        "test result: ok. 18 passed; 0 failed; 4 ignored; 0 measured; 0 filtered out; finished in 1.40s",
+        "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.25s"
+      ]
+    },
+    "clippy": {
+      "path": "/private/tmp/cg-maven-javadoc-input-clippy.log",
+      "sha256": "49e1ae848eb4ce63df2b74a9221b71093c2185c688f92825d9001b5f72850ddc",
+      "results": []
+    }
+  }
+}

@@ -51,6 +51,10 @@
 - **WHEN** Git hook 环境含 GIT_INDEX_FILE
 - **THEN** 检查该 index，保留真实工作树及 index 内容
 
+#### Scenario: Rust source membership changes during Clippy
+- **WHEN** 原生 Clippy 运行期间普通发现范围内新增、删除或重命名 Rust 源码，或已观察的其它 Rust 文件、嵌套 Cargo 清单及锁文件内容变化
+- **THEN** MUST 撤回局部完成、当前源码诊断与本轮原生覆盖，反馈 rust_inputs_changed_during_scan；源码范围按同一静态发现策略前后复核，发现失败或截断不能当作空集合。根配置的存在性保护继续有效；不据此宣称动态 Cargo 模型、外部依赖和完整配置闭包均已固定
+
 ### Requirement: Managed artifact publication SHALL preserve identity and ownership
 
 受管工具安装的缓存发布 MUST 与质量结果缓存分开。安装字节须有上限并核对预期 SHA-256，缓存根须归当前用户且不可被其它用户写入；使用固定目录描述符和不覆盖的原子发布，拒绝缓存根/目标链接、损坏或权限不符的已有制品。取消、到期或校验失败不得发布未完成文件；正常退出清理暂存，重复相同字节只能在再次核验后复用。缓存写入收据只说明字节发布，不证明锁/发行来源批准、平台兼容、可启动或质量通过；CLI 安装仍须独立核验批准来源。

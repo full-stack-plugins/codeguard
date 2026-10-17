@@ -1,5 +1,12 @@
 use codeguard_adapters::javadoc_pom_direct_replay_eligible;
 
+#[test]
+fn real_engineering_maven_smoke_uses_the_supported_replay_profile() {
+    assert!(javadoc_pom_direct_replay_eligible(include_bytes!(
+        "../../../tests/acceptance/fixtures/engineering-maven-smoke/pom.xml"
+    )));
+}
+
 const SIMPLE: &str = "<project><modelVersion>4.0.0</modelVersion><groupId>demo</groupId><artifactId>docs</artifactId><version>1</version><build><plugins><plugin><artifactId>maven-javadoc-plugin</artifactId><version>3.12.0</version><configuration><doclint>missing</doclint></configuration></plugin></plugins></build></project>";
 
 #[test]

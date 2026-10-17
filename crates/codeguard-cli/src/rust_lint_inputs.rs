@@ -13,6 +13,7 @@ pub(crate) struct RustLintInputs {
     snapshot: SourceSnapshot,
     absent: Vec<PathBuf>,
     root_identity: (u64, u64),
+    inventory: crate::rust_input_inventory::RustInputInventory,
 }
 impl RustLintInputs {
     /// 在原生启动前捕获指定源码和根配置；返回有界快照或不完整原因。
@@ -31,7 +32,10 @@ impl RustLintInputs {
             ));
         }
         let root_identity = (metadata.dev(), metadata.ino());
+        let inventory = crate::rust_input_inventory::RustInputInventory::capture(root)?;
         let mut paths: BTreeSet<PathBuf> = sources.iter().map(PathBuf::from).collect();
+        paths.extend(inventory.source_files.iter().map(PathBuf::from));
+        paths.extend(inventory.configuration_files.iter().cloned());
         paths.insert(PathBuf::from("Cargo.toml"));
         let mut absent = Vec::new();
         // 同时固定两种配置名称；不存在也必须固定，避免扫描中新增配置改变规则。
@@ -66,6 +70,7 @@ impl RustLintInputs {
             snapshot,
             absent,
             root_identity,
+            inventory,
         })
     }
     /// 返回扫描前指定文件的原始字节，供诊断指纹和源码摘要绑定。
@@ -83,6 +88,8 @@ impl RustLintInputs {
             .snapshot
             .verify_source_unchanged()
             .is_ok_and(|same| same)
+            && crate::rust_input_inventory::RustInputInventory::capture(root)
+                .is_ok_and(|current| current == self.inventory)
             && self.absent.iter().all(|relative| {
                 fs::symlink_metadata(root.join(relative))
                     .is_err_and(|e| e.kind() == io::ErrorKind::NotFound)

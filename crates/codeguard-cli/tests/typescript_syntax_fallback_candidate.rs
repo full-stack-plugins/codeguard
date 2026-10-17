@@ -402,8 +402,13 @@ fn no_recovery_remains_incomplete_and_javascript_does_not_use_typescript_grammar
     );
     fs::write(project.0.join("app.js"), "const x = ;\n").unwrap();
     let (_, js_report) = project.lint("app.js");
-    assert_eq!(js_report["schema_version"], "0.2.0");
+    assert_eq!(js_report["schema_version"], "0.6.0");
     assert!(js_report.get("syntax_precheck").is_none());
+    let row = &js_report["syntax_candidates"]["observations"][0];
+    assert_eq!(row["language"], "javascript");
+    assert_eq!(row["grammar_qualified"], false);
+    assert!(row["recovery_count"].as_u64().unwrap() > 0);
+    assert_eq!(js_report["setup"]["requirement"], "required");
 }
 
 #[test]

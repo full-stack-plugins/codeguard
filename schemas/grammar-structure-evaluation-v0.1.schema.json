@@ -1,0 +1,436 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:grammar-structure-evaluation:0.1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "report_type",
+    "schema_version",
+    "authority",
+    "status",
+    "delivery_decision",
+    "grammar_qualified_count",
+    "native_oracle_executed",
+    "independent_holdout",
+    "program_stable",
+    "program_sha256",
+    "manifest_sha256",
+    "corpus_sha256",
+    "sample_count",
+    "language_count",
+    "cohort_count",
+    "cohort_policy",
+    "raw_report",
+    "combined_cases",
+    "combined_cohorts"
+  ],
+  "properties": {
+    "report_type": {
+      "const": "grammar_structure_evaluation"
+    },
+    "schema_version": {
+      "const": "0.1.0"
+    },
+    "authority": {
+      "const": "repository_regression_only"
+    },
+    "status": {
+      "const": "incomplete"
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    },
+    "grammar_qualified_count": {
+      "const": 0
+    },
+    "native_oracle_executed": {
+      "const": false
+    },
+    "independent_holdout": {
+      "const": false
+    },
+    "program_stable": {
+      "type": "boolean"
+    },
+    "program_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "manifest_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "corpus_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "sample_count": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 4096
+    },
+    "language_count": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 4096
+    },
+    "cohort_count": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 4096
+    },
+    "cohort_policy": {
+      "const": "separate_sources_no_pooled_precision"
+    },
+    "raw_report": {
+      "oneOf": [
+        {
+          "$ref": "grammar-regression-evaluation-v0.1.schema.json"
+        },
+        {
+          "$ref": "grammar-regression-evaluation-v0.2.schema.json"
+        }
+      ]
+    },
+    "combined_cases": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 4096,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "language",
+          "cohort",
+          "label",
+          "source_sha256",
+          "grammar_sha256",
+          "expected_valid",
+          "classification",
+          "structural_observations"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "language": {
+            "enum": [
+              "c",
+              "cpp",
+              "csharp",
+              "go",
+              "java",
+              "javascript",
+              "lua",
+              "luau",
+              "objc",
+              "python",
+              "rust",
+              "solidity",
+              "tsx",
+              "typescript",
+              "zig",
+              "arkts",
+              "nix",
+              "terraform",
+              "dart",
+              "erlang",
+              "pascal",
+              "cfml",
+              "cfquery",
+              "cfscript",
+              "cobol",
+              "scala",
+              "swift",
+              "vbnet",
+              "r",
+              "ruby",
+              "php",
+              "kotlin"
+            ]
+          },
+          "cohort": {
+            "enum": [
+              "repository_regression",
+              "upstream_grammar_regression",
+              "provisional_syntax"
+            ]
+          },
+          "label": {
+            "enum": [
+              "regression",
+              "pending"
+            ]
+          },
+          "source_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "grammar_sha256": {
+            "oneOf": [
+              {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "expected_valid": {
+            "type": "boolean"
+          },
+          "classification": {
+            "enum": [
+              "valid",
+              "invalid",
+              "unknown"
+            ]
+          },
+          "structural_observations": {
+            "type": "array",
+            "maxItems": 128,
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "grammar-probe-v0.2.schema.json#/$defs/structure"
+                },
+                {
+                  "$ref": "grammar-probe-v0.3.schema.json#/$defs/structure"
+                },
+                {
+                  "$ref": "grammar-probe-v0.4.schema.json#/$defs/structure"
+                },
+                {
+                  "$ref": "grammar-probe-v0.6.schema.json#/$defs/structure"
+                },
+                {
+                  "$ref": "grammar-probe-v0.7.schema.json#/$defs/structure"
+                }
+              ]
+            }
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "language": {
+                  "const": "python"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "structural_observations": {
+                  "items": {
+                    "$ref": "grammar-probe-v0.2.schema.json#/$defs/structure"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "language": {
+                  "const": "go"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "structural_observations": {
+                  "items": {
+                    "$ref": "grammar-probe-v0.3.schema.json#/$defs/structure"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "language": {
+                  "const": "cfquery"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "structural_observations": {
+                  "items": {
+                    "$ref": "grammar-probe-v0.4.schema.json#/$defs/structure"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "language": {
+                  "const": "javascript"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "structural_observations": {
+                  "items": {
+                    "$ref": "grammar-probe-v0.6.schema.json#/$defs/structure"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "language": {
+                  "const": "erlang"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "structural_observations": {
+                  "items": {
+                    "$ref": "grammar-probe-v0.7.schema.json#/$defs/structure"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "language": {
+                  "not": {
+                    "enum": [
+                      "python",
+                      "go",
+                      "cfquery",
+                      "javascript",
+                      "erlang"
+                    ]
+                  }
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "structural_observations": {
+                  "maxItems": 0
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "combined_cohorts": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 384,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "language",
+          "cohort",
+          "sample_count",
+          "unknown_count",
+          "pending_label_count",
+          "tp",
+          "fp",
+          "fn",
+          "tn"
+        ],
+        "properties": {
+          "language": {
+            "enum": [
+              "c",
+              "cpp",
+              "csharp",
+              "go",
+              "java",
+              "javascript",
+              "lua",
+              "luau",
+              "objc",
+              "python",
+              "rust",
+              "solidity",
+              "tsx",
+              "typescript",
+              "zig",
+              "arkts",
+              "nix",
+              "terraform",
+              "dart",
+              "erlang",
+              "pascal",
+              "cfml",
+              "cfquery",
+              "cfscript",
+              "cobol",
+              "scala",
+              "swift",
+              "vbnet",
+              "r",
+              "ruby",
+              "php",
+              "kotlin"
+            ]
+          },
+          "cohort": {
+            "enum": [
+              "repository_regression",
+              "upstream_grammar_regression",
+              "provisional_syntax"
+            ]
+          },
+          "sample_count": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4096
+          },
+          "unknown_count": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4096
+          },
+          "pending_label_count": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4096
+          },
+          "tp": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4096
+          },
+          "fp": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4096
+          },
+          "fn": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4096
+          },
+          "tn": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4096
+          }
+        }
+      }
+    }
+  }
+}

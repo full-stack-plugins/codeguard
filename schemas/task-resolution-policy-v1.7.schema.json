@@ -1,0 +1,142 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:task-resolution-policy:1.7.0",
+  "title": "Rust 原生首次任务的限定签名策略",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.7.0"
+    },
+    "report_type": {
+      "const": "task_resolution_policy"
+    },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "workspace_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.:-]{1,128}$"
+        },
+        "task_id": {
+          "type": "string",
+          "pattern": "^CG-B-[0-9a-f]{32}$"
+        },
+        "checker_id": {
+          "const": "syntax.native_confirmation"
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096,
+          "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))[^\\\\:\\x00-\\x1f\\x7f]+$"
+        }
+      },
+      "required": [
+        "workspace_id",
+        "task_id",
+        "checker_id",
+        "scope"
+      ]
+    },
+    "policy_revision": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_.:-]{1,128}$"
+    },
+    "original_report_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "original_source_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "grammar_sha256": {
+      "type": "null"
+    },
+    "tool_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "adapter_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "native_rule_id": {
+      "const": "rust.syntax"
+    },
+    "native_version": {
+      "const": "rustfmt 1.9.0-stable"
+    },
+    "edition_context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "edition",
+        "manifest_ref",
+        "manifest_sha256",
+        "workspace_manifest_ref",
+        "workspace_manifest_sha256"
+      ],
+      "properties": {
+        "edition": {
+          "enum": [
+            "2015",
+            "2018",
+            "2021",
+            "2024"
+          ]
+        },
+        "manifest_ref": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096,
+          "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[^\\r\\n]+$"
+        },
+        "manifest_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "workspace_manifest_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096,
+              "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[^\\r\\n]+$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "workspace_manifest_sha256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "required": [
+    "schema_version",
+    "report_type",
+    "identity",
+    "policy_revision",
+    "original_report_sha256",
+    "original_source_sha256",
+    "grammar_sha256",
+    "tool_sha256",
+    "adapter_sha256",
+    "native_rule_id",
+    "native_version",
+    "edition_context"
+  ]
+}

@@ -142,6 +142,7 @@ fn repair_hint(file: &PythonLintFileResult, rule_id: &str) -> Value {
     if !file.completion || file.source_sha256.is_none() {
         return json!({"status":"verification_required","step":"先恢复原生检查完整性并重新扫描该源码"});
     }
+    let doc = codeguard_adapters::RuffDocumentationRule::from_code(rule_id);
     let (step, status) = match rule_id {
         "F401" => (
             "核对该导入是否确实未被使用；仅在确认后移除该导入",
@@ -159,6 +160,17 @@ fn repair_hint(file: &PythonLintFileResult, rule_id: &str) -> Value {
             "确认该公共类的职责，并为类补充准确的 docstring",
             "bounded_repair_candidate",
         ),
+        _ if doc.is_some() => {
+            let rule = doc.as_ref().expect("已核对规则");
+            (
+                rule.step,
+                if rule.investigation_required {
+                    "investigation_required"
+                } else {
+                    "bounded_repair_candidate"
+                },
+            )
+        }
         _ => (
             "查阅该原生规则及私有诊断，确认成因后制定修复",
             "investigation_required",
@@ -174,6 +186,9 @@ fn repair_hint(file: &PythonLintFileResult, rule_id: &str) -> Value {
 }
 
 fn rule_summary(code: &str) -> &'static str {
+    if let Some(rule) = codeguard_adapters::RuffDocumentationRule::from_code(code) {
+        return rule.summary;
+    }
     match code {
         "F401" => "导入未使用",
         "E501" => "行长度超出已配置限制",

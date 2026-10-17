@@ -1,0 +1,225 @@
+{
+  "schema_version": "0.1.0",
+  "report_type": "legacy_source_migration_audit",
+  "base_commit": "03ebb24",
+  "source_commit": "dec5f9d1361eefff493e120b4278939a243814a9",
+  "scope": [
+    "bin",
+    "scripts",
+    "hooks"
+  ],
+  "file_count": 21,
+  "delivery_decision": "not_evaluated",
+  "rows": [
+    {
+      "path": "bin/codeguard",
+      "before_sha256": "0abde018abda97d252314918bec9e65fa3e54bb9b0d11bff6ef9389e2f6a278f",
+      "after_sha256": "0b3f4fba7f3388149168ffc749f26dfee24ddc1ab317e78f497ebe4181733614",
+      "disposition": "preserve",
+      "rationale": "Canonical bounded Rust non-blocking lifecycle and pinned runtime, with legacy Git gate kept separate; script replay does not establish actual host acceptance.",
+      "spec_ref": "openspec/changes/introduce-rust-codeguard-cli/specs/hook-protocol/spec.md",
+      "fixture_ref": "tests/test_rust_lifecycle.cjs",
+      "fixture_sha256": "03f1766d66d5b54b0d13a69938fd88eec7883d2a999fcde822468a0f428d04ea"
+    },
+    {
+      "path": "hooks/__protocol__.md",
+      "before_sha256": "b8850c35afee7c2ed67b3a3fab16c953cb74945f2f15409241df9b8c341f867a",
+      "after_sha256": "c49484fdef7292ed1b51e2c874abbb723cca0451c5774816e95a98ab91a1d682",
+      "disposition": "preserve",
+      "rationale": "Canonical bounded Rust non-blocking lifecycle and pinned runtime, with legacy Git gate kept separate; script replay does not establish actual host acceptance.",
+      "spec_ref": "openspec/changes/introduce-rust-codeguard-cli/specs/hook-protocol/spec.md",
+      "fixture_ref": "tests/test_rust_lifecycle.cjs",
+      "fixture_sha256": "03f1766d66d5b54b0d13a69938fd88eec7883d2a999fcde822468a0f428d04ea"
+    },
+    {
+      "path": "hooks/env_check.py",
+      "before_sha256": "25b467b2d431db9796a9bf38a873c78a95e19e7afc31ddc5bd5915487e3b7dfc",
+      "after_sha256": "6407413e0fd29cb8c66d40170a02c0b760499ff6016db79d711825cf44c657d2",
+      "disposition": "legacy",
+      "rationale": "Legacy wrappers find the portable plugin root; non-trigger prompts exit before probing. Rust lifecycle never executes these wrappers.",
+      "spec_ref": "openspec/changes/introduce-rust-codeguard-cli/specs/hook-protocol/spec.md",
+      "fixture_ref": "tests/test_plugin_manifests.py",
+      "fixture_sha256": "2bb9c59178222cf32a4c79981f8c314c7aa74398c2bedb16473ecfb8e3bc7ef7"
+    },
+    {
+      "path": "hooks/gate_lib.py",
+      "before_sha256": "88049b41363bfe6214729f7b01bfc5d29b71ad175280aeb8150239fec6a2ac72",
+      "after_sha256": "f028a3e3657473c0b5b86ce140932362ec82fb9898d5beda65c5b44522fe3260",
+      "disposition": "legacy",
+      "rationale": "Legacy wrappers find the portable plugin root; non-trigger prompts exit before probing. Rust lifecycle never executes these wrappers.",
+      "spec_ref": "openspec/changes/introduce-rust-codeguard-cli/specs/hook-protocol/spec.md",
+      "fixture_ref": "tests/test_plugin_manifests.py",
+      "fixture_sha256": "2bb9c59178222cf32a4c79981f8c314c7aa74398c2bedb16473ecfb8e3bc7ef7"
+    },
+    {
+      "path": "hooks/hooks.json",
+      "before_sha256": "50f60c22b3596cfbadd0be67a6239507c3473dde261a63a82ef7ee03b47652fb",
+      "after_sha256": "a9d9e5b2ae25258ed4dcd7fca44964e700ac75fb1e838aa6d63e246b01183584",
+      "disposition": "preserve",
+      "rationale": "Canonical bounded Rust non-blocking lifecycle and pinned runtime, with legacy Git gate kept separate; script replay does not establish actual host acceptance.",
+      "spec_ref": "openspec/changes/introduce-rust-codeguard-cli/specs/hook-protocol/spec.md",
+      "fixture_ref": "tests/test_rust_lifecycle.cjs",
+      "fixture_sha256": "03f1766d66d5b54b0d13a69938fd88eec7883d2a999fcde822468a0f428d04ea"
+    },
+    {
+      "path": "hooks/post_tool_lint.py",
+      "before_sha256": "3ba5a32ca889c3568cd5f47b46e0c91fa86515999ce1817e078c5742f846da1f",
+      "after_sha256": "4d298f172f91f25778021058ec1a014ed8eef5f958297354f0f56c6ccec9c4e8",
+      "disposition": "legacy",
+      "rationale": "Legacy wrappers find the portable plugin root; non-trigger prompts exit before probing. Rust lifecycle never executes these wrappers.",
+      "spec_ref": "openspec/changes/introduce-rust-codeguard-cli/specs/hook-protocol/spec.md",
+      "fixture_ref": "tests/test_plugin_manifests.py",
+      "fixture_sha256": "2bb9c59178222cf32a4c79981f8c314c7aa74398c2bedb16473ecfb8e3bc7ef7"
+    },
+    {
+      "path": "hooks/pre_tool_git_guard.py",
+      "before_sha256": "7d02fc3f22f3138be4dcf7ce596b7226f10b69d86e03c1578d96262009599666",
+      "after_sha256": "b6beb72fe5d87706430505953082689544476393528078b3dc5b8f994f061ea4",
+      "disposition": "legacy",
+      "rationale": "Legacy wrappers find the portable plugin root; non-trigger prompts exit before probing. Rust lifecycle never executes these wrappers.",
+      "spec_ref": "openspec/changes/introduce-rust-codeguard-cli/specs/hook-protocol/spec.md",
+      "fixture_ref": "tests/test_plugin_manifests.py",
+      "fixture_sha256": "2bb9c59178222cf32a4c79981f8c314c7aa74398c2bedb16473ecfb8e3bc7ef7"
+    },
+    {
+      "path": "hooks/rust_runtime_dispatch.cjs",
+      "before_sha256": null,
+      "after_sha256": "31edfd17640232fdce3d61cd05e10c05d2ecd82207c3358c5bf73f9ff4af3de2",
+      "disposition": "preserve",
+      "rationale": "Canonical bounded Rust non-blocking lifecycle and pinned runtime, with legacy Git gate kept separate; script replay does not establish actual host acceptance.",
+      "spec_ref": "openspec/changes/introduce-rust-codeguard-cli/specs/hook-protocol/spec.md",
+      "fixture_ref": "tests/test_rust_lifecycle.cjs",
+      "fixture_sha256": "03f1766d66d5b54b0d13a69938fd88eec7883d2a999fcde822468a0f428d04ea"
+    },
+    {
+      "path": "hooks/stop_summary.py",
+      "before_sha256": "eba15eda10fc9ca82830cd35eaad8f1bd1bb6449689a8b23ba6ea89665051383",
+      "after_sha256": "f77c9803c513c0bb3134fb2f2231b7177850199507e814d03e7ef07f4780b1f7",
+      "disposition": "legacy",
+      "rationale": "Legacy wrappers find the portable plugin root; non-trigger prompts exit before probing. Rust lifecycle never executes these wrappers.",
+      "spec_ref": "openspec/changes/introduce-rust-codeguard-cli/specs/hook-protocol/spec.md",
+      "fixture_ref": "tests/test_plugin_manifests.py",
+      "fixture_sha256": "2bb9c59178222cf32a4c79981f8c314c7aa74398c2bedb16473ecfb8e3bc7ef7"
+    },
+    {
+      "path": "hooks/user_prompt_validator.py",
+      "before_sha256": "cb21611a242120c74ce55dc4f8ea0c77e155fe17fcada6452879a609f2f67c25",
+      "after_sha256": "ce17a18189fe1f93016bc8f034eeb08362dcbdabd06973c7938ca65970c96fcb",
+      "disposition": "legacy",
+      "rationale": "Legacy wrappers find the portable plugin root; non-trigger prompts exit before probing. Rust lifecycle never executes these wrappers.",
+      "spec_ref": "openspec/changes/introduce-rust-codeguard-cli/specs/hook-protocol/spec.md",
+      "fixture_ref": "tests/test_prompt_application.py",
+      "fixture_sha256": "8e7fac949add48d449d1f50644f4da4ee2ebc7157d893658d39b7f0daf0d9912"
+    },
+    {
+      "path": "scripts/bump-plugin.mjs",
+      "before_sha256": "3a9e575add4a4bbbaf6d281a3e55aec35adfdb377e683bd570d804cb2b51cb96",
+      "after_sha256": "09e12f085abd79b656681dfdabbfcd452c3886b4a94ff8e60a7e733de232ae05",
+      "disposition": "preserve",
+      "rationale": "Read back the actual nested Claude marketplace version after release edits.",
+      "spec_ref": "openspec/changes/introduce-rust-codeguard-cli/specs/binary-distribution/spec.md",
+      "fixture_ref": "tests/test_plugin_manifests.py",
+      "fixture_sha256": "2bb9c59178222cf32a4c79981f8c314c7aa74398c2bedb16473ecfb8e3bc7ef7"
+    },
+    {
+      "path": "scripts/check_architecture.py",
+      "before_sha256": "d321d35a7cc5543d96cf5630e7665253f1762b21e1f908c1dea707bc2ae1aa70",
+      "after_sha256": "1e6aa7a5f0b9c0d38f79e4d2e42cbfa47b0c272edc545cb40e853f71fe0c1e68",
+      "disposition": "legacy",
+      "rationale": "Retain legacy module layers only; Rust crate boundaries have an independent validator.",
+      "spec_ref": "openspec/changes/introduce-rust-codeguard-cli/specs/execution-kernel/spec.md",
+      "fixture_ref": "tests/test_architecture.py",
+      "fixture_sha256": "5380e0fe12a4526542d238a578d90c72d7918771b9ac64b27b5960384ce84595"
+    },
+    {
+      "path": "scripts/codeguard/engine.py",
+      "before_sha256": null,
+      "after_sha256": "5a751561e738d54f8d7828a5f56e3edb2b019ee2f4d58448cab1e6624f2da477",
+      "disposition": "correct",
+      "rationale": "Engine inventory/exit zero is observation, never protected delivery authority.",
+      "spec_ref": "openspec/changes/introduce-rust-codeguard-cli/specs/verdict-integrity/spec.md",
+      "fixture_ref": "tests/test_engine_boundary.py",
+      "fixture_sha256": "4c221eae1e230e9a4378bba10cf1bb1fae649323c4582acb0bdf5eab0d362957"
+    },
+    {
+      "path": "scripts/codeguard/gate.py",
+      "before_sha256": "fb3e857e2a3c2f8f30564ccde1ba1a771536a31f7a262a5ed96d3f8d153ff11b",
+      "after_sha256": "3ea96427bdd9f8450865b194504bc2ddd2d1867419b2d21dcb6fa224ec572c37",
+      "disposition": "preserve",
+      "rationale": "Resolve real executable/script directories before effective environment/cache identity; module hints do not replace original checker commands.",
+      "spec_ref": "openspec/changes/introduce-rust-codeguard-cli/specs/execution-kernel/spec.md",
+      "fixture_ref": "tests/test_skip_gate_safety_scope.py",
+      "fixture_sha256": "4df10655e9651fa3599fe2c6f80f285048fab2f6127fda2618fbd54375cffde7"
+    },
+    {
+      "path": "scripts/codeguard/git_guard_application.py",
+      "before_sha256": "034a952860b4e05d59bccb9360844debeba19e8f4672f65829f6a61859c6f300",
+      "after_sha256": "ba02599816a06e04aa2fd573d68934092019797d84f29638ab4eaccacc372adb",
+      "disposition": "legacy",
+      "rationale": "Legacy language bypass retains safety observations; no bypass or fail-open can grant new delivery allow.",
+      "spec_ref": "openspec/changes/introduce-rust-codeguard-cli/specs/hook-protocol/spec.md",
+      "fixture_ref": "tests/test_skip_gate_safety_scope.py",
+      "fixture_sha256": "4df10655e9651fa3599fe2c6f80f285048fab2f6127fda2618fbd54375cffde7"
+    },
+    {
+      "path": "scripts/codeguard/prompt_application.py",
+      "before_sha256": "74c338ee1e9d9f1e8374344a3a56d2e134307f9e784b76f4024b0331220161e1",
+      "after_sha256": "09a1fbc9b675ac192bbab330363951dd70753f1ef9aa9afa71d4ed6baaaadf29",
+      "disposition": "legacy",
+      "rationale": "Legacy language bypass retains safety observations; no bypass or fail-open can grant new delivery allow.",
+      "spec_ref": "openspec/changes/introduce-rust-codeguard-cli/specs/hook-protocol/spec.md",
+      "fixture_ref": "tests/test_skip_gate_safety_scope.py",
+      "fixture_sha256": "4df10655e9651fa3599fe2c6f80f285048fab2f6127fda2618fbd54375cffde7"
+    },
+    {
+      "path": "scripts/codeguard/reporting.py",
+      "before_sha256": "ee93fd61c4b444667d0dd00368ec957d1ebc2820b20b17273dd931dc95273305",
+      "after_sha256": "3fe64bda11dfdc8a32b5b04d49923786d366bedae7a7d1c784c76515c361a05e",
+      "disposition": "legacy",
+      "rationale": "Legacy language bypass retains safety observations; no bypass or fail-open can grant new delivery allow.",
+      "spec_ref": "openspec/changes/introduce-rust-codeguard-cli/specs/hook-protocol/spec.md",
+      "fixture_ref": "tests/test_skip_gate_safety_scope.py",
+      "fixture_sha256": "4df10655e9651fa3599fe2c6f80f285048fab2f6127fda2618fbd54375cffde7"
+    },
+    {
+      "path": "scripts/codeguard/toolchain.py",
+      "before_sha256": "41527c6f4962976f0059b45804cc62d92eaada71968a705299d158687f2ff99f",
+      "after_sha256": "78b339c525529da37dba13e972fc631a53ff02edef6ebd5ca600680923e42add",
+      "disposition": "preserve",
+      "rationale": "Resolve real executable/script directories before effective environment/cache identity; module hints do not replace original checker commands.",
+      "spec_ref": "openspec/changes/introduce-rust-codeguard-cli/specs/execution-kernel/spec.md",
+      "fixture_ref": "tests/test_skip_gate_safety_scope.py",
+      "fixture_sha256": "4df10655e9651fa3599fe2c6f80f285048fab2f6127fda2618fbd54375cffde7"
+    },
+    {
+      "path": "scripts/engine_report.py",
+      "before_sha256": null,
+      "after_sha256": "96f5011860ad65abc416e2d94ac5b68837447151fe2706173c69912d02de8101",
+      "disposition": "correct",
+      "rationale": "Engine inventory/exit zero is observation, never protected delivery authority.",
+      "spec_ref": "openspec/changes/introduce-rust-codeguard-cli/specs/verdict-integrity/spec.md",
+      "fixture_ref": "tests/test_engine_boundary.py",
+      "fixture_sha256": "4c221eae1e230e9a4378bba10cf1bb1fae649323c4582acb0bdf5eab0d362957"
+    },
+    {
+      "path": "scripts/paths.py",
+      "before_sha256": "95709ddbad6cee7f817a83e8dacab29c5f968ecf3947c5623b2a6cb5ab72d29e",
+      "after_sha256": "dc152dc6a4e6dbd07377fa5c02caf900955d95ad4cee7250f6684cd7ff41a878",
+      "disposition": "preserve",
+      "rationale": "Resolve real executable/script directories before effective environment/cache identity; module hints do not replace original checker commands.",
+      "spec_ref": "openspec/changes/introduce-rust-codeguard-cli/specs/execution-kernel/spec.md",
+      "fixture_ref": "tests/test_skip_gate_safety_scope.py",
+      "fixture_sha256": "4df10655e9651fa3599fe2c6f80f285048fab2f6127fda2618fbd54375cffde7"
+    },
+    {
+      "path": "scripts/validate_portable_plugin.py",
+      "before_sha256": null,
+      "after_sha256": "141c821168b9bd2327e5e487f26c546a9e750bfe79043c5f59ba4b78853d05a6",
+      "disposition": "preserve",
+      "rationale": "Portable package manifest, MCP, skill containment and mirror checks are packaging validation, not source-quality approval.",
+      "spec_ref": "openspec/changes/introduce-rust-codeguard-cli/specs/binary-distribution/spec.md",
+      "fixture_ref": "plugin.json",
+      "fixture_sha256": "72f6f83af29468037ecb318719a98f3424df2ecc18d10b2a871e07b051a5a762"
+    }
+  ]
+}

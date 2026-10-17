@@ -1,8 +1,6 @@
 //! 原生 Cargo/rustdoc 库目标观察；完整项目策略与修复任务仍独立核验。
 
-use crate::check_budget::{
-    budget_record, parse_check_timeout, resolve_project_default, select_check_timeout,
-};
+use crate::check_budget::{budget_record, parse_check_timeout};
 use crate::discovery::discover;
 use crate::doctor_scratch::DoctorScratch;
 use crate::rustdoc_repair_brief::rustdoc_repair_brief;
@@ -21,91 +19,23 @@ use std::ffi::OsString;
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 use std::sync::atomic::AtomicBool;
-use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
+use std::time::{Instant, SystemTime, UNIX_EPOCH};
 
-struct Arguments {
-    root: PathBuf,
-    tool: Option<PathBuf>,
-    json: bool,
-    timeout: Option<u64>,
+/// Rust 注释入口的已校验参数，供统一编排与原生观察共用。
+pub(crate) struct Arguments {
+    pub root: PathBuf,
+    pub tool: Option<PathBuf>,
+    pub json: bool,
+    pub timeout: Option<u64>,
 }
 
 /// 执行 comments rust 的局部文档观察；参数为该入口剩余 argv，不授予完整门禁或任务关闭。
 pub fn run(args: &[String]) -> ExitCode {
-    let arguments = match parse_args(args) {
-        Ok(value) => value,
-        Err(reason) => {
-            eprintln!("{reason}");
-            return ExitCode::from(2);
-        }
-    };
-    let timeout = select_check_timeout(arguments.timeout)
-        .and_then(|(value, source)| resolve_project_default(&arguments.root, value, source));
-    let (timeout, source) = match timeout {
-        Ok(value) => value,
-        Err(reason) => {
-            eprintln!("{reason}");
-            return ExitCode::from(2);
-        }
-    };
-    let deadline = Instant::now() + Duration::from_millis(timeout);
-    let mut report = empty_report(timeout, source);
-    if let Some(root) = arguments
-        .root
-        .canonicalize()
-        .ok()
-        .filter(|root| root.is_dir())
-    {
-        report = observe_for_verification(
-            &root,
-            arguments.tool.as_deref(),
-            timeout,
-            source,
-            deadline,
-            false,
-            &AtomicBool::new(false),
-        );
-        persist_and_sync(&root, &mut report);
-    }
-    let exit = if report["reason"] == "request_cancelled" {
-        130
-    } else {
-        3
-    };
-    if exit == 130 {
-        report["exit_code"] = json!(130);
-        report["command_status"] = json!("cancelled");
-    }
-    if arguments.json {
-        println!("{report}");
-    } else {
-        println!(
-            "Rust 注释检查：未完成；原生观察 {}，原因 {}",
-            report["local_scan_complete"], report["reason"]
-        );
-        for finding in report["findings"].as_array().into_iter().flatten() {
-            println!(
-                "原生规则 {}：{}:{}；按规则依据补齐或纠正文档后用原工具复检",
-                finding["rule_id"], finding["path"], finding["line"]
-            );
-            println!("规则依据：{}", finding["repair_brief"]["rule_basis"]);
-            for step in finding["repair_brief"]["steps"]
-                .as_array()
-                .into_iter()
-                .flatten()
-            {
-                println!("下一步：{}", step.as_str().unwrap_or(""));
-            }
-        }
-        println!(
-            "任务同步：{}；库目标局部探针不代表原配置、全部构建组合或已修复；正式关闭与复发重开尚未接通。",
-            report["backlog_status"]
-        );
-    }
-    ExitCode::from(exit)
+    crate::rust_documentation_command::run(args)
 }
 
-fn empty_report(timeout: u64, source: &str) -> Value {
+/// 构造原 rustdoc 未完成报告；参数为时间预算与来源，不授予检查资格。
+pub(crate) fn empty_report(timeout: u64, source: &str) -> Value {
     let report = json!({
         "schema_version":"0.4.0","report_type":"rustdoc_local_observation","operation":"comments","language":"rust",
         "workspace_binding":"uninitialized","workspace_id":null,"run_id":format!("rustdoc-{}-{}",std::process::id(),SystemTime::now().duration_since(UNIX_EPOCH).map_or(0,|value|value.as_nanos())),"backlog_sync":null,
@@ -389,7 +319,8 @@ fn observe(
     }
 }
 
-fn parse_args(args: &[String]) -> Result<Arguments, String> {
+/// 解析语种后 argv，返回路径/工具/预算参数；非法参数在原生执行前拒绝。
+pub(crate) fn parse_args(args: &[String]) -> Result<Arguments, String> {
     let mut root = None;
     let mut tool = None;
     let mut format = None;

@@ -1,0 +1,48 @@
+{
+  "authority": "local_unverified",
+  "budget": {
+    "enforcement": "native_execution_only",
+    "source": "cli",
+    "timeout_ms": 30000
+  },
+  "delivery_decision": "not_evaluated",
+  "language": "java",
+  "mode": "gradle",
+  "native": {
+    "authority": "local_unverified",
+    "checker_id": "java.gradle.dependency_check",
+    "coverage_proven": false,
+    "database_freshness_verified": false,
+    "delivery_decision": "not_evaluated",
+    "dependency_attribution_verified": false,
+    "dependency_cache_sha256": null,
+    "gradle_bundle_sha256": "c16a389b246fcaf3b57adad324e66b2672327c269e86ed9e9f93eb7265ce8518",
+    "init_scripts_sha256": "384b54fad544562d01b2931612ae38cdf3bb60a30bb6dbf41d18bcd7581ad6df",
+    "java_entry_sha256": "430786dda544af57cee67ff74709ace9dd922e08e0a6f36d56921b7b82088672",
+    "jdk_release_sha256": "de3b2cd7580150641e86a183a24483372a6ba524b5dcd2a622cce5b44f7f3e51",
+    "model_report_sha256": null,
+    "native_exit_code": null,
+    "native_status": "incomplete",
+    "native_stderr_sha256": null,
+    "native_stdout_sha256": null,
+    "ownership_report_sha256": null,
+    "reason": "request_cancelled",
+    "report_type": "gradle_dependency_check_probe",
+    "reports": [],
+    "schema_version": "0.2.0",
+    "source_snapshot_sha256": "81e7352b015b67522ad07a095bb22e2c89c20e85864beb7ad49aab72d2ccd342",
+    "task_paths": []
+  },
+  "next_action": "读取原生reason恢复已有Gradle/JDK、原OWASP任务、原JSON配置和选定输入；缺插件或漏洞库属于环境阻塞，不修改无关源码。恢复后使用相同原任务复检",
+  "operation": "cve",
+  "report_type": "java_gradle_cve_feedback",
+  "requested_task_paths": [
+    ":dependencyCheckAnalyze"
+  ],
+  "schema_version": "0.2.0",
+  "selected_inputs": [
+    "build.gradle",
+    "settings.gradle"
+  ],
+  "task_sync": "not_integrated"
+}

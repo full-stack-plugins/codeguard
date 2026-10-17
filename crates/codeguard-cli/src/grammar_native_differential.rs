@@ -1,7 +1,9 @@
 //! 开发期原生/WASM 差分回放；使用已支持的原生观察器，不授予独立 holdout 或语言资格。
 use crate::grammar_evaluation::{classify_probe, validate_corpus};
 use crate::grammar_native_checker::GrammarNativeChecker;
-use crate::syntax_worker_runner::run_syntax_worker_candidate;
+use crate::syntax_worker_runner::{
+    run_syntax_worker_candidate, run_syntax_worker_module_candidate,
+};
 use codeguard_runtime::read_bounded_regular_file;
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
@@ -68,8 +70,14 @@ pub fn replay_native_corpus(
     let javascript_selected = tools.contains_key("javascript");
     let ruby_selected = tools.contains_key("ruby");
     let go_selected = tools.contains_key("go");
-    let measure_structure =
-        tools.contains_key("python") || javascript_selected || ruby_selected || go_selected;
+    let rust_selected = tools.contains_key("rust");
+    let clang_selected = tools.contains_key("c") || tools.contains_key("cpp");
+    let measure_structure = clang_selected
+        || tools.contains_key("python")
+        || javascript_selected
+        || ruby_selected
+        || go_selected
+        || rust_selected;
     let mut cases = Vec::new();
     for case in &corpus.cases {
         let Some((checker, tool, tool_sha, companion)) = frozen.get(&case.language) else {
@@ -114,7 +122,7 @@ pub fn replay_native_corpus(
             && checker
                 .companion_identity(&tools[&case.language])
                 .is_ok_and(|current| current == *companion);
-        let native_class = tool_current.then(|| classify_native(&native)).flatten();
+        let native_class = tool_current.then(|| checker.classify(&native)).flatten();
         let wasm_started = Instant::now();
         let observation =
             if !admitted || cancelled.load(Ordering::Relaxed) || Instant::now() >= deadline {
@@ -125,7 +133,13 @@ pub fn replay_native_corpus(
                 }
                 .to_owned())
             } else {
-                run_syntax_worker_candidate(
+                // 原始恢复和项目结构候选来自同一worker；仍分别保留两层指标。
+                let runner = if case.language == "javascript" {
+                    run_syntax_worker_module_candidate
+                } else {
+                    run_syntax_worker_candidate
+                };
+                runner(
                     executable,
                     &case.language,
                     &case.id,
@@ -134,18 +148,24 @@ pub fn replay_native_corpus(
                     cancelled,
                 )
             };
-        let (wasm_class, recovery_count, wasm_reason, structures) = match observation {
-            Ok(observation) => {
-                let truncated = observation.precheck.truncated_files > 0;
-                (
-                    classify_probe(observation.recoveries.len(), truncated),
-                    Some(observation.recoveries.len()),
-                    truncated.then_some("syntax_recovery_incomplete".to_owned()),
-                    Some(observation.structural_observations),
-                )
-            }
-            Err(reason) => (None, None, Some(reason), None),
-        };
+        let (wasm_class, recovery_count, wasm_reason, wasm_reason_detail, structures) =
+            match observation {
+                Ok(observation) => {
+                    let truncated = observation.precheck.truncated_files > 0;
+                    (
+                        classify_probe(observation.recoveries.len(), truncated),
+                        Some(observation.recoveries.len()),
+                        observation
+                            .evaluation_incomplete_reason()
+                            .map(str::to_owned),
+                        observation
+                            .evaluation_incomplete_reason_detail()
+                            .map(str::to_owned),
+                        Some(observation.structural_observations),
+                    )
+                }
+                Err(reason) => (None, None, Some(reason), None, None),
+            };
         let asset = manifest["assets"]
             .as_array()
             .and_then(|assets| assets.iter().find(|a| a["language"] == case.language))
@@ -154,8 +174,18 @@ pub fn replay_native_corpus(
             "source_sha256":case.source_sha256,"grammar_sha256":asset["sha256"],"fixture_expected_valid":case.expected_valid,"fixture_label":case.label,
             "native_attempted":native_attempted,"native":native,"native_classification":name(native_class),"native_identity_current":tool_current,
             "native_elapsed_us":native_us,"wasm_classification":name(wasm_class),"wasm_recovery_count":recovery_count,"wasm_reason":wasm_reason,
+            // 兼容 reason 不变；精确细分独立成字段，便于逐语言区分隐藏错误与预算截断。
+            "wasm_reason_detail":wasm_reason_detail,
             "wasm_elapsed_us":elapsed_us(wasm_started),"comparison":comparison(native_class,wasm_class),
             "fixture_native_disagreement":native_class.map(|valid|valid!=case.expected_valid)});
+        if matches!(case.language.as_str(), "c" | "cpp") {
+            row["native_standard"] = json!(if case.language == "c" { "c11" } else { "c++17" });
+            row["native_classification_policy"] = json!("clang-audited-punctuation-v1");
+        }
+        if case.language == "javascript" {
+            // Node开发观察器固定--input-type=module，不向未知项目模式推断。
+            row["javascript_mode"] = json!("module");
+        }
         if measure_structure {
             // 原始恢复统计保持不变，结构规则仅补充独立的候选层测量。
             let combined = combined_candidate(wasm_class, structures.as_ref().map(Vec::len));
@@ -197,6 +227,8 @@ pub fn replay_native_corpus(
                     row["wasm_classification"] = json!("unknown");
                     row["wasm_recovery_count"] = Value::Null;
                     row["wasm_reason"] = json!("grammar_evaluation_program_changed");
+                    // 覆盖原因后清空细分，避免与新 reason 矛盾的旧细分留在行里。
+                    row["wasm_reason_detail"] = Value::Null;
                     if measure_structure {
                         row["structural_observations"] = Value::Null;
                         row["combined_candidate_classification"] = json!("unknown");
@@ -235,8 +267,8 @@ pub fn replay_native_corpus(
             inventory.push(json!({"language":language,"grammar_sha256":asset["sha256"],"native_selected":false,"reason":if checker(language).is_some(){"explicit_native_tool_not_selected"}else{"native_differential_adapter_unavailable"},"grammar_qualified":false}));
         }
     }
-    let mut report = json!({"schema_version":if go_selected {"0.7.0"}else if ruby_selected {"0.5.0"}else if javascript_selected {"0.4.0"}else if measure_structure {"0.3.0"}else{"0.1.0"},"report_type":"native_grammar_differential","status":"incomplete","delivery_decision":"not_evaluated",
-        "authority":"development_native_differential_only","native_adapter_reused":!(javascript_selected || ruby_selected || go_selected),"independent_holdout":false,"grammar_qualified_count":0,
+    let mut report = json!({"schema_version":if clang_selected {"0.12.0"}else if javascript_selected {"0.10.0"}else if rust_selected {"0.8.0"}else if go_selected {"0.7.0"}else if ruby_selected {"0.5.0"}else if measure_structure {"0.3.0"}else{"0.1.0"},"report_type":"native_grammar_differential","status":"incomplete","delivery_decision":"not_evaluated",
+        "authority":"development_native_differential_only","native_adapter_reused":!(javascript_selected || ruby_selected || go_selected || rust_selected),"independent_holdout":false,"grammar_qualified_count":0,
         "corpus_sha256":digest(corpus_bytes),"manifest_sha256":corpus.manifest_sha256,"program_sha256":program_sha,"program_stable":program_stable,
         "language_count":inventory.len(),"selected_language_count":frozen.len(),"sample_count":cases.len(),"languages":inventory,"cases":cases});
     if measure_structure {

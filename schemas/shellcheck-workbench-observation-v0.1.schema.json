@@ -1,0 +1,218 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "source_sha256",
+    "dialect",
+    "authority",
+    "coverage_proven",
+    "delivery_decision",
+    "input_stable",
+    "native",
+    "project_configuration",
+    "workspace_binding",
+    "workspace_id",
+    "run_id",
+    "path",
+    "requested_config"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.1.0"
+    },
+    "report_type": {
+      "const": "shellcheck_workbench_observation"
+    },
+    "source_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "dialect": {
+      "type": "string",
+      "pattern": "^[a-z]{1,16}$"
+    },
+    "authority": {
+      "const": "local_unverified"
+    },
+    "coverage_proven": {
+      "const": false
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    },
+    "input_stable": {
+      "type": "boolean"
+    },
+    "native": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "configuration_mode",
+        "diagnostics",
+        "environment_codes",
+        "reason",
+        "report_valid",
+        "status",
+        "tool_sha256",
+        "version"
+      ],
+      "properties": {
+        "configuration_mode": {
+          "enum": [
+            "not_applied",
+            "frozen_project_rc",
+            "builtin_without_global_rc"
+          ]
+        },
+        "diagnostics": {
+          "type": "array",
+          "maxItems": 128,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "rule_id",
+              "severity",
+              "line",
+              "column",
+              "end_line",
+              "end_column"
+            ],
+            "properties": {
+              "rule_id": {
+                "type": "string",
+                "pattern": "^SC[0-9]{4}$"
+              },
+              "severity": {
+                "enum": [
+                  "error",
+                  "warning",
+                  "info",
+                  "style"
+                ]
+              },
+              "line": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "column": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "end_line": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "end_column": {
+                "type": "integer",
+                "minimum": 1
+              }
+            }
+          }
+        },
+        "environment_codes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^SC[0-9]{4}$"
+          }
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "report_valid": {
+          "type": "boolean"
+        },
+        "status": {
+          "enum": [
+            "incomplete",
+            "completed",
+            "diagnostics_observed"
+          ]
+        },
+        "tool_sha256": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "version": {
+          "enum": [
+            null,
+            "0.11.0"
+          ]
+        }
+      }
+    },
+    "project_configuration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "global_configuration",
+        "reason",
+        "sha256",
+        "source_path",
+        "status"
+      ],
+      "properties": {
+        "global_configuration": {
+          "const": "not_loaded"
+        },
+        "reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "sha256": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "source_path": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "status": {
+          "enum": [
+            "configured",
+            "missing",
+            "invalid",
+            "unknown"
+          ]
+        }
+      }
+    },
+    "workspace_binding": {
+      "const": "bound"
+    },
+    "workspace_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^shellcheck-[a-zA-Z0-9-]+$"
+    },
+    "path": {
+      "type": "string",
+      "minLength": 1
+    },
+    "requested_config": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:shellcheck-workbench-observation:0.1.0"
+}

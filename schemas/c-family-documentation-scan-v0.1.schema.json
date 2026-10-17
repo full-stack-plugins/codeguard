@@ -1,0 +1,294 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:c-family-documentation-scan:0.1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "language",
+    "scope",
+    "project_configuration",
+    "standard",
+    "tool",
+    "source_file_count",
+    "unobserved_count",
+    "file_limit",
+    "report_limit_bytes",
+    "scope_stable",
+    "local_scan_complete",
+    "native_task_started",
+    "status",
+    "reason",
+    "files",
+    "task_status",
+    "authority",
+    "coverage_proven",
+    "delivery_decision"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.1.0"
+    },
+    "report_type": {
+      "const": "c_family_documentation_scan"
+    },
+    "language": {
+      "enum": [
+        "c",
+        "cpp"
+      ]
+    },
+    "scope": {
+      "const": "discovered_standalone_files"
+    },
+    "project_configuration": {
+      "const": "unknown"
+    },
+    "standard": {
+      "enum": [
+        null,
+        "c11",
+        "c++17"
+      ]
+    },
+    "tool": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "selected",
+        "resolved",
+        "sha256"
+      ],
+      "properties": {
+        "selected": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "resolved": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "sha256": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    },
+    "source_file_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "unobserved_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "file_limit": {
+      "const": 64
+    },
+    "report_limit_bytes": {
+      "const": 16777216
+    },
+    "scope_stable": {
+      "type": "boolean"
+    },
+    "local_scan_complete": {
+      "type": "boolean"
+    },
+    "native_task_started": {
+      "type": "boolean"
+    },
+    "status": {
+      "enum": [
+        "not_run",
+        "context_required",
+        "partial"
+      ]
+    },
+    "reason": {
+      "enum": [
+        "native_task_not_started",
+        "clang_documentation_context_required",
+        "request_cancelled",
+        "request_deadline_exceeded",
+        "aggregate_report_limit",
+        "native_documentation_coverage_unverified"
+      ]
+    },
+    "files": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "current",
+          "reason",
+          "feedback"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "current": {
+            "type": "boolean"
+          },
+          "reason": {
+            "enum": [
+              "native_documentation_observed",
+              "source_scope_unavailable",
+              "input_or_scope_changed"
+            ]
+          },
+          "feedback": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "c-family-comments-feedback-v0.5.schema.json"
+              },
+              {
+                "$ref": "c-family-comments-feedback-v0.9.schema.json"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "task_status": {
+      "enum": [
+        "not_connected",
+        "partial"
+      ]
+    },
+    "authority": {
+      "const": "local_unverified"
+    },
+    "coverage_proven": {
+      "const": false
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "language": {
+            "const": "c"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "standard": {
+            "enum": [
+              null,
+              "c11"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "language": {
+            "const": "cpp"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "standard": {
+            "enum": [
+              null,
+              "c++17"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "local_scan_complete": {
+            "const": true
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "scope_stable": {
+            "const": true
+          },
+          "status": {
+            "const": "partial"
+          },
+          "unobserved_count": {
+            "const": 0
+          },
+          "files": {
+            "minItems": 1,
+            "items": {
+              "properties": {
+                "current": {
+                  "const": true
+                },
+                "feedback": {
+                  "type": "object",
+                  "properties": {
+                    "local_scan_complete": {
+                      "const": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "enum": [
+              "not_run",
+              "context_required"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "files": {
+            "maxItems": 0
+          },
+          "local_scan_complete": {
+            "const": false
+          },
+          "native_task_started": {
+            "const": false
+          },
+          "task_status": {
+            "const": "not_connected"
+          }
+        }
+      }
+    }
+  ]
+}

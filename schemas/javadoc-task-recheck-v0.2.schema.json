@@ -1,0 +1,174 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:javadoc-task-recheck:0.2.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "operation",
+    "workspace_binding",
+    "checker_id",
+    "authority",
+    "coverage_proven",
+    "delivery_decision",
+    "run_id",
+    "workspace_id",
+    "task_id",
+    "task_path",
+    "task_rule",
+    "origin",
+    "scan",
+    "native_observation",
+    "input_bindings",
+    "task_input_stable",
+    "configuration_matches",
+    "tool_identity_matches",
+    "reason",
+    "observation_scope"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.2.0"
+    },
+    "report_type": {
+      "const": "javadoc_task_recheck"
+    },
+    "operation": {
+      "const": "task_verify"
+    },
+    "workspace_binding": {
+      "const": "bound"
+    },
+    "checker_id": {
+      "const": "java.jdk.javadoc"
+    },
+    "authority": {
+      "const": "local_unverified"
+    },
+    "coverage_proven": {
+      "const": false
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^javadoc-task-[A-Za-z0-9-]{1,100}$"
+    },
+    "workspace_id": {
+      "type": "string",
+      "pattern": "^ws-[0-9a-f]{32}$"
+    },
+    "task_id": {
+      "type": "string",
+      "pattern": "^CG-(B-)?[0-9a-f]{32}$"
+    },
+    "task_path": {
+      "type": "string",
+      "minLength": 1
+    },
+    "task_rule": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "origin": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "first_run_id",
+        "first_report_sha256"
+      ],
+      "properties": {
+        "first_run_id": {
+          "type": "string",
+          "pattern": "^javadoc-[A-Za-z0-9-]{1,100}$"
+        },
+        "first_report_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "scan": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "javadoc-workbench-observation-v0.2.schema.json"
+        }
+      ]
+    },
+    "native_observation": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "check-feedback-v0.46.schema.json#/properties/native_results/properties/java_javadoc"
+        },
+        {
+          "$ref": "java-javadoc-local-feedback.schema.json"
+        }
+      ]
+    },
+    "input_bindings": {
+      "type": "array",
+      "maxItems": 10,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "sha256",
+          "location"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sha256": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "location": {
+            "enum": [
+              "workspace",
+              "tool"
+            ]
+          }
+        }
+      }
+    },
+    "task_input_stable": {
+      "type": "boolean"
+    },
+    "configuration_matches": {
+      "type": "boolean"
+    },
+    "tool_identity_matches": {
+      "type": "boolean"
+    },
+    "reason": {
+      "type": "string",
+      "pattern": "^[a-z0-9_]{1,80}$"
+    },
+    "observation_scope": {
+      "enum": [
+        "explicit_file_probe",
+        "configured_project_probe"
+      ]
+    }
+  }
+}

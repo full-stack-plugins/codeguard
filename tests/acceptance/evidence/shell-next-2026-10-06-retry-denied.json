@@ -1,0 +1,12 @@
+{
+  "attempt_id": null,
+  "authority": "local_unverified",
+  "command_status": "incomplete",
+  "delivery_decision": "not_evaluated",
+  "exit_code": 3,
+  "operation": "attempt_start",
+  "reason": "no_progress_budget_exhausted",
+  "report_type": "task_attempt",
+  "schema_version": "0.1.0",
+  "task_id": "CG-9e3be727dbf76c8e55a5ca543cc21506"
+}

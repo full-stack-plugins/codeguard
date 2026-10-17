@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0.0",
+  "rule_id": "codeguard.javascript.duplicate_direct_lexical_binding",
+  "rule_version": "1.0.0",
+  "qualification": "candidate_unqualified",
+  "basis": "codeguard_structure_rule",
+  "language": "javascript",
+  "root_kind": "program",
+  "declaration_kind": "lexical_declaration",
+  "declarator_kind": "variable_declarator",
+  "name_kind": "identifier",
+  "scope": "direct_simple_lexical_names_only"
+}

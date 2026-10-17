@@ -1,0 +1,133 @@
+{
+  "delivery_decision": "not_evaluated",
+  "execution": "local_observation",
+  "host_blocking_verified": false,
+  "local_feedback": {
+    "candidate_recovery_count": 0,
+    "coverage_proven": false,
+    "delivery_decision": "not_evaluated",
+    "kotlin_lint": null,
+    "native_unwired_files": [],
+    "next_action": "review_native_results_and_resolve_incomplete_checks",
+    "node_lint": {
+      "backlog_status": "not_connected",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "files": [],
+      "new_blockers": 0,
+      "new_findings": 0,
+      "next": null,
+      "reason": "eslint_files_incomplete",
+      "status": "incomplete",
+      "unexecuted_files": []
+    },
+    "python_lint": null,
+    "report_type": "hook_fast_feedback",
+    "requested_paths": [
+      "app.sh"
+    ],
+    "ruby_lint": null,
+    "scan_scope": "selected_files",
+    "schema_version": "0.11.0",
+    "shell_lint": {
+      "authority": "local_unverified",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "files": [
+        {
+          "dialect": "bash",
+          "input_stable": true,
+          "native": {
+            "configuration_mode": "not_applied",
+            "diagnostics": [],
+            "environment_codes": [],
+            "reason": "shellcheck_tool_not_found",
+            "report_valid": false,
+            "status": "incomplete",
+            "tool_sha256": null,
+            "version": null
+          },
+          "path": "app.sh",
+          "project_configuration": {
+            "global_configuration": "not_loaded",
+            "reason": null,
+            "sha256": null,
+            "source_path": null,
+            "status": "missing"
+          },
+          "schema_version": "0.2.0",
+          "source_sha256": "00400e6bf65ec46ff1d85a7494ac3f11a3ca09d56c5e0792941ff5ba67908968",
+          "task_workflow_status": "partial",
+          "workbench": {
+            "reason": null,
+            "run_id": "shellcheck-1791224104855307000-44858-0",
+            "status": "synced_partial",
+            "sync": {
+              "already_consumed_reports": 2,
+              "historical_findings": 0,
+              "imported_reports": 1,
+              "new_blockers": 1,
+              "new_findings": 0
+            },
+            "task_ids": [
+              "CG-B-0d167d7349409743b255ebb666647fd1"
+            ],
+            "workspace_id": "ws-13016c7a49a3fcc2d9125bac0b04953f"
+          }
+        }
+      ],
+      "local_check_complete": false,
+      "native_task_started": false,
+      "report_type": "shell_native_scan",
+      "schema_version": "0.1.0",
+      "scope": "bounded_discovered_shell_files",
+      "scope_stable": true,
+      "source_file_count": 1,
+      "task_status": "synced_partial",
+      "tool_selection": {
+        "executable": null,
+        "resolved": null,
+        "source": "not_found"
+      },
+      "unobserved_count": 0
+    },
+    "swift_lint": null,
+    "syntax_candidates": {
+      "authority": "candidate_unqualified",
+      "delivery_decision": "incomplete",
+      "execution_phase": "after_native",
+      "native_preferred_count": 0,
+      "next_action": "核对适用语言版本与原生 lint/编译器；候选恢复节点不是已确认违规，零恢复也不表示完整通过",
+      "observations": [],
+      "reason": "unrouted_source",
+      "skipped_count": 0,
+      "source_file_count": 1,
+      "status": "not_run",
+      "unrouted_count": 1
+    },
+    "syntax_tasks": {
+      "failures": [],
+      "new_blockers": 0,
+      "status": "synced_partial",
+      "tasks": []
+    },
+    "unavailable_files": [],
+    "zig_lint": null
+  },
+  "plan": {
+    "action": "fast_file_check",
+    "host_blocking_claimed": false,
+    "may_claim_delivery": false,
+    "requires_git_snapshot": false,
+    "scope_resolution_reason": null,
+    "soft_result_reuse_candidate": true,
+    "target_paths": [
+      "app.sh"
+    ],
+    "task_id": null
+  },
+  "reason": null,
+  "report_type": "hook_execution_feedback",
+  "schema_version": "0.21.0",
+  "soft_result_reused": false
+}

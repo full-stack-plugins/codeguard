@@ -1,0 +1,70 @@
+{
+  "date": "2026-10-06",
+  "source_base": "e652a4b2d7b3d758190a5d7390e04066dc340b4d",
+  "scope": "project_mode_observation_library_only",
+  "protocol": "javascript_mode_observation/0.1.0",
+  "default_tests": {
+    "passed": 4,
+    "failed": 0,
+    "ignored": 1
+  },
+  "feature_related": {
+    "passed": 11,
+    "failed": 0,
+    "ignored": 1
+  },
+  "actual_node_file_check": {
+    "version": "v24.18.0",
+    "test_passed": 1,
+    "source_checks": 5,
+    "source_and_mode_evidence_stable": true,
+    "tool_entry_bytes_stable": true
+  },
+  "observations_validated": 21,
+  "schema_definitions": 402,
+  "rejected_variants": [
+    "wrong_mode",
+    "wrong_extension",
+    "missing_source_digest",
+    "native_execution",
+    "allow",
+    "unknown_field"
+  ],
+  "strict_default_clippy": "passed",
+  "strict_feature_clippy": "passed",
+  "automatic_project_scanner_connected": false,
+  "task_or_host_connected": false,
+  "independent_holdout": false,
+  "grammar_qualified_count": 0,
+  "observation_bundle": {
+    "path": "tests/acceptance/evidence/javascript-project-mode-observations-2026-10-06.json",
+    "sha256": "bc98b846f8d8c220803f6e6f159fd4e25b67da6a0de93de7d61477ac8a5747e3",
+    "validation": "each_member_against_javascript_mode_observation_0_1"
+  },
+  "logs": [
+    {
+      "path": "/private/tmp/cg-js-project-mode-red.log",
+      "sha256": "001e656416cf4dc02e4fc9355137de248f6545ed1c2bf02a75f01550c956f9f3"
+    },
+    {
+      "path": "/private/tmp/cg-js-project-mode-default-final.log",
+      "sha256": "84c982469292ce411c31fc5f465af5c78feb5e1f01b1613db4746ef6e1a67eed"
+    },
+    {
+      "path": "/private/tmp/cg-js-project-mode-feature.log",
+      "sha256": "ad3ae153a6b8dae2f391e2e5df3568c5eeaf60846fe819d8f79a5985d73fddcf"
+    },
+    {
+      "path": "/private/tmp/cg-js-project-mode-actual.log",
+      "sha256": "ec90795fabbbe3af983173dff379c2ba122ca17144ce2e69520e954214880a1a"
+    },
+    {
+      "path": "/private/tmp/cg-js-project-mode-default-clippy.log",
+      "sha256": "d6270aaf41514af49908fe9a00a0bbecb17e37ff576e76b2ffab2b3e79f09f77"
+    },
+    {
+      "path": "/private/tmp/cg-js-project-mode-feature-clippy.log",
+      "sha256": "f36e6bd60a8e7cc8d88280cf7dd757291d313070f5c1e6b594ab0b70a662d993"
+    }
+  ]
+}

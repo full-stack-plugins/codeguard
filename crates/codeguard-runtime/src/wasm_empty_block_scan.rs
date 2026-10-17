@@ -13,6 +13,7 @@ pub struct WasmEmptyBlockScan {
 /// 扫描整个语法树中的空 block，不以 has_error 裁剪分支。
 /// 参数为语法树和1至1024条记录预算；返回原始字节位置及截断状态。
 /// 只观察精确名为 block 的节点；语言专用规则和确认权威由上层承担。
+/// 节点取出、子节点检查及判空时的命名子节点检查均计入二十万次访问预算。
 pub fn scan_wasm_empty_blocks(
     tree: &Tree,
     max_records: usize,
@@ -31,10 +32,23 @@ pub fn scan_wasm_empty_blocks(
             break;
         }
         if node.kind() == "block" {
-            let has_statement = (0..node.named_child_count()).any(|index| {
-                node.named_child(index)
-                    .is_some_and(|child| child.kind() != "comment")
-            });
+            let mut has_statement = false;
+            let mut cursor = node.walk();
+            for child in node.named_children(&mut cursor) {
+                visited += 1;
+                if visited > 200_000 {
+                    truncated = true;
+                    break;
+                }
+                if child.kind() != "comment" {
+                    has_statement = true;
+                    break;
+                }
+            }
+            // 未完成判空不能生成空块事实；此前其它块的观察仍保留。
+            if truncated {
+                break;
+            }
             if !has_statement {
                 if let Some(parent) = node.parent() {
                     if blocks.len() == max_records {
@@ -55,13 +69,23 @@ pub fn scan_wasm_empty_blocks(
                 }
             }
         }
-        for index in (0..node.child_count()).rev() {
-            if let Some(child) = node.child(index) {
+        // 逆向游标保留原 DFS 顺序，逐次子节点检查也消耗预算。
+        let mut cursor = node.walk();
+        if cursor.goto_last_child() {
+            loop {
+                visited += 1;
+                if visited > 200_000 {
+                    truncated = true;
+                    break;
+                }
                 if stack.len() == 200_000 {
                     truncated = true;
                     break;
                 }
-                stack.push(child);
+                stack.push(cursor.node());
+                if !cursor.goto_previous_sibling() {
+                    break;
+                }
             }
         }
         if truncated {

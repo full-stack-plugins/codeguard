@@ -1,0 +1,811 @@
+{
+  "scope": "local_static_structure_candidate_only",
+  "records": {
+    "accepted": {
+      "delivery_decision": "not_evaluated",
+      "grammar_qualified": false,
+      "grammar_sha256": "9d4eaaec46eec7e6400d4b8d6c85fac7dfe33867ed5b4e5c218dfa7851c32558",
+      "language": "cfquery",
+      "native": {
+        "reason": "explicit_candidate_probe",
+        "status": "not_run"
+      },
+      "next_action": "run_or_configure_applicable_native_lint_before_delivery",
+      "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-cfquery-evidence-af1k84po/accepted.sql",
+      "precheck": {
+        "cancelled": false,
+        "checked_files": 1,
+        "incomplete_files": 0,
+        "scope_complete": true,
+        "selected_files": 1,
+        "status": "incomplete",
+        "suspected_recoveries": 0,
+        "truncated_files": 0,
+        "unqualified_files": 1,
+        "unsupported_files": 0
+      },
+      "recoveries": [],
+      "report_type": "grammar_candidate_probe",
+      "schema_version": "0.1.0",
+      "source_sha256": "40cfe2fef3dbbdb052f013c95d5601fabbf774ce3cf6a2df615c4e1e9529d409",
+      "status": "incomplete"
+    },
+    "distinct": {
+      "delivery_decision": "not_evaluated",
+      "grammar_qualified": false,
+      "grammar_sha256": "9d4eaaec46eec7e6400d4b8d6c85fac7dfe33867ed5b4e5c218dfa7851c32558",
+      "language": "cfquery",
+      "native": {
+        "reason": "explicit_candidate_probe",
+        "status": "not_run"
+      },
+      "next_action": "confirm_candidate_structure_with_applicable_native_tool",
+      "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-cfquery-evidence-af1k84po/distinct.sql",
+      "precheck": {
+        "cancelled": false,
+        "checked_files": 1,
+        "incomplete_files": 0,
+        "scope_complete": true,
+        "selected_files": 1,
+        "status": "incomplete",
+        "suspected_recoveries": 0,
+        "truncated_files": 0,
+        "unqualified_files": 1,
+        "unsupported_files": 0
+      },
+      "precheck_scope": "raw_parser_recoveries_and_observation_budgets",
+      "recoveries": [],
+      "report_type": "grammar_candidate_probe",
+      "schema_version": "0.4.0",
+      "source_scope": "static_cfquery_sql_candidate",
+      "source_sha256": "ce27ebdd1d6d792ec06a196783622c7e90f9c583251b8572798d4937b5ac90ba",
+      "status": "incomplete",
+      "structural_observations": [
+        {
+          "basis": "codeguard_structure_rule",
+          "end_byte": 20,
+          "end_column_byte": 20,
+          "end_row": 0,
+          "parent_syntax_kind": "program",
+          "rule_id": "codeguard.cfquery.distinct_projection",
+          "rule_sha256": "03652b60616a695c6343b1a39efcf2ea8f469838c6df13bb94ab3d0138b4ea03",
+          "rule_version": "1.0.0",
+          "start_byte": 0,
+          "start_column_byte": 0,
+          "start_row": 0
+        }
+      ]
+    },
+    "first": {
+      "delivery_decision": "not_evaluated",
+      "execution": "local_observation",
+      "host_blocking_verified": false,
+      "local_feedback": {
+        "candidate_recovery_count": 0,
+        "candidate_structure_count": 1,
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "go_syntax": null,
+        "kotlin_lint": null,
+        "native_unwired_files": [
+          "query.cfm"
+        ],
+        "next_action": "require_native_lint_confirmation",
+        "node_lint": {
+          "backlog_status": "not_connected",
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "files": [],
+          "new_blockers": 0,
+          "new_findings": 0,
+          "next": null,
+          "reason": "eslint_files_incomplete",
+          "status": "incomplete",
+          "unexecuted_files": []
+        },
+        "python_lint": null,
+        "report_type": "hook_fast_feedback",
+        "requested_paths": [
+          "query.cfm"
+        ],
+        "ruby_lint": null,
+        "scan_scope": "selected_files",
+        "schema_version": "0.13.0",
+        "shell_lint": null,
+        "swift_lint": null,
+        "syntax_candidates": {
+          "authority": "candidate_unqualified",
+          "delivery_decision": "incomplete",
+          "execution_phase": "after_native",
+          "native_preferred_count": 0,
+          "next_action": "核对适用语言版本与原生 lint/编译器；候选恢复节点不是已确认违规，零恢复也不表示完整通过",
+          "observations": [
+            {
+              "byte_offset": 0,
+              "grammar_qualified": false,
+              "grammar_sha256": "17aeb294c58dd47045b470fc082ccceac3100c8e548b13764d4f3987a062322f",
+              "known_limitations": [
+                "Pinned CodeGraph asset; only narrow syntax fixtures; native differential, language and dialect ranges, public lint route, resource budget and release remain unqualified"
+              ],
+              "language": "cfml",
+              "path": "query.cfm",
+              "reason": null,
+              "recoveries": [],
+              "recovery_count": 0,
+              "scope": "whole_file",
+              "source_sha256": "b5ff2566a625d892c98204b69288931d81d0d82e82937ccb1ad5003d8b6169ab",
+              "status": "candidate_observed"
+            },
+            {
+              "byte_offset": 36,
+              "fragment_source_sha256": "47f4fd20875a42c3ab518b750322817f1383b020b213b62b58a0fee3fe38539d",
+              "grammar_qualified": false,
+              "grammar_sha256": "9d4eaaec46eec7e6400d4b8d6c85fac7dfe33867ed5b4e5c218dfa7851c32558",
+              "known_limitations": [
+                "Pinned grammar has zero recovery for SELECT DISTINCT FROM users, rejected by PostgreSQL 18.6; SELECT FROM users is accepted by that dialect. Independent structural candidates require applicable native confirmation. Other dialects, systematic precision and release remain unqualified"
+              ],
+              "language": "cfquery",
+              "path": "query.cfm",
+              "reason": null,
+              "recoveries": [],
+              "recovery_count": 0,
+              "scope": "cfquery_body",
+              "source_sha256": "b5ff2566a625d892c98204b69288931d81d0d82e82937ccb1ad5003d8b6169ab",
+              "status": "candidate_observed",
+              "structural_observation_count": 1,
+              "structural_observations": [
+                {
+                  "basis": "codeguard_structure_rule",
+                  "end_byte": 57,
+                  "end_column_byte": 20,
+                  "end_row": 2,
+                  "parent_syntax_kind": "program",
+                  "rule_id": "codeguard.cfquery.distinct_projection",
+                  "rule_sha256": "03652b60616a695c6343b1a39efcf2ea8f469838c6df13bb94ab3d0138b4ea03",
+                  "rule_version": "1.0.0",
+                  "start_byte": 37,
+                  "start_column_byte": 0,
+                  "start_row": 2
+                }
+              ]
+            }
+          ],
+          "reason": "candidate_unqualified",
+          "skipped_count": 0,
+          "source_file_count": 1,
+          "status": "observed_partial",
+          "unrouted_count": 0
+        },
+        "syntax_tasks": {
+          "failures": [],
+          "new_blockers": 1,
+          "status": "synced_partial",
+          "tasks": [
+            {
+              "language": "cfquery",
+              "path": "query.cfm",
+              "task_id": "CG-B-4998379a94fbe697b37e0085b443a651"
+            }
+          ]
+        },
+        "unavailable_files": [],
+        "zig_lint": null
+      },
+      "plan": {
+        "action": "fast_file_check",
+        "host_blocking_claimed": false,
+        "may_claim_delivery": false,
+        "requires_git_snapshot": false,
+        "scope_resolution_reason": null,
+        "soft_result_reuse_candidate": true,
+        "target_paths": [
+          "query.cfm"
+        ],
+        "task_id": null
+      },
+      "reason": null,
+      "report_type": "hook_execution_feedback",
+      "schema_version": "0.23.0",
+      "soft_result_reused": false
+    },
+    "repeat": {
+      "delivery_decision": "not_evaluated",
+      "execution": "local_observation",
+      "host_blocking_verified": false,
+      "local_feedback": {
+        "candidate_recovery_count": 0,
+        "candidate_structure_count": 1,
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "go_syntax": null,
+        "kotlin_lint": null,
+        "native_unwired_files": [
+          "query.cfm"
+        ],
+        "next_action": "require_native_lint_confirmation",
+        "node_lint": {
+          "backlog_status": "not_connected",
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "files": [],
+          "new_blockers": 0,
+          "new_findings": 0,
+          "next": null,
+          "reason": "eslint_files_incomplete",
+          "status": "incomplete",
+          "unexecuted_files": []
+        },
+        "python_lint": null,
+        "report_type": "hook_fast_feedback",
+        "requested_paths": [
+          "query.cfm"
+        ],
+        "ruby_lint": null,
+        "scan_scope": "selected_files",
+        "schema_version": "0.13.0",
+        "shell_lint": null,
+        "swift_lint": null,
+        "syntax_candidates": {
+          "authority": "candidate_unqualified",
+          "delivery_decision": "incomplete",
+          "execution_phase": "after_native",
+          "native_preferred_count": 0,
+          "next_action": "核对适用语言版本与原生 lint/编译器；候选恢复节点不是已确认违规，零恢复也不表示完整通过",
+          "observations": [
+            {
+              "byte_offset": 0,
+              "grammar_qualified": false,
+              "grammar_sha256": "17aeb294c58dd47045b470fc082ccceac3100c8e548b13764d4f3987a062322f",
+              "known_limitations": [
+                "Pinned CodeGraph asset; only narrow syntax fixtures; native differential, language and dialect ranges, public lint route, resource budget and release remain unqualified"
+              ],
+              "language": "cfml",
+              "path": "query.cfm",
+              "reason": null,
+              "recoveries": [],
+              "recovery_count": 0,
+              "scope": "whole_file",
+              "source_sha256": "b5ff2566a625d892c98204b69288931d81d0d82e82937ccb1ad5003d8b6169ab",
+              "status": "candidate_observed"
+            },
+            {
+              "byte_offset": 36,
+              "fragment_source_sha256": "47f4fd20875a42c3ab518b750322817f1383b020b213b62b58a0fee3fe38539d",
+              "grammar_qualified": false,
+              "grammar_sha256": "9d4eaaec46eec7e6400d4b8d6c85fac7dfe33867ed5b4e5c218dfa7851c32558",
+              "known_limitations": [
+                "Pinned grammar has zero recovery for SELECT DISTINCT FROM users, rejected by PostgreSQL 18.6; SELECT FROM users is accepted by that dialect. Independent structural candidates require applicable native confirmation. Other dialects, systematic precision and release remain unqualified"
+              ],
+              "language": "cfquery",
+              "path": "query.cfm",
+              "reason": null,
+              "recoveries": [],
+              "recovery_count": 0,
+              "scope": "cfquery_body",
+              "source_sha256": "b5ff2566a625d892c98204b69288931d81d0d82e82937ccb1ad5003d8b6169ab",
+              "status": "candidate_observed",
+              "structural_observation_count": 1,
+              "structural_observations": [
+                {
+                  "basis": "codeguard_structure_rule",
+                  "end_byte": 57,
+                  "end_column_byte": 20,
+                  "end_row": 2,
+                  "parent_syntax_kind": "program",
+                  "rule_id": "codeguard.cfquery.distinct_projection",
+                  "rule_sha256": "03652b60616a695c6343b1a39efcf2ea8f469838c6df13bb94ab3d0138b4ea03",
+                  "rule_version": "1.0.0",
+                  "start_byte": 37,
+                  "start_column_byte": 0,
+                  "start_row": 2
+                }
+              ]
+            }
+          ],
+          "reason": "candidate_unqualified",
+          "skipped_count": 0,
+          "source_file_count": 1,
+          "status": "observed_partial",
+          "unrouted_count": 0
+        },
+        "syntax_tasks": {
+          "failures": [],
+          "new_blockers": 0,
+          "status": "synced_partial",
+          "tasks": [
+            {
+              "language": "cfquery",
+              "path": "query.cfm",
+              "task_id": "CG-B-4998379a94fbe697b37e0085b443a651"
+            }
+          ]
+        },
+        "unavailable_files": [],
+        "zig_lint": null
+      },
+      "plan": {
+        "action": "fast_file_check",
+        "host_blocking_claimed": false,
+        "may_claim_delivery": false,
+        "requires_git_snapshot": false,
+        "scope_resolution_reason": null,
+        "soft_result_reuse_candidate": true,
+        "target_paths": [
+          "query.cfm"
+        ],
+        "task_id": null
+      },
+      "reason": null,
+      "report_type": "hook_execution_feedback",
+      "schema_version": "0.23.0",
+      "soft_result_reused": false
+    },
+    "check": {
+      "authority": "local_unverified",
+      "category_candidates": [
+        {
+          "capability_status": "gap",
+          "category": "lint",
+          "checker_id": null,
+          "language": "cfml",
+          "legacy_status": "stable",
+          "next_action": null,
+          "reason": "native_adapter_not_integrated",
+          "status": "not_integrated"
+        },
+        {
+          "capability_status": "gap",
+          "category": "comments",
+          "checker_id": null,
+          "language": "cfml",
+          "legacy_status": "stable",
+          "next_action": null,
+          "reason": "native_adapter_not_integrated",
+          "status": "not_integrated"
+        },
+        {
+          "capability_status": "gap",
+          "category": "dependencies",
+          "checker_id": null,
+          "language": "cfml",
+          "legacy_status": "stable",
+          "next_action": null,
+          "reason": "native_adapter_not_integrated",
+          "status": "not_integrated"
+        },
+        {
+          "capability_status": "gap",
+          "category": "cve",
+          "checker_id": null,
+          "language": "cfml",
+          "legacy_status": "stable",
+          "next_action": null,
+          "reason": "native_adapter_not_integrated",
+          "status": "not_integrated"
+        },
+        {
+          "capability_status": "gap",
+          "category": "security",
+          "checker_id": null,
+          "language": "cfml",
+          "legacy_status": "stable",
+          "next_action": null,
+          "reason": "native_adapter_not_integrated",
+          "status": "not_integrated"
+        },
+        {
+          "capability_status": "gap",
+          "category": "build",
+          "checker_id": null,
+          "language": "cfml",
+          "legacy_status": "stable",
+          "next_action": null,
+          "reason": "native_adapter_not_integrated",
+          "status": "not_integrated"
+        },
+        {
+          "capability_status": "gap",
+          "category": "lint",
+          "checker_id": null,
+          "language": "sql",
+          "legacy_status": "stable",
+          "next_action": null,
+          "reason": "native_adapter_not_integrated",
+          "status": "not_integrated"
+        },
+        {
+          "capability_status": "gap",
+          "category": "comments",
+          "checker_id": null,
+          "language": "sql",
+          "legacy_status": "stable",
+          "next_action": null,
+          "reason": "native_adapter_not_integrated",
+          "status": "not_integrated"
+        },
+        {
+          "capability_status": "gap",
+          "category": "dependencies",
+          "checker_id": null,
+          "language": "sql",
+          "legacy_status": "stable",
+          "next_action": null,
+          "reason": "native_adapter_not_integrated",
+          "status": "not_integrated"
+        },
+        {
+          "capability_status": "gap",
+          "category": "cve",
+          "checker_id": null,
+          "language": "sql",
+          "legacy_status": "stable",
+          "next_action": null,
+          "reason": "native_adapter_not_integrated",
+          "status": "not_integrated"
+        },
+        {
+          "capability_status": "gap",
+          "category": "security",
+          "checker_id": null,
+          "language": "sql",
+          "legacy_status": "stable",
+          "next_action": null,
+          "reason": "native_adapter_not_integrated",
+          "status": "not_integrated"
+        },
+        {
+          "capability_status": "gap",
+          "category": "build",
+          "checker_id": null,
+          "language": "sql",
+          "legacy_status": "stable",
+          "next_action": null,
+          "reason": "native_adapter_not_integrated",
+          "status": "not_integrated"
+        }
+      ],
+      "command_status": "incomplete",
+      "delivery_decision": "incomplete",
+      "discovery": {
+        "blocked_paths": [],
+        "build_roots": [],
+        "checker_configurations": [],
+        "declared_versions": {},
+        "languages": [
+          {
+            "id": "cfml",
+            "manifests": [],
+            "source_files": [
+              "query.cfm"
+            ]
+          },
+          {
+            "id": "sql",
+            "manifests": [],
+            "source_files": [
+              "accepted.sql",
+              "distinct.sql"
+            ]
+          }
+        ],
+        "lockfiles": [],
+        "manifest_sha256": {},
+        "native_tool_candidates": [],
+        "observation_complete": true,
+        "observed_entries": 4,
+        "report_type": "discovery",
+        "root": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-cfquery-evidence-af1k84po",
+        "schema_version": "0.4.0",
+        "scope_summary": {
+          "configuration_exception_files_observed": 0,
+          "dependency_roots_excluded": 0,
+          "dot_prefix_roots_excluded": 1,
+          "git_safety_status": "not_evaluated",
+          "ordinary_scan_policy": "project_sources_default_v2"
+        },
+        "source_set_candidates": [],
+        "unknown_conditions": [
+          "source_sets_not_fully_classified",
+          "dialects_not_classified"
+        ]
+      },
+      "execution_budget": {
+        "enforcement": "native_execution_only",
+        "jobs_limit": 4,
+        "jobs_source": "builtin_default",
+        "native_task_count": 0,
+        "source": "builtin_default",
+        "started_native_task_count": 0,
+        "timeout_ms": 1800000
+      },
+      "execution_tasks": [],
+      "exit_code": 3,
+      "export": {
+        "reason_code": null,
+        "status": "not_requested"
+      },
+      "native_results": {
+        "erlang_lint": null,
+        "go_lint": null,
+        "java_cve": null,
+        "java_dependencies": null,
+        "java_javadoc": null,
+        "java_p3c": null,
+        "kotlin_lint": null,
+        "node_lint": null,
+        "npm_cve": [],
+        "python_cve": [],
+        "python_lint": null,
+        "ruby_lint": null,
+        "rust_build": null,
+        "rust_comments": null,
+        "rust_cve": null,
+        "rust_lint": null,
+        "shell_lint": null,
+        "swift_lint": null,
+        "zig_lint": null
+      },
+      "next": {
+        "authority": "local_unverified",
+        "command_status": "complete",
+        "delivery_decision": "not_evaluated",
+        "disposition": "needs_decision",
+        "exit_code": 0,
+        "next_actions": [],
+        "operation": "next",
+        "reason": "local_task_selected",
+        "repair_brief": {
+          "action_id": "restore-checker-environment",
+          "affected_paths": [
+            "query.cfm"
+          ],
+          "authority": "local_unverified",
+          "build_root": ".",
+          "checker_id": "syntax.native_confirmation",
+          "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+          "constraints": [
+            "先恢复检查完整性",
+            "不得关闭检查器或修改无关源码"
+          ],
+          "disposition": "needs_decision",
+          "evidence_ref": {
+            "first_report_sha256": "9453f8f0d60a410b037b75e9cc9e0c16c3686944fd454188a16b0f548e2bb961",
+            "first_run_id": "syntax-confirm-34729-1791231363154395000"
+          },
+          "history": {
+            "attempt_count": 0,
+            "awaiting_verification": false,
+            "budget": 2,
+            "no_progress_count": 0,
+            "open_attempt_id": null,
+            "recent": []
+          },
+          "kind": "blocker",
+          "reason_code": "native_syntax_confirmation_needed",
+          "recheck_argv": [
+            "codeguard",
+            "task",
+            "verify",
+            "CG-B-4998379a94fbe697b37e0085b443a651",
+            ".",
+            "--format",
+            "json"
+          ],
+          "schema_version": "0.3.0",
+          "scope": "query.cfm",
+          "step": "CFQuery 仅有静态 SQL 关键词结构候选；先明确 datasource、数据库方言/版本、模板插值及 schema 上下文，再选择隔离的原生 SQL 语法确认。当前 task verify 尚未接入 CFQuery 原生 adapter，不自动连接项目数据库、不安装其它语言工具，不凭候选修改源码或关闭任务",
+          "task_id": "CG-B-4998379a94fbe697b37e0085b443a651"
+        },
+        "report_type": "repair_brief_preview",
+        "schema_version": "0.3.0"
+      },
+      "obligation_status": "unresolved",
+      "operation": "check",
+      "reason": "full_project_obligations_and_trusted_policy_unavailable",
+      "report_type": "check_feedback",
+      "required_obligations": null,
+      "schema_version": "0.53.0",
+      "selection": "all",
+      "syntax_candidates": {
+        "authority": "candidate_unqualified",
+        "delivery_decision": "incomplete",
+        "execution_phase": "after_native",
+        "native_preferred_count": 0,
+        "next_action": "核对适用语言版本与原生 lint/编译器；候选恢复节点不是已确认违规，零恢复也不表示完整通过",
+        "observations": [
+          {
+            "byte_offset": 0,
+            "grammar_qualified": false,
+            "grammar_sha256": "17aeb294c58dd47045b470fc082ccceac3100c8e548b13764d4f3987a062322f",
+            "known_limitations": [
+              "Pinned CodeGraph asset; only narrow syntax fixtures; native differential, language and dialect ranges, public lint route, resource budget and release remain unqualified"
+            ],
+            "language": "cfml",
+            "path": "query.cfm",
+            "reason": null,
+            "recoveries": [],
+            "recovery_count": 0,
+            "scope": "whole_file",
+            "source_sha256": "b5ff2566a625d892c98204b69288931d81d0d82e82937ccb1ad5003d8b6169ab",
+            "status": "candidate_observed"
+          },
+          {
+            "byte_offset": 36,
+            "fragment_source_sha256": "47f4fd20875a42c3ab518b750322817f1383b020b213b62b58a0fee3fe38539d",
+            "grammar_qualified": false,
+            "grammar_sha256": "9d4eaaec46eec7e6400d4b8d6c85fac7dfe33867ed5b4e5c218dfa7851c32558",
+            "known_limitations": [
+              "Pinned grammar has zero recovery for SELECT DISTINCT FROM users, rejected by PostgreSQL 18.6; SELECT FROM users is accepted by that dialect. Independent structural candidates require applicable native confirmation. Other dialects, systematic precision and release remain unqualified"
+            ],
+            "language": "cfquery",
+            "path": "query.cfm",
+            "reason": null,
+            "recoveries": [],
+            "recovery_count": 0,
+            "scope": "cfquery_body",
+            "source_sha256": "b5ff2566a625d892c98204b69288931d81d0d82e82937ccb1ad5003d8b6169ab",
+            "status": "candidate_observed",
+            "structural_observation_count": 1,
+            "structural_observations": [
+              {
+                "basis": "codeguard_structure_rule",
+                "end_byte": 57,
+                "end_column_byte": 20,
+                "end_row": 2,
+                "parent_syntax_kind": "program",
+                "rule_id": "codeguard.cfquery.distinct_projection",
+                "rule_sha256": "03652b60616a695c6343b1a39efcf2ea8f469838c6df13bb94ab3d0138b4ea03",
+                "rule_version": "1.0.0",
+                "start_byte": 37,
+                "start_column_byte": 0,
+                "start_row": 2
+              }
+            ]
+          }
+        ],
+        "reason": "unrouted_source",
+        "skipped_count": 0,
+        "source_file_count": 3,
+        "status": "observed_partial",
+        "unrouted_count": 2
+      },
+      "syntax_tasks": {
+        "failures": [],
+        "new_blockers": 0,
+        "status": "synced_partial",
+        "tasks": [
+          {
+            "language": "cfquery",
+            "path": "query.cfm",
+            "task_id": "CG-B-4998379a94fbe697b37e0085b443a651"
+          }
+        ]
+      },
+      "unresolved_conditions": [
+        "dialects_not_classified",
+        "required_obligations_unresolved",
+        "source_sets_not_fully_classified",
+        "tool_lock_unverified",
+        "trusted_policy_unavailable"
+      ]
+    },
+    "confirmation": {
+      "affected_paths": [
+        "query.cfm"
+      ],
+      "authority": "local_unverified",
+      "blocker_id": "CG-B-4998379a94fbe697b37e0085b443a651",
+      "build_root": ".",
+      "checker_id": "syntax.native_confirmation",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "execution": "incomplete",
+      "fingerprint": "4998379a94fbe697b37e0085b443a651c5b445626f59621468c67b0ff6bdb25a",
+      "language": "cfquery",
+      "observations": [
+        {
+          "byte_offset": 36,
+          "fragment_source_sha256": "47f4fd20875a42c3ab518b750322817f1383b020b213b62b58a0fee3fe38539d",
+          "grammar_qualified": false,
+          "grammar_sha256": "9d4eaaec46eec7e6400d4b8d6c85fac7dfe33867ed5b4e5c218dfa7851c32558",
+          "known_limitations": [
+            "Pinned grammar has zero recovery for SELECT DISTINCT FROM users, rejected by PostgreSQL 18.6; SELECT FROM users is accepted by that dialect. Independent structural candidates require applicable native confirmation. Other dialects, systematic precision and release remain unqualified"
+          ],
+          "language": "cfquery",
+          "path": "query.cfm",
+          "reason": null,
+          "recoveries": [],
+          "recovery_count": 0,
+          "scope": "cfquery_body",
+          "source_sha256": "b5ff2566a625d892c98204b69288931d81d0d82e82937ccb1ad5003d8b6169ab",
+          "status": "candidate_observed",
+          "structural_observation_count": 1,
+          "structural_observations": [
+            {
+              "basis": "codeguard_structure_rule",
+              "end_byte": 57,
+              "end_column_byte": 20,
+              "end_row": 2,
+              "parent_syntax_kind": "program",
+              "rule_id": "codeguard.cfquery.distinct_projection",
+              "rule_sha256": "03652b60616a695c6343b1a39efcf2ea8f469838c6df13bb94ab3d0138b4ea03",
+              "rule_version": "1.0.0",
+              "start_byte": 37,
+              "start_column_byte": 0,
+              "start_row": 2
+            }
+          ]
+        }
+      ],
+      "reason_code": "native_syntax_confirmation_needed",
+      "report_type": "syntax_confirmation_observation",
+      "run_id": "syntax-confirm-34729-1791231363154395000",
+      "schema_version": "0.11.0",
+      "scope": "query.cfm",
+      "workspace_binding": "bound",
+      "workspace_id": "ws-1cc16406aa0ea6f660959512f86a57a3"
+    },
+    "next": {
+      "authority": "local_unverified",
+      "command_status": "complete",
+      "delivery_decision": "not_evaluated",
+      "disposition": "needs_decision",
+      "exit_code": 0,
+      "next_actions": [],
+      "operation": "next",
+      "reason": "local_task_selected",
+      "repair_brief": {
+        "action_id": "restore-checker-environment",
+        "affected_paths": [
+          "query.cfm"
+        ],
+        "authority": "local_unverified",
+        "build_root": ".",
+        "checker_id": "syntax.native_confirmation",
+        "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+        "constraints": [
+          "先恢复检查完整性",
+          "不得关闭检查器或修改无关源码"
+        ],
+        "disposition": "needs_decision",
+        "evidence_ref": {
+          "first_report_sha256": "9453f8f0d60a410b037b75e9cc9e0c16c3686944fd454188a16b0f548e2bb961",
+          "first_run_id": "syntax-confirm-34729-1791231363154395000"
+        },
+        "history": {
+          "attempt_count": 0,
+          "awaiting_verification": false,
+          "budget": 2,
+          "no_progress_count": 0,
+          "open_attempt_id": null,
+          "recent": []
+        },
+        "kind": "blocker",
+        "reason_code": "native_syntax_confirmation_needed",
+        "recheck_argv": [
+          "codeguard",
+          "task",
+          "verify",
+          "CG-B-4998379a94fbe697b37e0085b443a651",
+          ".",
+          "--format",
+          "json"
+        ],
+        "schema_version": "0.3.0",
+        "scope": "query.cfm",
+        "step": "CFQuery 仅有静态 SQL 关键词结构候选；先明确 datasource、数据库方言/版本、模板插值及 schema 上下文，再选择隔离的原生 SQL 语法确认。当前 task verify 尚未接入 CFQuery 原生 adapter，不自动连接项目数据库、不安装其它语言工具，不凭候选修改源码或关闭任务",
+        "task_id": "CG-B-4998379a94fbe697b37e0085b443a651"
+      },
+      "report_type": "repair_brief_preview",
+      "schema_version": "0.3.0"
+    },
+    "conversation": {
+      "hookSpecificOutput": {
+        "additionalContext": "CodeGuard：query.cfm 局部检查反馈：原生诊断 0 项；规则 ；结构规则 codeguard.cfquery.distinct_projection；WASM 候选 2 项、疑似恢复节点 0 项、独立结构观察 1 项、恢复扫描未完成 0 项；不可检查文件 0 项、原生快检未接线 1 项。必须准备或修复适用的原生 lint/编译器，再确认疑似问题或恢复未完成检查；不要仅凭候选结果修改源码。已知 grammar 限制 [cfml]：Pinned CodeGraph asset; only narrow syntax fixtures; native differential, language and dialect ranges, public lint route, resource budget and release remain unqualified；已知 grammar 限制 [cfquery]：Pinned grammar has zero recovery for SELECT DISTINCT FROM users, rejected by PostgreSQL 18.6; SELECT FROM users is accepted by that dialect. Independent structural candidates requi；原生确认任务 CG-B-4998379a94fbe697b37e0085b443a651：codeguard task show CG-B-4998379a94fbe697b37e0085b443a651 . --format=json；完成原生确认后 codeguard task verify CG-B-4998379a94fbe697b37e0085b443a651 . --format=json。候选语法能力尚未完整验收，完整项目与交付未评估。",
+        "hookEventName": "PostToolUse"
+      },
+      "systemMessage": "CodeGuard 局部检查反馈"
+    }
+  },
+  "binary_sha256": "f85172b16d6d4e369ef3ab885ef2f48ffc116cc5cdb30bf14a987d33951307be"
+}

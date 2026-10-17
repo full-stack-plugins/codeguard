@@ -10,3 +10,5 @@
 cargo test -p codeguard-cli --test check_all_java_p3c --offline
 CODEGUARD_MAVEN_BIN=/absolute/path/to/mvn CODEGUARD_JAVA_HOME=/absolute/path/to/jdk-21 CODEGUARD_JAVADOC_MAVEN_REPO=/absolute/path/to/isolated-repo cargo test -p codeguard-cli --test check_all_java_p3c --offline real_maven_javadoc_multifile_probe_keeps_project_authority_unverified -- --ignored
 ```
+
+2026-10-06运行后身份加固：新增JDK release字节复核；变化或不可读时不保留诊断。原工作区源码和POM已由SourceSnapshot与私有副本同时复核。公开输入变化反例与剩余工作见 [补充验收](maven-javadoc-input-stability.md)。

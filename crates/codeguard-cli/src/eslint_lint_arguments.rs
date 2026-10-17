@@ -35,8 +35,11 @@ impl EslintLintArguments {
         while index < args.len() {
             let current = &args[index];
             if current.starts_with('-') {
+                let (option, inline) = current
+                    .split_once('=')
+                    .map_or((current.as_str(), None), |(key, value)| (key, Some(value)));
                 if !matches!(
-                    current.as_str(),
+                    option,
                     "--node-tool"
                         | "--eslint-entry"
                         | "--config"
@@ -46,18 +49,24 @@ impl EslintLintArguments {
                         | "--eslint-version"
                         | "--format"
                         | "--timeout"
-                ) || !seen.insert(current.clone())
+                ) || !seen.insert(option.to_owned())
                 {
                     return Err("ESLint 参数未知或重复".into());
                 }
-                index += 1;
-                let value = args
-                    .get(index)
-                    .filter(|value| !value.starts_with('-'))
-                    .ok_or("ESLint 参数缺少值")?;
-                match current.as_str() {
+                let value = if let Some(value) = inline {
+                    value
+                } else {
+                    index += 1;
+                    args.get(index)
+                        .map(String::as_str)
+                        .ok_or("ESLint 参数缺少值")?
+                };
+                if value.is_empty() || value.starts_with('-') {
+                    return Err("ESLint 参数缺少值".into());
+                }
+                match option {
                     "--format" => {
-                        if !matches!(value.as_str(), "human" | "json") {
+                        if !matches!(value, "human" | "json") {
                             return Err("ESLint 格式未知".into());
                         }
                         result.json = value == "json";
@@ -67,14 +76,14 @@ impl EslintLintArguments {
                         if !codeguard_adapters::eslint_report_version_matches(value, value) {
                             return Err("需要具体稳定 ESLint 10 版本".into());
                         }
-                        result.version = Some(value.clone());
+                        result.version = Some(value.to_owned());
                     }
                     _ => {
                         let path = PathBuf::from(value);
                         if !path.is_absolute() || value.chars().any(char::is_control) {
                             return Err("工具及原配置需要安全绝对路径".into());
                         }
-                        match current.as_str() {
+                        match option {
                             "--node-tool" => result.node = Some(path),
                             "--eslint-entry" => result.entry = Some(path),
                             "--config-map" => result.config_map = Some(path),
@@ -94,5 +103,24 @@ impl EslintLintArguments {
             index += 1;
         }
         Ok(result)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::EslintLintArguments;
+    #[test]
+    fn joined_and_separate_options_share_identity_and_reject_duplicates() {
+        let parse = |args: &[&str]| {
+            EslintLintArguments::parse(&args.iter().map(|v| (*v).to_owned()).collect::<Vec<_>>())
+        };
+        let separated = parse(&["input.js", "--format", "json", "--timeout", "2s"]).unwrap();
+        let joined = parse(&["input.js", "--format=json", "--timeout=2s"]).unwrap();
+        assert_eq!(joined.json, separated.json);
+        assert_eq!(joined.timeout_ms, separated.timeout_ms);
+        assert!(parse(&["input.js", "--format=json", "--format", "human"]).is_err());
+        assert!(parse(&["input.js", "--format=", "--timeout=2s"]).is_err());
+        assert!(parse(&["input.js", "--workspace="]).is_err());
+        assert!(parse(&["input.js", "--unknown=json"]).is_err());
     }
 }

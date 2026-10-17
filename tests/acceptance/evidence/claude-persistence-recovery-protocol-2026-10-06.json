@@ -1,0 +1,39 @@
+{
+  "evidence_type": "claude_event_protocol_persistence_recovery",
+  "captured_at": "2026-10-06",
+  "source_base_commit": "4d51c7df4744c72623593bb4d37a3609e205c5a0",
+  "test_source_sha256": "37e5a6b84cf2d4ab5691174a97d15812cc12faa59f76b531285db0f5c417b530",
+  "execution_scope": "development_cli_consumes_claude_protocol_not_actual_host",
+  "explicit_target": {
+    "passed": 1,
+    "failed": 0,
+    "ignored": 0
+  },
+  "affected_suite": {
+    "passed": 30,
+    "failed": 0,
+    "ignored": 1
+  },
+  "clippy": "passed",
+  "logs_sha256": {
+    "cg-claude-persistence-regression.log": "b9b8831b91a61dc3c6f0d95304fdbffa60cd4a2b0e0a81da27dd8b866f0bf60c",
+    "cg-claude-persistence-suite.log": "102b930fc57eb104a89a0c61dbf53dd1d887cbde6d98752cb1f41acf90b9b7e6",
+    "cg-claude-persistence-clippy.log": "7c5a8f9258ee6ed3ee7c06e42bdaec46eb74d8bad05007f259f310651599dc92"
+  },
+  "checks": [
+    "failed_persistence_feedback_twice",
+    "no_fabricated_task_reference",
+    "untrusted_source_not_echoed",
+    "directory_recovery",
+    "one_stable_task_after_repeated_events",
+    "task_projection_preserved",
+    "finding_remains_open"
+  ],
+  "actual_host_attempt": {
+    "host_started": false,
+    "reason": "previous_private_runtime_cache_missing_active_json",
+    "runtime_verify_exit": 3
+  },
+  "full_host_acceptance": false,
+  "delivery_decision": "not_evaluated"
+}

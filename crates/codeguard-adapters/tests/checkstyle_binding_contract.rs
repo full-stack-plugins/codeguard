@@ -22,6 +22,8 @@ fn ambiguous_bindings_are_not_resolved_by_order() {
     for names in [
         ["JavadocType", "JavadocMethod"],
         ["JavadocMethod", "JavadocType"],
+        ["JavadocStyle", "SummaryJavadoc"],
+        ["NonEmptyAtclauseDescription", "JavadocMethod"],
     ] {
         let body = names
             .map(|n| {
@@ -74,6 +76,9 @@ fn official_full_names_bind_without_suffix_guessing_or_duplicate_identity() {
         "JavadocType",
         "JavadocMethod",
         "JavadocVariable",
+        "JavadocStyle",
+        "NonEmptyAtclauseDescription",
+        "SummaryJavadoc",
     ] {
         let class = format!("com.puppycrawl.tools.checkstyle.checks.javadoc.{name}Check");
         let full = format!(
@@ -206,4 +211,118 @@ fn type_tag_repair_guidance_covers_author_and_version_without_inventing_values()
     let step = bindings["typeTags"].repair_steps[0];
     assert!(step.contains("@author") && step.contains("@version"));
     assert!(step.contains("不编造"));
+}
+
+#[test]
+fn detailed_documentation_modules_preserve_original_properties_and_custom_sources() {
+    for (name, properties, keyword) in [
+        (
+            "JavadocStyle",
+            "<property name=\"checkEmptyJavadoc\" value=\"true\"/><property name=\"checkFirstSentence\" value=\"false\"/><property name=\"checkHtml\" value=\"true\"/><property name=\"scope\" value=\"public\"/><property name=\"tokens\" value=\"RECORD_DEF, COMPACT_CTOR_DEF, METHOD_DEF, VARIABLE_DEF\"/><property name=\"endOfSentenceFormat\" value=\"[。.!?]$\"/>",
+            "用途",
+        ),
+        (
+            "NonEmptyAtclauseDescription",
+            "<property name=\"javadocTokens\" value=\"PARAM_LITERAL, RETURN_LITERAL, THROWS_LITERAL, EXCEPTION_LITERAL, DEPRECATED_LITERAL\"/><property name=\"violateExecutionOnNonTightHtml\" value=\"true\"/>",
+            "参数",
+        ),
+        (
+            "SummaryJavadoc",
+            "<property name=\"period\" value=\"。\"/><property name=\"forbiddenSummaryFragments\" value=\"^(TODO|待补充)$\"/><property name=\"violateExecutionOnNonTightHtml\" value=\"false\"/>",
+            "摘要",
+        ),
+    ] {
+        let xml = format!(
+            "{DTD}<module name=\"Checker\"><module name=\"TreeWalker\"><module name=\"{name}\"><property name=\"id\" value=\"detailedDocs\"/>{properties}</module></module></module>"
+        );
+        let map = checkstyle_comment_rule_bindings(xml.as_bytes(), "10.21.4")
+            .expect("official detailed documentation config");
+        assert_eq!(
+            map["detailedDocs"].checker_class,
+            format!("com.puppycrawl.tools.checkstyle.checks.javadoc.{name}Check")
+        );
+        assert!(map["detailedDocs"].repair_steps[0].contains(keyword));
+        assert!(
+            checkstyle_comment_rule_bindings(
+                xml.replace("name=\"TreeWalker\"", "name=\"UnknownWalker\"")
+                    .as_bytes(),
+                "10.21.4"
+            )
+            .is_none()
+        );
+        assert!(
+            checkstyle_comment_rule_bindings(
+                xml.replace("value=\"true\"", "value=\"maybe\"")
+                    .replace("value=\"false\"", "value=\"maybe\"")
+                    .as_bytes(),
+                "10.21.4"
+            )
+            .is_none()
+        );
+        for alias in [
+            format!("{name}Check"),
+            format!("com.puppycrawl.tools.checkstyle.checks.javadoc.{name}Check"),
+        ] {
+            let changed = xml.replace(&format!("name=\"{name}\""), &format!("name=\"{alias}\""));
+            assert_eq!(
+                checkstyle_comment_rule_bindings(changed.as_bytes(), "10.21.4").unwrap(),
+                map
+            );
+        }
+    }
+}
+
+#[test]
+fn detailed_documentation_properties_do_not_escape_the_native_module_or_token_set() {
+    for (name, properties) in [
+        (
+            "JavadocMethod",
+            "<property name=\"checkEmptyJavadoc\" value=\"true\"/>",
+        ),
+        (
+            "SummaryJavadoc",
+            "<property name=\"javadocTokens\" value=\"PARAM_LITERAL\"/>",
+        ),
+        (
+            "NonEmptyAtclauseDescription",
+            "<property name=\"javadocTokens\" value=\"METHOD_DEF\"/>",
+        ),
+        (
+            "JavadocStyle",
+            "<property name=\"tokens\" value=\"PARAM_LITERAL\"/>",
+        ),
+        (
+            "JavadocStyle",
+            "<property name=\"checkEmptyJavadoc\" value=\"maybe\"/>",
+        ),
+        (
+            "NonEmptyAtclauseDescription",
+            "<property name=\"period\" value=\"。\"/>",
+        ),
+        (
+            "SummaryJavadoc",
+            "<property name=\"scope\" value=\"public\"/>",
+        ),
+    ] {
+        let xml = format!(
+            "{DTD}<module name=\"Checker\"><module name=\"TreeWalker\"><module name=\"{name}\">{properties}</module></module></module>"
+        );
+        assert!(
+            checkstyle_comment_rule_bindings(xml.as_bytes(), "10.21.4").is_none(),
+            "{xml}"
+        );
+    }
+}
+
+#[test]
+fn summary_native_root_token_and_empty_options_are_preserved_without_rust_regex_evaluation() {
+    let xml = format!(
+        "{DTD}<module name=\"Checker\"><module name=\"TreeWalker\"><module name=\"SummaryJavadoc\"><property name=\"javadocTokens\" value=\"JAVADOC\"/><property name=\"period\" value=\"\"/><property name=\"forbiddenSummaryFragments\" value=\"\"/></module></module></module>"
+    );
+    assert!(checkstyle_comment_rule_bindings(xml.as_bytes(), "10.21.4").is_some());
+    let invalid_regex = xml.replace(
+        "name=\"forbiddenSummaryFragments\" value=\"\"",
+        "name=\"forbiddenSummaryFragments\" value=\"[\"",
+    );
+    assert!(checkstyle_comment_rule_bindings(invalid_regex.as_bytes(), "10.21.4").is_some());
 }

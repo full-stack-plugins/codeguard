@@ -1,0 +1,656 @@
+[
+  {
+    "case": "rewrite",
+    "next": {
+      "authority": "local_unverified",
+      "command_status": "complete",
+      "delivery_decision": "not_evaluated",
+      "disposition": "actionable",
+      "exit_code": 0,
+      "next_actions": [],
+      "operation": "next",
+      "reason": "local_task_selected",
+      "repair_brief": {
+        "action_id": "restore-checker-environment",
+        "affected_paths": [
+          "Cargo.toml",
+          "Cargo.lock"
+        ],
+        "authority": "local_unverified",
+        "build_root": ".",
+        "checker_id": "rust.cargo_audit",
+        "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+        "constraints": [
+          "先恢复检查完整性",
+          "不得关闭检查器或修改无关源码"
+        ],
+        "disposition": "actionable",
+        "evidence_ref": {
+          "first_report_sha256": "398f44d11d8a3ed64ccaa66c31a970667272736d6f6fdc5cd619ea24cdb9dde3",
+          "first_run_id": "rust-cve-47954-1791318286457358000-0"
+        },
+        "history": {
+          "attempt_count": 0,
+          "awaiting_verification": false,
+          "budget": 2,
+          "no_progress_count": 0,
+          "open_attempt_id": null,
+          "recent": []
+        },
+        "kind": "blocker",
+        "reason_code": "rust_cve_coverage_unverified",
+        "recheck_argv": [
+          "codeguard",
+          "task",
+          "verify",
+          "CG-B-888f83d5368ab761f33eae56bac15bc7",
+          ".",
+          "--cargo-audit-tool",
+          "<本轮已核验绝对路径>",
+          "--rustsec-db",
+          "<已核验离线数据库绝对目录>",
+          "--format",
+          "json"
+        ],
+        "schema_version": "0.1.0",
+        "scope": ".",
+        "step": "核对原生 cargo-audit advisory 与 Cargo.lock 解析版本，恢复工具或离线库；漏洞库时效、来源和完整策略未经核验前保持任务开放，误报仅提出待审候选",
+        "task_id": "CG-B-888f83d5368ab761f33eae56bac15bc7"
+      },
+      "report_type": "repair_brief_preview",
+      "schema_version": "0.1.0"
+    },
+    "report": {
+      "authority": "local_unverified",
+      "checker_id": "rust.cargo_audit",
+      "command_status": "incomplete",
+      "coverage_proven": false,
+      "database_advisory_count": 1,
+      "database_freshness": "unverified",
+      "database_last_commit": null,
+      "database_last_updated": null,
+      "delivery_decision": "not_evaluated",
+      "dependency_count": 1,
+      "execution_budget": {
+        "enforcement": "native_execution_only",
+        "source": "builtin_default",
+        "timeout_ms": 1800000
+      },
+      "exit_code": 3,
+      "findings": [
+        {
+          "advisory_id": "RUSTSEC-2020-0071",
+          "cve_aliases": [
+            "CVE-2020-26235"
+          ],
+          "cvss_vector": null,
+          "package_checksum": "0000000000000000000000000000000000000000000000000000000000000000",
+          "package_name": "time",
+          "package_source_sha256": "c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0",
+          "package_version": "0.1.40",
+          "severity": "unverified"
+        }
+      ],
+      "language": "rust",
+      "local_scan_complete": false,
+      "lock_sha256": "7c9a5cb7320bd0a565a37961d3d282285f10d802cea2b5c6338761b5ae46b04f",
+      "manifest_sha256": "1854e6670f1fdb5357ed3da931aa518f4d85eb3735d940768520434fcc305ba8",
+      "native_warnings_present": false,
+      "next_actions": [
+        "核对原生漏洞库来源、提交与时效；零漏洞不能证明安全",
+        "复核解析依赖及原生 advisory 后修复或提出精确误报候选",
+        "已同步稳定待处理任务；使用 codeguard next 获取原工具复检指引"
+      ],
+      "operation": "cve",
+      "reason": "cargo_audit_database_changed",
+      "report_type": "rust_cve_local_observation",
+      "schema_version": "0.1.0",
+      "tool_sha256": "516d5c652bc63008e3673a2d1d1a16534bfe805898da59bc6319fa07ed7d0545"
+    }
+  },
+  {
+    "case": "remove",
+    "next": {
+      "authority": "local_unverified",
+      "command_status": "complete",
+      "delivery_decision": "not_evaluated",
+      "disposition": "actionable",
+      "exit_code": 0,
+      "next_actions": [],
+      "operation": "next",
+      "reason": "local_task_selected",
+      "repair_brief": {
+        "action_id": "restore-checker-environment",
+        "affected_paths": [
+          "Cargo.toml",
+          "Cargo.lock"
+        ],
+        "authority": "local_unverified",
+        "build_root": ".",
+        "checker_id": "rust.cargo_audit",
+        "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+        "constraints": [
+          "先恢复检查完整性",
+          "不得关闭检查器或修改无关源码"
+        ],
+        "disposition": "actionable",
+        "evidence_ref": {
+          "first_report_sha256": "0d6dc018d3c842edcb6ebf5454a7218d888699eac163c0286427414060d8395b",
+          "first_run_id": "rust-cve-47962-1791318287042791000-0"
+        },
+        "history": {
+          "attempt_count": 0,
+          "awaiting_verification": false,
+          "budget": 2,
+          "no_progress_count": 0,
+          "open_attempt_id": null,
+          "recent": []
+        },
+        "kind": "blocker",
+        "reason_code": "rust_cve_coverage_unverified",
+        "recheck_argv": [
+          "codeguard",
+          "task",
+          "verify",
+          "CG-B-888f83d5368ab761f33eae56bac15bc7",
+          ".",
+          "--cargo-audit-tool",
+          "<本轮已核验绝对路径>",
+          "--rustsec-db",
+          "<已核验离线数据库绝对目录>",
+          "--format",
+          "json"
+        ],
+        "schema_version": "0.1.0",
+        "scope": ".",
+        "step": "核对原生 cargo-audit advisory 与 Cargo.lock 解析版本，恢复工具或离线库；漏洞库时效、来源和完整策略未经核验前保持任务开放，误报仅提出待审候选",
+        "task_id": "CG-B-888f83d5368ab761f33eae56bac15bc7"
+      },
+      "report_type": "repair_brief_preview",
+      "schema_version": "0.1.0"
+    },
+    "report": {
+      "authority": "local_unverified",
+      "checker_id": "rust.cargo_audit",
+      "command_status": "incomplete",
+      "coverage_proven": false,
+      "database_advisory_count": 1,
+      "database_freshness": "unverified",
+      "database_last_commit": null,
+      "database_last_updated": null,
+      "delivery_decision": "not_evaluated",
+      "dependency_count": 1,
+      "execution_budget": {
+        "enforcement": "native_execution_only",
+        "source": "builtin_default",
+        "timeout_ms": 1800000
+      },
+      "exit_code": 3,
+      "findings": [
+        {
+          "advisory_id": "RUSTSEC-2020-0071",
+          "cve_aliases": [
+            "CVE-2020-26235"
+          ],
+          "cvss_vector": null,
+          "package_checksum": "0000000000000000000000000000000000000000000000000000000000000000",
+          "package_name": "time",
+          "package_source_sha256": "c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0",
+          "package_version": "0.1.40",
+          "severity": "unverified"
+        }
+      ],
+      "language": "rust",
+      "local_scan_complete": false,
+      "lock_sha256": "7c9a5cb7320bd0a565a37961d3d282285f10d802cea2b5c6338761b5ae46b04f",
+      "manifest_sha256": "1854e6670f1fdb5357ed3da931aa518f4d85eb3735d940768520434fcc305ba8",
+      "native_warnings_present": false,
+      "next_actions": [
+        "核对原生漏洞库来源、提交与时效；零漏洞不能证明安全",
+        "复核解析依赖及原生 advisory 后修复或提出精确误报候选",
+        "已同步稳定待处理任务；使用 codeguard next 获取原工具复检指引"
+      ],
+      "operation": "cve",
+      "reason": "cargo_audit_database_changed",
+      "report_type": "rust_cve_local_observation",
+      "schema_version": "0.1.0",
+      "tool_sha256": "d2ef5f6086519ecff7ed2e439311cc525dd99cd91e53cad17e158e5dfb8b0b30"
+    }
+  },
+  {
+    "case": "add",
+    "next": {
+      "authority": "local_unverified",
+      "command_status": "complete",
+      "delivery_decision": "not_evaluated",
+      "disposition": "actionable",
+      "exit_code": 0,
+      "next_actions": [],
+      "operation": "next",
+      "reason": "local_task_selected",
+      "repair_brief": {
+        "action_id": "restore-checker-environment",
+        "affected_paths": [
+          "Cargo.toml",
+          "Cargo.lock"
+        ],
+        "authority": "local_unverified",
+        "build_root": ".",
+        "checker_id": "rust.cargo_audit",
+        "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+        "constraints": [
+          "先恢复检查完整性",
+          "不得关闭检查器或修改无关源码"
+        ],
+        "disposition": "actionable",
+        "evidence_ref": {
+          "first_report_sha256": "0c4a1d8b40f841cc7283a97d95895d8504ea0593a28d6acf8fe58545726c2ef0",
+          "first_run_id": "rust-cve-47967-1791318287550643000-0"
+        },
+        "history": {
+          "attempt_count": 0,
+          "awaiting_verification": false,
+          "budget": 2,
+          "no_progress_count": 0,
+          "open_attempt_id": null,
+          "recent": []
+        },
+        "kind": "blocker",
+        "reason_code": "rust_cve_coverage_unverified",
+        "recheck_argv": [
+          "codeguard",
+          "task",
+          "verify",
+          "CG-B-888f83d5368ab761f33eae56bac15bc7",
+          ".",
+          "--cargo-audit-tool",
+          "<本轮已核验绝对路径>",
+          "--rustsec-db",
+          "<已核验离线数据库绝对目录>",
+          "--format",
+          "json"
+        ],
+        "schema_version": "0.1.0",
+        "scope": ".",
+        "step": "核对原生 cargo-audit advisory 与 Cargo.lock 解析版本，恢复工具或离线库；漏洞库时效、来源和完整策略未经核验前保持任务开放，误报仅提出待审候选",
+        "task_id": "CG-B-888f83d5368ab761f33eae56bac15bc7"
+      },
+      "report_type": "repair_brief_preview",
+      "schema_version": "0.1.0"
+    },
+    "report": {
+      "authority": "local_unverified",
+      "checker_id": "rust.cargo_audit",
+      "command_status": "incomplete",
+      "coverage_proven": false,
+      "database_advisory_count": 1,
+      "database_freshness": "unverified",
+      "database_last_commit": null,
+      "database_last_updated": null,
+      "delivery_decision": "not_evaluated",
+      "dependency_count": 1,
+      "execution_budget": {
+        "enforcement": "native_execution_only",
+        "source": "builtin_default",
+        "timeout_ms": 1800000
+      },
+      "exit_code": 3,
+      "findings": [
+        {
+          "advisory_id": "RUSTSEC-2020-0071",
+          "cve_aliases": [
+            "CVE-2020-26235"
+          ],
+          "cvss_vector": null,
+          "package_checksum": "0000000000000000000000000000000000000000000000000000000000000000",
+          "package_name": "time",
+          "package_source_sha256": "c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0",
+          "package_version": "0.1.40",
+          "severity": "unverified"
+        }
+      ],
+      "language": "rust",
+      "local_scan_complete": false,
+      "lock_sha256": "7c9a5cb7320bd0a565a37961d3d282285f10d802cea2b5c6338761b5ae46b04f",
+      "manifest_sha256": "1854e6670f1fdb5357ed3da931aa518f4d85eb3735d940768520434fcc305ba8",
+      "native_warnings_present": false,
+      "next_actions": [
+        "核对原生漏洞库来源、提交与时效；零漏洞不能证明安全",
+        "复核解析依赖及原生 advisory 后修复或提出精确误报候选",
+        "已同步稳定待处理任务；使用 codeguard next 获取原工具复检指引"
+      ],
+      "operation": "cve",
+      "reason": "cargo_audit_database_changed",
+      "report_type": "rust_cve_local_observation",
+      "schema_version": "0.1.0",
+      "tool_sha256": "d785d011539f39f5801ab5a166287eb2a52dca6d365fe2f72cfc042d1ccf8fef"
+    }
+  },
+  {
+    "case": "replace_root",
+    "next": {
+      "authority": "local_unverified",
+      "command_status": "complete",
+      "delivery_decision": "not_evaluated",
+      "disposition": "actionable",
+      "exit_code": 0,
+      "next_actions": [],
+      "operation": "next",
+      "reason": "local_task_selected",
+      "repair_brief": {
+        "action_id": "restore-checker-environment",
+        "affected_paths": [
+          "Cargo.toml",
+          "Cargo.lock"
+        ],
+        "authority": "local_unverified",
+        "build_root": ".",
+        "checker_id": "rust.cargo_audit",
+        "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+        "constraints": [
+          "先恢复检查完整性",
+          "不得关闭检查器或修改无关源码"
+        ],
+        "disposition": "actionable",
+        "evidence_ref": {
+          "first_report_sha256": "d17fd9127e132afbbabf5e94f50517b42a1303f67fd4aaa7143c35d8aa1299b1",
+          "first_run_id": "rust-cve-47973-1791318288072556000-0"
+        },
+        "history": {
+          "attempt_count": 0,
+          "awaiting_verification": false,
+          "budget": 2,
+          "no_progress_count": 0,
+          "open_attempt_id": null,
+          "recent": []
+        },
+        "kind": "blocker",
+        "reason_code": "rust_cve_coverage_unverified",
+        "recheck_argv": [
+          "codeguard",
+          "task",
+          "verify",
+          "CG-B-888f83d5368ab761f33eae56bac15bc7",
+          ".",
+          "--cargo-audit-tool",
+          "<本轮已核验绝对路径>",
+          "--rustsec-db",
+          "<已核验离线数据库绝对目录>",
+          "--format",
+          "json"
+        ],
+        "schema_version": "0.1.0",
+        "scope": ".",
+        "step": "核对原生 cargo-audit advisory 与 Cargo.lock 解析版本，恢复工具或离线库；漏洞库时效、来源和完整策略未经核验前保持任务开放，误报仅提出待审候选",
+        "task_id": "CG-B-888f83d5368ab761f33eae56bac15bc7"
+      },
+      "report_type": "repair_brief_preview",
+      "schema_version": "0.1.0"
+    },
+    "report": {
+      "authority": "local_unverified",
+      "checker_id": "rust.cargo_audit",
+      "command_status": "incomplete",
+      "coverage_proven": false,
+      "database_advisory_count": 1,
+      "database_freshness": "unverified",
+      "database_last_commit": null,
+      "database_last_updated": null,
+      "delivery_decision": "not_evaluated",
+      "dependency_count": 1,
+      "execution_budget": {
+        "enforcement": "native_execution_only",
+        "source": "builtin_default",
+        "timeout_ms": 1800000
+      },
+      "exit_code": 3,
+      "findings": [
+        {
+          "advisory_id": "RUSTSEC-2020-0071",
+          "cve_aliases": [
+            "CVE-2020-26235"
+          ],
+          "cvss_vector": null,
+          "package_checksum": "0000000000000000000000000000000000000000000000000000000000000000",
+          "package_name": "time",
+          "package_source_sha256": "c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0",
+          "package_version": "0.1.40",
+          "severity": "unverified"
+        }
+      ],
+      "language": "rust",
+      "local_scan_complete": false,
+      "lock_sha256": "7c9a5cb7320bd0a565a37961d3d282285f10d802cea2b5c6338761b5ae46b04f",
+      "manifest_sha256": "1854e6670f1fdb5357ed3da931aa518f4d85eb3735d940768520434fcc305ba8",
+      "native_warnings_present": false,
+      "next_actions": [
+        "核对原生漏洞库来源、提交与时效；零漏洞不能证明安全",
+        "复核解析依赖及原生 advisory 后修复或提出精确误报候选",
+        "已同步稳定待处理任务；使用 codeguard next 获取原工具复检指引"
+      ],
+      "operation": "cve",
+      "reason": "cargo_audit_database_changed",
+      "report_type": "rust_cve_local_observation",
+      "schema_version": "0.1.0",
+      "tool_sha256": "eb69b98fb3833d58c694628f41e68d351448796b19b96ac9ea8261b86e3442c3"
+    }
+  },
+  {
+    "case": "revert_content",
+    "next": {
+      "authority": "local_unverified",
+      "command_status": "complete",
+      "delivery_decision": "not_evaluated",
+      "disposition": "actionable",
+      "exit_code": 0,
+      "next_actions": [],
+      "operation": "next",
+      "reason": "local_task_selected",
+      "repair_brief": {
+        "action_id": "restore-checker-environment",
+        "affected_paths": [
+          "Cargo.toml",
+          "Cargo.lock"
+        ],
+        "authority": "local_unverified",
+        "build_root": ".",
+        "checker_id": "rust.cargo_audit",
+        "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+        "constraints": [
+          "先恢复检查完整性",
+          "不得关闭检查器或修改无关源码"
+        ],
+        "disposition": "actionable",
+        "evidence_ref": {
+          "first_report_sha256": "797c067ddc88c685b1bd3400b9246bf491d38c71723eea617b3fd112bdbe2c2f",
+          "first_run_id": "rust-cve-47981-1791318288573237000-0"
+        },
+        "history": {
+          "attempt_count": 0,
+          "awaiting_verification": false,
+          "budget": 2,
+          "no_progress_count": 0,
+          "open_attempt_id": null,
+          "recent": []
+        },
+        "kind": "blocker",
+        "reason_code": "rust_cve_coverage_unverified",
+        "recheck_argv": [
+          "codeguard",
+          "task",
+          "verify",
+          "CG-B-888f83d5368ab761f33eae56bac15bc7",
+          ".",
+          "--cargo-audit-tool",
+          "<本轮已核验绝对路径>",
+          "--rustsec-db",
+          "<已核验离线数据库绝对目录>",
+          "--format",
+          "json"
+        ],
+        "schema_version": "0.1.0",
+        "scope": ".",
+        "step": "核对原生 cargo-audit advisory 与 Cargo.lock 解析版本，恢复工具或离线库；漏洞库时效、来源和完整策略未经核验前保持任务开放，误报仅提出待审候选",
+        "task_id": "CG-B-888f83d5368ab761f33eae56bac15bc7"
+      },
+      "report_type": "repair_brief_preview",
+      "schema_version": "0.1.0"
+    },
+    "report": {
+      "authority": "local_unverified",
+      "checker_id": "rust.cargo_audit",
+      "command_status": "incomplete",
+      "coverage_proven": false,
+      "database_advisory_count": 1,
+      "database_freshness": "unverified",
+      "database_last_commit": null,
+      "database_last_updated": null,
+      "delivery_decision": "not_evaluated",
+      "dependency_count": 1,
+      "execution_budget": {
+        "enforcement": "native_execution_only",
+        "source": "builtin_default",
+        "timeout_ms": 1800000
+      },
+      "exit_code": 3,
+      "findings": [
+        {
+          "advisory_id": "RUSTSEC-2020-0071",
+          "cve_aliases": [
+            "CVE-2020-26235"
+          ],
+          "cvss_vector": null,
+          "package_checksum": "0000000000000000000000000000000000000000000000000000000000000000",
+          "package_name": "time",
+          "package_source_sha256": "c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0",
+          "package_version": "0.1.40",
+          "severity": "unverified"
+        }
+      ],
+      "language": "rust",
+      "local_scan_complete": false,
+      "lock_sha256": "7c9a5cb7320bd0a565a37961d3d282285f10d802cea2b5c6338761b5ae46b04f",
+      "manifest_sha256": "1854e6670f1fdb5357ed3da931aa518f4d85eb3735d940768520434fcc305ba8",
+      "native_warnings_present": false,
+      "next_actions": [
+        "核对原生漏洞库来源、提交与时效；零漏洞不能证明安全",
+        "复核解析依赖及原生 advisory 后修复或提出精确误报候选",
+        "已同步稳定待处理任务；使用 codeguard next 获取原工具复检指引"
+      ],
+      "operation": "cve",
+      "reason": "cargo_audit_database_changed",
+      "report_type": "rust_cve_local_observation",
+      "schema_version": "0.1.0",
+      "tool_sha256": "199aa8fa56a738e4b4e390f60647d6fd1a86eb64d02d0fa35ce3a3a9ef6001b8"
+    }
+  },
+  {
+    "case": "lock_housekeeping",
+    "next": {
+      "authority": "local_unverified",
+      "command_status": "complete",
+      "delivery_decision": "not_evaluated",
+      "disposition": "actionable",
+      "exit_code": 0,
+      "next_actions": [],
+      "operation": "next",
+      "reason": "local_task_selected",
+      "repair_brief": {
+        "action_id": "restore-checker-environment",
+        "affected_paths": [
+          "Cargo.toml",
+          "Cargo.lock"
+        ],
+        "authority": "local_unverified",
+        "build_root": ".",
+        "checker_id": "rust.cargo_audit",
+        "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+        "constraints": [
+          "先恢复检查完整性",
+          "不得关闭检查器或修改无关源码"
+        ],
+        "disposition": "actionable",
+        "evidence_ref": {
+          "first_report_sha256": "8d5722d5b03893f4ec2778b72731b904549dcda0b032cc488bd107de68e3e97e",
+          "first_run_id": "rust-cve-47985-1791318289083345000-0"
+        },
+        "history": {
+          "attempt_count": 0,
+          "awaiting_verification": false,
+          "budget": 2,
+          "no_progress_count": 0,
+          "open_attempt_id": null,
+          "recent": []
+        },
+        "kind": "blocker",
+        "reason_code": "rust_cve_coverage_unverified",
+        "recheck_argv": [
+          "codeguard",
+          "task",
+          "verify",
+          "CG-B-888f83d5368ab761f33eae56bac15bc7",
+          ".",
+          "--cargo-audit-tool",
+          "<本轮已核验绝对路径>",
+          "--rustsec-db",
+          "<已核验离线数据库绝对目录>",
+          "--format",
+          "json"
+        ],
+        "schema_version": "0.1.0",
+        "scope": ".",
+        "step": "核对原生 cargo-audit advisory 与 Cargo.lock 解析版本，恢复工具或离线库；漏洞库时效、来源和完整策略未经核验前保持任务开放，误报仅提出待审候选",
+        "task_id": "CG-B-888f83d5368ab761f33eae56bac15bc7"
+      },
+      "report_type": "repair_brief_preview",
+      "schema_version": "0.1.0"
+    },
+    "report": {
+      "authority": "local_unverified",
+      "checker_id": "rust.cargo_audit",
+      "command_status": "incomplete",
+      "coverage_proven": false,
+      "database_advisory_count": 1,
+      "database_freshness": "unverified",
+      "database_last_commit": null,
+      "database_last_updated": null,
+      "delivery_decision": "not_evaluated",
+      "dependency_count": 1,
+      "execution_budget": {
+        "enforcement": "native_execution_only",
+        "source": "builtin_default",
+        "timeout_ms": 1800000
+      },
+      "exit_code": 3,
+      "findings": [
+        {
+          "advisory_id": "RUSTSEC-2020-0071",
+          "cve_aliases": [
+            "CVE-2020-26235"
+          ],
+          "cvss_vector": null,
+          "package_checksum": "0000000000000000000000000000000000000000000000000000000000000000",
+          "package_name": "time",
+          "package_source_sha256": "c19b7c6f923b580ac259164a89f2577984ad5ab09ee9d583b888f934adbbe8d0",
+          "package_version": "0.1.40",
+          "severity": "unverified"
+        }
+      ],
+      "language": "rust",
+      "local_scan_complete": true,
+      "lock_sha256": "7c9a5cb7320bd0a565a37961d3d282285f10d802cea2b5c6338761b5ae46b04f",
+      "manifest_sha256": "1854e6670f1fdb5357ed3da931aa518f4d85eb3735d940768520434fcc305ba8",
+      "native_warnings_present": false,
+      "next_actions": [
+        "核对原生漏洞库来源、提交与时效；零漏洞不能证明安全",
+        "复核解析依赖及原生 advisory 后修复或提出精确误报候选",
+        "已同步稳定待处理任务；使用 codeguard next 获取原工具复检指引"
+      ],
+      "operation": "cve",
+      "reason": "database_freshness_unverified",
+      "report_type": "rust_cve_local_observation",
+      "schema_version": "0.1.0",
+      "tool_sha256": "65d92a45cd88d9381f2a195856339a4e7351ea4580097d086ba346599a7a0718"
+    }
+  }
+]

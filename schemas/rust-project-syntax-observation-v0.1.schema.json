@@ -1,0 +1,547 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:rust-project-syntax-observation:0.1.0",
+  "title": "Bounded project edition Rust parser observation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "status",
+    "reason",
+    "path",
+    "source_sha256",
+    "edition_context",
+    "native",
+    "coverage_proven",
+    "delivery_decision"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.1.0"
+    },
+    "report_type": {
+      "const": "rust_project_syntax_observation"
+    },
+    "status": {
+      "enum": [
+        "incomplete",
+        "completed",
+        "diagnostics_observed"
+      ]
+    },
+    "reason": {
+      "type": "string",
+      "pattern": "^[a-z0-9_]+$"
+    },
+    "path": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096,
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[^\\r\\n]+$"
+    },
+    "source_sha256": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "edition_context": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "edition",
+            "manifest_ref",
+            "manifest_sha256",
+            "workspace_manifest_ref",
+            "workspace_manifest_sha256"
+          ],
+          "properties": {
+            "edition": {
+              "enum": [
+                "2015",
+                "2018",
+                "2021",
+                "2024"
+              ]
+            },
+            "manifest_ref": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096,
+              "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[^\\r\\n]+$"
+            },
+            "manifest_sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "workspace_manifest_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 4096,
+                  "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[^\\r\\n]+$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "workspace_manifest_sha256": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "native": {
+      "anyOf": [
+        {
+          "$ref": "urn:codeguard:schema:rustfmt-syntax-observation:0.2.0"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "coverage_proven": {
+      "const": false
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "completed"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "edition_context": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "edition",
+              "manifest_ref",
+              "manifest_sha256",
+              "workspace_manifest_ref",
+              "workspace_manifest_sha256"
+            ],
+            "properties": {
+              "edition": {
+                "enum": [
+                  "2015",
+                  "2018",
+                  "2021",
+                  "2024"
+                ]
+              },
+              "manifest_ref": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4096,
+                "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[^\\r\\n]+$"
+              },
+              "manifest_sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "workspace_manifest_ref": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4096,
+                    "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[^\\r\\n]+$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "workspace_manifest_sha256": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          },
+          "source_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "native": {
+            "allOf": [
+              {
+                "$ref": "urn:codeguard:schema:rustfmt-syntax-observation:0.2.0"
+              },
+              {
+                "properties": {
+                  "status": {
+                    "const": "completed"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "diagnostics_observed"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "edition_context": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "edition",
+              "manifest_ref",
+              "manifest_sha256",
+              "workspace_manifest_ref",
+              "workspace_manifest_sha256"
+            ],
+            "properties": {
+              "edition": {
+                "enum": [
+                  "2015",
+                  "2018",
+                  "2021",
+                  "2024"
+                ]
+              },
+              "manifest_ref": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4096,
+                "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[^\\r\\n]+$"
+              },
+              "manifest_sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "workspace_manifest_ref": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4096,
+                    "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[^\\r\\n]+$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "workspace_manifest_sha256": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          },
+          "source_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "native": {
+            "allOf": [
+              {
+                "$ref": "urn:codeguard:schema:rustfmt-syntax-observation:0.2.0"
+              },
+              {
+                "properties": {
+                  "status": {
+                    "const": "diagnostics_observed"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "edition_context": {
+            "type": "object",
+            "properties": {
+              "edition": {
+                "const": "2015"
+              }
+            },
+            "required": [
+              "edition"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "native": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "allOf": [
+                  {
+                    "$ref": "urn:codeguard:schema:rustfmt-syntax-observation:0.2.0"
+                  },
+                  {
+                    "properties": {
+                      "edition": {
+                        "const": "2015"
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "edition_context": {
+            "type": "object",
+            "properties": {
+              "edition": {
+                "const": "2018"
+              }
+            },
+            "required": [
+              "edition"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "native": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "allOf": [
+                  {
+                    "$ref": "urn:codeguard:schema:rustfmt-syntax-observation:0.2.0"
+                  },
+                  {
+                    "properties": {
+                      "edition": {
+                        "const": "2018"
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "edition_context": {
+            "type": "object",
+            "properties": {
+              "edition": {
+                "const": "2021"
+              }
+            },
+            "required": [
+              "edition"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "native": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "allOf": [
+                  {
+                    "$ref": "urn:codeguard:schema:rustfmt-syntax-observation:0.2.0"
+                  },
+                  {
+                    "properties": {
+                      "edition": {
+                        "const": "2021"
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "edition_context": {
+            "type": "object",
+            "properties": {
+              "edition": {
+                "const": "2024"
+              }
+            },
+            "required": [
+              "edition"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "native": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "allOf": [
+                  {
+                    "$ref": "urn:codeguard:schema:rustfmt-syntax-observation:0.2.0"
+                  },
+                  {
+                    "properties": {
+                      "edition": {
+                        "const": "2024"
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "native": {
+            "type": "object",
+            "required": [
+              "status"
+            ],
+            "properties": {
+              "status": {
+                "const": "completed"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "status": {
+            "const": "completed"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "native": {
+            "type": "object",
+            "required": [
+              "status"
+            ],
+            "properties": {
+              "status": {
+                "const": "diagnostics_observed"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "status": {
+            "const": "diagnostics_observed"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "native": {
+            "type": "object",
+            "required": [
+              "status"
+            ],
+            "properties": {
+              "status": {
+                "const": "incomplete"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "status": {
+            "const": "incomplete"
+          }
+        }
+      }
+    }
+  ]
+}

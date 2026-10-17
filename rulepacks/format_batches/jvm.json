@@ -1,0 +1,149 @@
+{
+  "schema_version": "0.1.0",
+  "batch": "jvm",
+  "languages": [
+    {
+      "language": "java",
+      "status": "integrated",
+      "formatter": "google-java-format",
+      "tool_key": "google-java-format",
+      "check_argv": [
+        "--dry-run",
+        "--set-exit-if-changed",
+        "{file}"
+      ],
+      "apply_argv": [
+        "--replace",
+        "{file}"
+      ],
+      "config_markers": [
+        ".editorconfig",
+        "pom.xml",
+        "build.gradle",
+        "build.gradle.kts"
+      ],
+      "extensions": [
+        ".java"
+      ],
+      "dialects": {
+        "style": "google"
+      },
+      "notes": "Java 选 google-java-format（GJF）而非 spotless / palantir-java-format，理由是逐文件调用契约：codeguard format 以 {file} 逐文件驱动格式化器，需要可直接对单文件判定合规性的独立 CLI。① spotless 是 Maven/Gradle 插件形态，只能通过 mvn spotless:check / gradle spotlessCheck 驱动整个项目生命周期，无法对单个 .java 文件给出独立退出码，且项目未配置插件时命令直接失败（退出 1 会与「不合规」混淆）；② palantir-java-format 是 GJF 的 fork，check/apply 语义与 GJF 完全一致（--dry-run --set-exit-if-changed / --replace），选 GJF 是因为它是 upstream 且发行形态最稳定；项目若偏好 palantir 风格，可用 --tool google-java-format=<palantir 绝对路径> 替换绑定，无需改档案；③ GJF 对 .groovy 输出 Skipping non-Java file 且恒退 0，故 groovy 不复用本条目，改走 npm-groovy-lint 包装器。实测（本机 google-java-format 1.27.0 + JDK 21）：不合规退出 1 且 stdout 列出文件、已格式化退出 0、--replace 就地重写后复检退出 0。限制：GJF 无自身配置文件（仅 --aosp 风格变体），缩进/换行由内置风格决定；只重排版面，不做 import 顺序治理、不检查注释完整性、不做静态分析，不能替代 Checkstyle/P3C（那是 conventions 核心能力的职责）。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
+    },
+    {
+      "language": "kotlin",
+      "status": "integrated",
+      "formatter": "ktlint",
+      "tool_key": "ktlint",
+      "check_argv": [
+        "{file}"
+      ],
+      "apply_argv": [
+        "--format",
+        "{file}"
+      ],
+      "config_markers": [
+        ".editorconfig"
+      ],
+      "extensions": [
+        ".kt",
+        ".kts"
+      ],
+      "dialects": {},
+      "notes": "Kotlin 生态主流格式化/风格检查器（实测 ktlint 1.8.0）。check_argv 属 B 类：默认 lint 模式对违规文件退出 1 并在 stdout 输出违规明细（file:line:col 规则），合规时退出 0 且无输出；apply_argv 为 --format（旧别名 -F 已弃用），就地改写并退出 0，.kt 与 .kts 两个方向均在本机实跑验证。通过 .editorconfig 配置（ktlint_code_style 等），无 .editorconfig 时使用内置默认风格。只检查风格/格式规则，不做类型或语义检查；对语法错误的文件也退出 1（按不合规处理而非故障）；路径未匹配到任何文件时仅输出警告并退出 0（会被视为合规）。本机经 GitHub release 自包含 jar + Java 21 实跑验证。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
+    },
+    {
+      "language": "scala",
+      "status": "integrated",
+      "formatter": "scalafmt",
+      "tool_key": "scalafmt",
+      "check_argv": [
+        "--test",
+        "{file}"
+      ],
+      "apply_argv": [
+        "{file}"
+      ],
+      "config_markers": [
+        ".scalafmt.conf"
+      ],
+      "extensions": [
+        ".scala",
+        ".sc"
+      ],
+      "dialects": {
+        "runner.dialect": "scala213"
+      },
+      "notes": "Scala 事实标准格式化器（实测 scalafmt 3.9.6）。check_argv 属 B 类：--test 对未格式化文件打印 diff 并退出 1，全部合规时退出 0；退出码 ≥2 为工具故障（实测：文件不存在=8，缺少 .scalafmt.conf=16）。apply_argv 直接跟 {file}（无额外标志）即就地格式化并退出 0。.scalafmt.conf 为强制项，缺失时拒绝运行（表现为故障码而非误判合规），方言由 runner.dialect 指定（实测 scala213 通过），.scala 与 .sc 均实测支持。只排版不检查语义，无法修复编译错误；不能在未提供 .scalafmt.conf 的项目中运行。本机经 Maven Central 的 scalafmt-cli_2.13 jar + Java 21 实跑验证；独立可执行文件可 coursier install scalafmt 获取。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
+    },
+    {
+      "language": "groovy",
+      "status": "integrated",
+      "formatter": "node",
+      "tool_key": "node",
+      "check_argv": [
+        "-e",
+        "const fs=require(\"node:fs\"),path=require(\"node:path\"),m=require(\"node:module\"),u=require(\"node:url\");\n(async()=>{\ntry{\nconst file=path.resolve(process.argv[2]||process.argv[1]);\nif(!fs.existsSync(file)){console.error(\"file not found: \"+file);process.exit(2);}\nconst req=m.createRequire(path.join(path.dirname(file),\"a.js\"));\nlet entry;\ntry{entry=req.resolve(\"npm-groovy-lint\");}catch(e){console.error(\"npm-groovy-lint not resolvable from \"+file+\" (install it as project devDependency): \"+e.message);process.exit(2);}\nconst mod=await import(u.pathToFileURL(entry).href);\nconst NpmGroovyLint=mod.default;\nconst RULES=\"ElseBlockBraces,ForStatementBraces,IfStatementBraces,WhileStatementBraces,NoTabCharacter,BlankLineBeforePackage,BlockEndsWithBlankLine,BlockStartsWithBlankLine,BracesForClass,BracesForForLoop,BracesForIfElse,BracesForMethod,BracesForTryCatchFinally,ClassEndsWithBlankLine,ClassStartsWithBlankLine,ClosureStatementOnOpeningLineOfMultipleLineClosure,ConsecutiveBlankLines,FileEndsWithoutNewline,Indentation,MissingBlankLineAfterImports,MissingBlankLineAfterPackage,SpaceAfterCatch,SpaceAfterClosingBrace,SpaceAfterComma,SpaceAfterFor,SpaceAfterIf,SpaceAfterMethodCallName,SpaceAfterOpeningBrace,SpaceAfterSemicolon,SpaceAfterSwitch,SpaceAfterWhile,SpaceAroundClosureArrow,SpaceAroundMapEntryColon,SpaceAroundOperator,SpaceBeforeClosingBrace,SpaceBeforeOpeningBrace,SpaceInsideParentheses,TrailingWhitespace,UnnecessaryGString,UnnecessarySemicolon\";\nconst linter=new NpmGroovyLint([process.execPath,\"npm-groovy-lint\",file,\"--rulesets\",RULES,\"--failon\",\"none\",\"--output\",\"json\",\"--noserver\"],{origin:\"codeguard\",parseOptions:true});\nconst realWrite=process.stdout.write.bind(process.stdout);\nprocess.stdout.write=()=>true;\nlet err=null;\ntry{await linter.run();}catch(e){err=e;}\nprocess.stdout.write=realWrite;\nif(err){console.error(\"npm-groovy-lint threw: \"+err.message);process.exit(2);}\nif(linter.status===2){console.error(\"npm-groovy-lint unexpected failure (check java/CodeNarc availability)\");process.exit(2);}\nconst result=linter.lintResult||{};\nlet violations=0,parseErrors=0;\nconst files=(result&&result.files)||{};\nfor(const key of Object.keys(files)){\nfor(const issue of (files[key].errors||[])){\nconst rule=issue&&issue.rule;\nif(rule===\"NglParseError\"){parseErrors++;}else{violations++;}\n}}\nif(parseErrors>0){console.error(\"groovy parse error: cannot judge formatting\");process.exit(2);}\nif(linter.status!==0&&violations===0){console.error(\"npm-groovy-lint status \"+linter.status+\" with no violations\");process.exit(2);}\nprocess.exit(violations>0?1:0);\n}catch(e){console.error(\"wrapper error: \"+(e&&e.message));process.exit(2);}\n})();",
+        "{file}"
+      ],
+      "apply_argv": [
+        "-e",
+        "const fs=require(\"node:fs\"),path=require(\"node:path\"),m=require(\"node:module\"),u=require(\"node:url\");\n(async()=>{\ntry{\nconst file=path.resolve(process.argv[2]||process.argv[1]);\nif(!fs.existsSync(file)){console.error(\"file not found: \"+file);process.exit(2);}\nconst req=m.createRequire(path.join(path.dirname(file),\"a.js\"));\nlet entry;\ntry{entry=req.resolve(\"npm-groovy-lint\");}catch(e){console.error(\"npm-groovy-lint not resolvable from \"+file+\" (install it as project devDependency): \"+e.message);process.exit(2);}\nconst mod=await import(u.pathToFileURL(entry).href);\nconst NpmGroovyLint=mod.default;\nconst quietRun=async(argv)=>{\nconst linter=new NpmGroovyLint(argv,{origin:\"codeguard\",parseOptions:true});\nconst realWrite=process.stdout.write.bind(process.stdout);\nprocess.stdout.write=()=>true;\nlet err=null;\ntry{await linter.run();}catch(e){err=e;}\nprocess.stdout.write=realWrite;\nreturn {linter,err};\n};\nconst countParseErrors=(linter)=>{\nconst result=linter.lintResult||{};\nlet parseErrors=0;\nconst files=(result&&result.files)||{};\nfor(const key of Object.keys(files)){\nfor(const issue of (files[key].errors||[])){\nif(issue&&issue.rule===\"NglParseError\"){parseErrors++;}\n}}\nreturn parseErrors;\n};\nconst pre=[process.execPath,\"npm-groovy-lint\",file,\"--parse\",\"--failon\",\"none\",\"--output\",\"json\",\"--noserver\"];\nconst pre1=await quietRun(pre);\nif(pre1.err){console.error(\"npm-groovy-lint threw: \"+pre1.err.message);process.exit(2);}\nif(pre1.linter.status===2){console.error(\"npm-groovy-lint unexpected failure (check java/CodeNarc availability)\");process.exit(2);}\nif(countParseErrors(pre1.linter)>0){console.error(\"groovy parse error: formatting refused, file untouched\");process.exit(2);}\nconst main=[process.execPath,\"npm-groovy-lint\",file,\"--format\",\"--nolintafter\",\"--parse\",\"--failon\",\"none\",\"--output\",\"json\",\"--noserver\"];\nconst main1=await quietRun(main);\nif(main1.err){console.error(\"npm-groovy-lint threw: \"+main1.err.message);process.exit(2);}\nif(main1.linter.status===2){console.error(\"npm-groovy-lint unexpected failure during format\");process.exit(2);}\nif(countParseErrors(main1.linter)>0){console.error(\"groovy parse error during format\");process.exit(2);}\nprocess.exit(0);\n}catch(e){console.error(\"wrapper error: \"+(e&&e.message));process.exit(2);}\n})();",
+        "{file}"
+      ],
+      "config_markers": [
+        ".groovylintrc-format.json"
+      ],
+      "extensions": [
+        ".groovy"
+      ],
+      "dialects": {},
+      "notes": "Groovy 生态无独立格式化器可执行文件：google-java-format 已移除 Groovy 支持（实测对 .groovy 输出 Skipping non-Java file 且恒退 0），故采用事实标准 npm-groovy-lint（18.0.0，内嵌 CodeNarc 3.7.0，需本机 java）经 node -e 包装调用，formatter/tool_key 为 node（与 julia/Rscript/pwsh 档位同构）。前置条件：被检文件所在项目须安装 npm-groovy-lint（devDependency），依赖解析失败退 2 工具故障、绝不静默放行。check 通过 API 以 --rulesets 显式限定 npm-groovy-lint 内置 .groovylintrc-format.json 的全部 40 条 formatting/braces/convention 规则做只读 lint：0=合规、1=存在格式违规、2=语法解析错误(NglParseError)/java 或依赖缺失/内部失败，三态本机全实测（check 全程 stdout 静默，md5 不变）。不能直接用其 CLI：默认规则集混入 NoDef/CompileStatic 等非格式规则且 --failon 默认 info 导致 clean 文件也退 1；--rulesets \"ruleset:formatting\"/ruleset XML 文件等形态经其 JSON 规则读取器解析会崩溃退 2（No such rule named [ruleset:formatting]）。apply 用 API --format（npm-groovy-lint 官方格式化模式，自动应用内置格式规则集修复）：已实测修复空行/尾随空格/分号/空格违规、幂等；因实测 --format 会部分改写语法残缺文件，apply 先做只读 parse 预检，含 NglParseError 时退 2 且文件不动（实测 md5 不变）。限制：--noserver 每次调用冷启动 java 有秒级延迟；check 硬编码与内置 format 配置一致的 40 条规则、不读项目级 .groovylintrc-format.json（项目同名配置只影响 apply 的格式化行为，改写后可能与 check 规则不一致）；只排版，不检查默认规则集中的代码质量项（NoDef、CompileStatic 等被刻意排除），不能替代 CodeNarc 完整 lint。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
+    },
+    {
+      "language": "clojure",
+      "status": "integrated",
+      "formatter": "cljfmt",
+      "tool_key": "cljfmt",
+      "check_argv": [
+        "check",
+        "{file}"
+      ],
+      "apply_argv": [
+        "fix",
+        "{file}"
+      ],
+      "config_markers": [
+        ".cljfmt.edn"
+      ],
+      "extensions": [
+        ".clj",
+        ".cljs",
+        ".cljc",
+        ".edn"
+      ],
+      "dialects": {},
+      "notes": "Clojure 社区主流格式化器 cljfmt（实测 0.16.6）。check_argv 属 B 类：check 子命令对未格式化文件打印 diff 并退出 1，合规时输出 'All source files formatted correctly' 并退出 0；apply_argv 为 fix 子命令，就地重写并退出 0。独立可执行文件可 brew install cljfmt（homebrew-core bottled 0.16.6）；本机经 clojure CLI（clojure -M -m cljfmt.main）以相同版本实跑验证两个方向的退出码，并经差分测试确认 .cljfmt.edn 项目配置真实生效（如 remove-trailing-whitespace? 开关）。只按内置/配置规则排版（缩进、缺失空格、尾随空白等），不做语义或宏展开检查；默认不删除表内多余空格（如 (a  b) 双空格实测不判违规）；对不存在的路径退出 1，与『不合规』同码而非故障码。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
+    }
+  ]
+}

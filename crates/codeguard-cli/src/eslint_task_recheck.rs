@@ -52,12 +52,6 @@ pub(crate) fn run(
             return report;
         }
     };
-    let (feedback, scan) = crate::eslint_lint_command::observe_for_task(root, &args, deadline);
-    report["reason"] = feedback["reason"].clone();
-    let Some(mut scan) = scan else {
-        return report;
-    };
-    scan["run_id"] = report["run_id"].clone();
     let original = brief["evidence_ref"]["first_run_id"]
         .as_str()
         .and_then(|run| {
@@ -78,6 +72,26 @@ pub(crate) fn run(
                 report
             }
         });
+    // 原始候选的包边界改变时先恢复上下文；修复源码字节允许变化，不借此关闭任务。
+    if let Some(old) = original
+        .as_ref()
+        .filter(|old| old["schema_version"] == "0.15.0")
+    {
+        let mut current =
+            crate::javascript_mode_observation::observe_javascript_mode(root, Path::new(scope));
+        let recorded = &old["observations"][0]["javascript_mode_observation"];
+        current.source_sha256 = recorded["source_sha256"].as_str().map(str::to_owned);
+        if json!(current) != *recorded {
+            report["reason"] = json!("javascript_module_context_changed");
+            return report;
+        }
+    }
+    let (feedback, scan) = crate::eslint_lint_command::observe_for_task(root, &args, deadline);
+    report["reason"] = feedback["reason"].clone();
+    let Some(mut scan) = scan else {
+        return report;
+    };
+    scan["run_id"] = report["run_id"].clone();
     report["original_context_matches"] = json!(original.is_some_and(|old| {
         old["report_type"] == "eslint_workbench_observation"
             && old["workspace_id"] == scan["workspace_id"]

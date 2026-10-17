@@ -1,0 +1,70 @@
+{
+  "authority": "local_unverified",
+  "command_status": "complete",
+  "delivery_decision": "not_evaluated",
+  "disposition": "needs_decision",
+  "exit_code": 0,
+  "next_actions": [],
+  "operation": "next",
+  "reason": "local_task_selected",
+  "repair_brief": {
+    "action_id": "repair-source",
+    "authority": "local_unverified",
+    "checker_id": "shell.shellcheck",
+    "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+    "constraints": [
+      "仅修改目标源码",
+      "不得忽略规则或将任务勾选当作复检"
+    ],
+    "disposition": "needs_decision",
+    "evidence_ref": {
+      "first_report_sha256": "fd7d66b6a2630cbe2cc591242c12d52410e91549247c476821ef9993bd5b969e",
+      "first_run_id": "shellcheck-1791220784240493000-42999-0"
+    },
+    "history": {
+      "attempt_count": 2,
+      "awaiting_verification": false,
+      "budget": 2,
+      "no_progress_count": 2,
+      "open_attempt_id": null,
+      "recent": [
+        {
+          "action_id": "repair-source",
+          "attempt_id": "CG-A-a74640eac947f764363057c856417d9d",
+          "note_code": "source_edit",
+          "observed_change": false,
+          "outcome": "ready-to-verify"
+        },
+        {
+          "action_id": "repair-source",
+          "attempt_id": "CG-A-eb972e7a84ee4ef3bd94c0525f1292b7",
+          "note_code": "source_edit",
+          "observed_change": false,
+          "outcome": "ready-to-verify"
+        }
+      ]
+    },
+    "kind": "finding",
+    "native_rule_id": "SC2086",
+    "recheck_argv": [
+      "codeguard",
+      "task",
+      "verify",
+      "CG-9e3be727dbf76c8e55a5ca543cc21506",
+      "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-shell-next-ogxmskqb",
+      "--shellcheck-tool",
+      "<已核验的绝对路径>",
+      "--format=json"
+    ],
+    "schema_version": "0.17.0",
+    "scope": "app.sh",
+    "source_sha256": "00400e6bf65ec46ff1d85a7494ac3f11a3ca09d56c5e0792941ff5ba67908968",
+    "step": "同一输入与动作连续无进展；检查原生诊断、工具配置和失败记录，提出具体修复或策略决策",
+    "task_id": "CG-9e3be727dbf76c8e55a5ca543cc21506",
+    "verification_observation": "still_present",
+    "verification_report_sha256": "9b3aef1cf9fd289437631ea00f27d7a112eac8b15801f9ef9c53cba006b75b8e",
+    "verification_run_id": "shellcheck-1791220785281289000-43016-0"
+  },
+  "report_type": "repair_brief_preview",
+  "schema_version": "0.17.0"
+}

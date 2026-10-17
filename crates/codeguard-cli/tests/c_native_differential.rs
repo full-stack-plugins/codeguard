@@ -1,10 +1,11 @@
 #![cfg(all(feature = "wasm-precheck", unix))]
 
+use sha2::{Digest, Sha256};
 use std::fs;
 use std::path::Path;
 use std::process::Command;
 
-fn corpus() -> [(&'static str, &'static str, bool); 13] {
+fn corpus() -> [(&'static str, &'static str, bool); 19] {
     [
         ("function", "int main(void) { return 0; }\n", true),
         ("pointer", "int f(const int *x) { return *x; }\n", true),
@@ -29,6 +30,32 @@ fn corpus() -> [(&'static str, &'static str, bool); 13] {
             "preprocessor",
             "#define VALUE 1\nint f(void) { return VALUE; }\n",
             true,
+        ),
+        (
+            "static_assert",
+            "_Static_assert(sizeof(int) > 0, \"int size\");\n",
+            true,
+        ),
+        (
+            "generic_selection",
+            "int f(void) { return _Generic(1, int: 2, default: 0); }\n",
+            true,
+        ),
+        (
+            "variable_length_array",
+            "int f(int n) { int values[n]; return sizeof(values) > 0; }\n",
+            true,
+        ),
+        ("function_pointer", "int (*handler)(int);\n", true),
+        (
+            "broken_static_assert",
+            "_Static_assert(, \"broken\");\n",
+            false,
+        ),
+        (
+            "broken_generic",
+            "int f(void) { return _Generic(1, int: ); }\n",
+            false,
         ),
         ("missing_brace", "int main(void) { return 0;\n", false),
         ("missing_semicolon", "int x = 1\n", false),
@@ -97,6 +124,7 @@ fn pinned_c_worker_matches_native_clang_on_syntax_corpus() {
         .unwrap()
         .join(format!("codeguard-c-differential-{}", std::process::id()));
     fs::create_dir_all(&root).unwrap();
+    let mut cases = Vec::new();
     for (name, source, expected_valid) in corpus() {
         let file = root.join(format!("{name}.c"));
         fs::write(&file, source).unwrap();
@@ -126,12 +154,32 @@ fn pinned_c_worker_matches_native_clang_on_syntax_corpus() {
             source,
             "{name}: native mutated source"
         );
+        let candidate_valid = candidate_is_valid(&root, name, source);
         assert_eq!(
-            candidate_is_valid(&root, name, source),
+            candidate_valid,
             native.status.success(),
             "{name}: clang={} worker classification differs",
             String::from_utf8_lossy(&native.stderr)
         );
+        cases.push(serde_json::json!({"case":name,"source_sha256":format!("{:x}",Sha256::digest(source.as_bytes())),"expected_valid":expected_valid,"native_exit":native.status.code(),"candidate_valid":candidate_valid}));
+    }
+    if let Ok(output) = std::env::var("CODEGUARD_C_DIFFERENTIAL_EVIDENCE") {
+        let output = Path::new(&output);
+        assert!(output.is_absolute(), "evidence path must be absolute");
+        let evidence = serde_json::json!({
+            "evidence_kind":"development_c11_native_wasm_differential",
+            "qualification":"not_granted",
+            "independent_holdout":false,
+            "standard":"c11",
+            "compiler_version":String::from_utf8_lossy(&version.stdout),
+            "compiler_sha256":format!("{:x}",Sha256::digest(fs::read(&clang).unwrap())),
+            "cli_sha256":format!("{:x}",Sha256::digest(fs::read(env!("CARGO_BIN_EXE_codeguard")).unwrap())),
+            "test_source_sha256":format!("{:x}",Sha256::digest(include_bytes!("c_native_differential.rs"))),
+            "grammar_manifest_sha256":format!("{:x}",Sha256::digest(fs::read(Path::new(env!("CARGO_MANIFEST_DIR")).join("../../grammars/manifest.json")).unwrap())),
+            "case_count":cases.len(),"cases":cases,
+            "delivery_decision":"not_evaluated"
+        });
+        fs::write(output, serde_json::to_vec_pretty(&evidence).unwrap()).unwrap();
     }
     fs::remove_dir_all(root).unwrap();
 }

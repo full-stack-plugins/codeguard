@@ -1,0 +1,39 @@
+{
+  "authority": "local_unverified",
+  "command_status": "incomplete",
+  "coverage_proven": false,
+  "delivery_decision": "not_evaluated",
+  "detailed_contract_qualification": "not_granted",
+  "documentation_configuration": {
+    "coverage_proven": false,
+    "files": [],
+    "next_action": "恢复项目根与原生检查环境，取得同轮文档规则设置。",
+    "reason": "project_root_unavailable",
+    "scope": "global_rule_selection_only",
+    "selected_file_count": 0,
+    "source_file_count": 0,
+    "status": "unavailable",
+    "unavailable_file_count": 0,
+    "unselected_file_count": 0
+  },
+  "documentation_findings": [],
+  "documentation_rule_coverage": "unverified",
+  "execution_budget": {
+    "enforcement": "native_execution_only",
+    "source": "builtin_default",
+    "timeout_ms": 1800000
+  },
+  "exit_code": 3,
+  "language": "python",
+  "local_scan_complete": false,
+  "native_report": null,
+  "next": null,
+  "next_actions": [
+    "核对原项目 Ruff 文档规则和配置；不会隐式启用 preview 或改写规则选择。",
+    "按稳定任务使用 task verify 原工具复检；零诊断不证明文档规则完整启用、详细内容准确或任务已关闭。"
+  ],
+  "operation": "comments",
+  "reason": "project_root_unavailable",
+  "report_type": "python_comments_feedback",
+  "schema_version": "0.2.0"
+}

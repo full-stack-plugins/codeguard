@@ -250,13 +250,41 @@ pub fn discover<P: ObservationPort>(
                             .extend(inspect_maven_unreadable(build_root, manifest));
                     }
                 }
-            } else if let Some(manifest) = manifests
+            }
+            // 同根多构建器逐份保留身份，POM观察不能遮蔽Gradle脚本或其未解析义务。
+            for manifest in manifests
                 .iter()
-                .find(|name| name.ends_with("build.gradle") || name.ends_with("build.gradle.kts"))
+                .filter(|name| name.ends_with("build.gradle") || name.ends_with("build.gradle.kts"))
             {
                 report
                     .checker_configurations
                     .extend(inspect_gradle_unknown(build_root, manifest));
+            }
+            for manifest in manifests.iter().filter(|name| name.ends_with("Cargo.toml")) {
+                let bytes = observation
+                    .read_bounded(&root.join(manifest), MAX_MANIFEST_BYTES)
+                    .ok();
+                let stable = bytes.as_ref().is_some_and(|bytes| {
+                    report.manifest_sha256.get(manifest)
+                        == Some(&format!("{:x}", Sha256::digest(bytes)))
+                });
+                if !stable {
+                    report.observation_complete = false;
+                    report.blocked_paths.push(manifest.clone());
+                }
+                let (configurations, blocked) = inspect_cargo_documentation_context(
+                    bytes.as_deref().filter(|_| stable),
+                    build_root,
+                    manifest,
+                    root,
+                    &report.manifest_sha256,
+                    observation,
+                );
+                if let Some(path) = blocked {
+                    report.observation_complete = false;
+                    report.blocked_paths.push(path);
+                }
+                report.checker_configurations.extend(configurations);
             }
         }
         report
@@ -333,6 +361,121 @@ pub(crate) fn record_unavailable_ruff_config(report: &mut DiscoveryReport, relat
     report.ruff_config_files.insert(relative.into());
 }
 
+// 仅在本次已观察范围内搜索至多64级祖先，不越过项目根或借用不稳定清单。
+fn inspect_cargo_documentation_context<P: ObservationPort>(
+    bytes: Option<&[u8]>,
+    build_root: &str,
+    manifest: &str,
+    root: &Path,
+    hashes: &BTreeMap<String, String>,
+    observation: &P,
+) -> (Vec<CheckerConfiguration>, Option<String>) {
+    let original =
+        codeguard_adapters::inspect_cargo_documentation_config(bytes, build_root, manifest);
+    if !original
+        .iter()
+        .all(|r| r.reason == "cargo_doc_lints_workspace_inheritance_unresolved")
+    {
+        return (original, None);
+    }
+    let Some(member) = bytes else {
+        return (original, None);
+    };
+    match codeguard_adapters::CargoWorkspaceReference::observe(member, manifest) {
+        Err(reason) => {
+            let mut rows = original;
+            for row in &mut rows {
+                row.reason = "cargo_doc_lints_explicit_workspace_reference_invalid".into();
+                row.next_action = format!(
+                    "显式workspace引用未解析：{reason}；核验原成员清单，不回退祖先规则、不修改无关源码"
+                );
+            }
+            return (rows, None);
+        }
+        Ok(Some(reference)) => {
+            for directory in &reference.traversal_directories {
+                if !matches!(
+                    observation.classify(&root.join(directory)),
+                    Ok(ObservedPathKind::Directory)
+                ) {
+                    return (original, Some(directory.clone()));
+                }
+            }
+            let name = &reference.manifest;
+            if !hashes.contains_key(name)
+                || !matches!(
+                    observation.classify(&root.join(name)),
+                    Ok(ObservedPathKind::File)
+                )
+            {
+                return (original, Some(name.clone()));
+            }
+            let Ok(candidate) = observation.read_bounded(&root.join(name), MAX_MANIFEST_BYTES)
+            else {
+                return (original, Some(name.clone()));
+            };
+            if hashes.get(name) != Some(&format!("{:x}", Sha256::digest(&candidate))) {
+                return (original, Some(name.clone()));
+            }
+            let rows = codeguard_adapters::inspect_cargo_documentation_workspace(
+                member, &candidate, build_root, manifest, name,
+            )
+            .unwrap_or_else(|| {
+                let mut rows = original;
+                for row in &mut rows {
+                    row.reason = "cargo_doc_lints_explicit_workspace_not_defined".into();
+                    row.next_action = format!(
+                        "显式候选清单{name}未声明workspace；核验原package.workspace，不回退祖先规则"
+                    );
+                }
+                rows
+            });
+            return (rows, None);
+        }
+        Ok(None) => {}
+    }
+    let mut parent = Path::new(manifest).parent();
+    for _ in 0..64 {
+        let Some(directory) = parent else {
+            return (original, None);
+        };
+        let candidate = directory.join("Cargo.toml");
+        let name = candidate.to_string_lossy().replace('\\', "/");
+        let candidate_bytes = if name == manifest {
+            Some(member.to_vec())
+        } else {
+            match observation.classify(&root.join(&candidate)) {
+                Err(error) if error.kind() == std::io::ErrorKind::NotFound => None,
+                Ok(ObservedPathKind::File) => {
+                    match observation.read_bounded(&root.join(&candidate), MAX_MANIFEST_BYTES) {
+                        Ok(bytes) => Some(bytes),
+                        Err(_) => return (original, Some(name)),
+                    }
+                }
+                _ => return (original, Some(name)),
+            }
+        };
+        if let Some(candidate_bytes) = candidate_bytes {
+            if hashes.get(&name) != Some(&format!("{:x}", Sha256::digest(&candidate_bytes))) {
+                return (original, Some(name));
+            }
+            if let Some(rows) = codeguard_adapters::inspect_cargo_documentation_workspace(
+                member,
+                &candidate_bytes,
+                build_root,
+                manifest,
+                &name,
+            ) {
+                return (rows, None);
+            }
+        } else if hashes.contains_key(&name) {
+            return (original, Some(name));
+        }
+        parent = directory.parent();
+    }
+    (original, Some(manifest.into()))
+}
+
 fn managed_workspace_artifact(relative: &str) -> bool {
     if relative == "AGENTS.md" {
         return true;
@@ -381,6 +524,10 @@ pub(crate) fn observe_file<P: ObservationPort>(
         report.blocked_paths.push(relative.into());
         return;
     };
+    if name == "compile_commands.json" {
+        crate::c_family_compilation_discovery::observe(report, observation, path, relative);
+        return;
+    }
     if LOCK_NAMES.contains(&name) || is_standard_python_lock_name(name) {
         report.lockfiles.insert(relative.into());
         match observation.read_bounded(path, 8 * 1024 * 1024) {
@@ -687,9 +834,248 @@ mod tests {
     use super::discover;
     use codeguard_adapters::legacy_registry;
     use codeguard_core::{ObservationPort, ObservedPathKind};
+    use sha2::{Digest, Sha256};
     use std::collections::BTreeMap;
     use std::io;
     use std::path::{Path, PathBuf};
+
+    struct WorkspaceAncestorObservation {
+        kind: ObservedPathKind,
+        bytes: Result<Vec<u8>, io::ErrorKind>,
+    }
+    impl ObservationPort for WorkspaceAncestorObservation {
+        fn classify(&self, path: &Path) -> io::Result<ObservedPathKind> {
+            if path == Path::new("project/Cargo.toml") {
+                Ok(self.kind)
+            } else {
+                Err(io::Error::from(io::ErrorKind::NotFound))
+            }
+        }
+        fn children(&self, _path: &Path) -> io::Result<Vec<PathBuf>> {
+            Ok(Vec::new())
+        }
+        fn read_bounded(&self, _path: &Path, _limit: u64) -> io::Result<Vec<u8>> {
+            self.bytes.clone().map_err(io::Error::from)
+        }
+    }
+
+    #[test]
+    fn cargo_workspace_ancestor_identity_io_and_budget_remain_incomplete() {
+        let member = b"[package]\nname='a'\nversion='0.1.0'\n[lints]\nworkspace=true\n";
+        let workspace = b"[workspace]\nmembers=['member']\n[workspace.lints.clippy]\nmissing_errors_doc='warn'\n";
+        let mut hashes = BTreeMap::from([
+            (
+                "member/Cargo.toml".into(),
+                format!("{:x}", Sha256::digest(member)),
+            ),
+            (
+                "Cargo.toml".into(),
+                format!("{:x}", Sha256::digest(workspace)),
+            ),
+        ]);
+        for (kind, bytes) in [
+            (ObservedPathKind::File, Ok(workspace.to_vec())),
+            (ObservedPathKind::File, Ok(b"[workspace]\n".to_vec())),
+            (ObservedPathKind::File, Err(io::ErrorKind::PermissionDenied)),
+            (ObservedPathKind::Symlink, Ok(workspace.to_vec())),
+        ] {
+            let valid = kind == ObservedPathKind::File
+                && bytes
+                    .as_ref()
+                    .ok()
+                    .is_some_and(|b| b.as_slice() == workspace);
+            let port = WorkspaceAncestorObservation { kind, bytes };
+            let (rows, blocked) = super::inspect_cargo_documentation_context(
+                Some(member),
+                "member",
+                "member/Cargo.toml",
+                Path::new("project"),
+                &hashes,
+                &port,
+            );
+            assert_eq!(
+                blocked,
+                if valid {
+                    None
+                } else {
+                    Some("Cargo.toml".into())
+                }
+            );
+            assert!(rows.iter().all(|r| r.configuration == "unknown"));
+            assert_eq!(
+                rows[1].next_action.contains("missing_errors_doc=warn"),
+                valid
+            );
+        }
+        hashes.remove("Cargo.toml");
+        let port = WorkspaceAncestorObservation {
+            kind: ObservedPathKind::File,
+            bytes: Ok(workspace.to_vec()),
+        };
+        let (_, blocked) = super::inspect_cargo_documentation_context(
+            Some(member),
+            "member",
+            "member/Cargo.toml",
+            Path::new("project"),
+            &hashes,
+            &port,
+        );
+        assert_eq!(blocked, Some("Cargo.toml".into()));
+        let name = format!("{}Cargo.toml", "x/".repeat(65));
+        hashes.insert(name.clone(), format!("{:x}", Sha256::digest(member)));
+        let (rows, blocked) = super::inspect_cargo_documentation_context(
+            Some(member),
+            "deep",
+            &name,
+            Path::new("project"),
+            &hashes,
+            &port,
+        );
+        assert_eq!(blocked, Some(name));
+        assert!(!rows[1].next_action.contains("missing_errors_doc=warn"));
+    }
+
+    struct ExplicitWorkspaceObservation {
+        directory_kind: ObservedPathKind,
+        file_kind: ObservedPathKind,
+        bytes: Result<Vec<u8>, io::ErrorKind>,
+    }
+    impl ObservationPort for ExplicitWorkspaceObservation {
+        fn classify(&self, path: &Path) -> io::Result<ObservedPathKind> {
+            match path.to_str() {
+                Some("project/." | "project/external") => Ok(ObservedPathKind::Directory),
+                Some("project/shared") => Ok(self.directory_kind),
+                Some("project/shared/Cargo.toml") => Ok(self.file_kind),
+                _ => Err(io::Error::from(io::ErrorKind::NotFound)),
+            }
+        }
+        fn children(&self, _path: &Path) -> io::Result<Vec<PathBuf>> {
+            Ok(Vec::new())
+        }
+        fn read_bounded(&self, _path: &Path, _limit: u64) -> io::Result<Vec<u8>> {
+            self.bytes.clone().map_err(io::Error::from)
+        }
+    }
+
+    #[test]
+    fn explicit_cargo_workspace_identity_io_and_links_cannot_borrow_ancestor_rules() {
+        let member = b"[package]\nname='external'\nversion='0.1.0'\nworkspace='../shared'\n[lints]\nworkspace=true\n";
+        let workspace = b"[workspace]\nmembers=['../external']\n[workspace.lints.clippy]\nmissing_errors_doc='warn'\n";
+        let mut hashes = BTreeMap::from([
+            (
+                "external/Cargo.toml".into(),
+                format!("{:x}", Sha256::digest(member)),
+            ),
+            (
+                "shared/Cargo.toml".into(),
+                format!("{:x}", Sha256::digest(workspace)),
+            ),
+        ]);
+        for (directory_kind, file_kind, bytes, blocked) in [
+            (
+                ObservedPathKind::Directory,
+                ObservedPathKind::File,
+                Ok(workspace.to_vec()),
+                None,
+            ),
+            (
+                ObservedPathKind::Directory,
+                ObservedPathKind::File,
+                Ok(b"[workspace]\n".to_vec()),
+                Some("shared/Cargo.toml"),
+            ),
+            (
+                ObservedPathKind::Directory,
+                ObservedPathKind::File,
+                Err(io::ErrorKind::PermissionDenied),
+                Some("shared/Cargo.toml"),
+            ),
+            (
+                ObservedPathKind::Symlink,
+                ObservedPathKind::File,
+                Ok(workspace.to_vec()),
+                Some("shared"),
+            ),
+            (
+                ObservedPathKind::Directory,
+                ObservedPathKind::Symlink,
+                Ok(workspace.to_vec()),
+                Some("shared/Cargo.toml"),
+            ),
+        ] {
+            let port = ExplicitWorkspaceObservation {
+                directory_kind,
+                file_kind,
+                bytes,
+            };
+            let (rows, actual) = super::inspect_cargo_documentation_context(
+                Some(member),
+                "external",
+                "external/Cargo.toml",
+                Path::new("project"),
+                &hashes,
+                &port,
+            );
+            assert_eq!(actual.as_deref(), blocked);
+            assert!(rows.iter().all(|r| r.configuration == "unknown"));
+            assert_eq!(
+                rows[1].next_action.contains("missing_errors_doc=warn"),
+                blocked.is_none()
+            );
+        }
+        hashes.remove("shared/Cargo.toml");
+        let port = ExplicitWorkspaceObservation {
+            directory_kind: ObservedPathKind::Directory,
+            file_kind: ObservedPathKind::File,
+            bytes: Ok(workspace.to_vec()),
+        };
+        let (_, blocked) = super::inspect_cargo_documentation_context(
+            Some(member),
+            "external",
+            "external/Cargo.toml",
+            Path::new("project"),
+            &hashes,
+            &port,
+        );
+        assert_eq!(blocked.as_deref(), Some("shared/Cargo.toml"));
+    }
+
+    struct ChangingCargoObservation(std::cell::Cell<usize>);
+    impl ObservationPort for ChangingCargoObservation {
+        fn classify(&self, path: &Path) -> io::Result<ObservedPathKind> {
+            Ok(if path == Path::new("project") {
+                ObservedPathKind::Directory
+            } else {
+                ObservedPathKind::File
+            })
+        }
+        fn children(&self, _directory: &Path) -> io::Result<Vec<PathBuf>> {
+            Ok(vec![PathBuf::from("project/Cargo.toml")])
+        }
+        fn read_bounded(&self, _path: &Path, _limit: u64) -> io::Result<Vec<u8>> {
+            let count = self.0.get();
+            self.0.set(count + 1);
+            Ok(format!(
+                "[package]\nname='a'\nversion='0.1.0'\n[lints.clippy]\nmissing_errors_doc='{}'\n",
+                if count == 0 { "allow" } else { "warn" }
+            )
+            .into_bytes())
+        }
+    }
+    #[test]
+    fn changed_cargo_bytes_cannot_bind_new_documentation_declarations() {
+        let port = ChangingCargoObservation(std::cell::Cell::new(0));
+        let r = discover(Path::new("project"), &legacy_registry().unwrap(), &port);
+        assert!(!r.observation_complete);
+        assert!(r.blocked_paths.iter().any(|p| p == "Cargo.toml"));
+        assert!(port.0.get() >= 2);
+        assert!(
+            r.checker_configurations
+                .iter()
+                .all(|c| c.configuration == "unknown"
+                    && !c.next_action.contains("missing_errors_doc=warn"))
+        );
+    }
 
     struct FakeObservation {
         children: BTreeMap<PathBuf, Vec<PathBuf>>,

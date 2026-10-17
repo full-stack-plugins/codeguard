@@ -1,0 +1,430 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:shell-native-scan:0.1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "scope",
+    "tool_selection",
+    "source_file_count",
+    "unobserved_count",
+    "scope_stable",
+    "local_check_complete",
+    "files",
+    "task_status",
+    "authority",
+    "coverage_proven",
+    "delivery_decision",
+    "native_task_started"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.1.0"
+    },
+    "report_type": {
+      "const": "shell_native_scan"
+    },
+    "scope": {
+      "const": "bounded_discovered_shell_files"
+    },
+    "tool_selection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "executable",
+        "resolved"
+      ],
+      "properties": {
+        "source": {
+          "enum": [
+            "explicit",
+            "path",
+            "not_found"
+          ]
+        },
+        "executable": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "resolved": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "source_file_count": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "unobserved_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "scope_stable": {
+      "type": "boolean"
+    },
+    "local_check_complete": {
+      "type": "boolean"
+    },
+    "files": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "schema_version",
+          "path",
+          "source_sha256",
+          "dialect",
+          "input_stable",
+          "native",
+          "project_configuration",
+          "task_workflow_status",
+          "workbench"
+        ],
+        "properties": {
+          "schema_version": {
+            "enum": [
+              "0.1.0",
+              "0.2.0"
+            ]
+          },
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_sha256": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "dialect": {
+            "type": "string",
+            "pattern": "^[a-z]{1,16}$"
+          },
+          "input_stable": {
+            "type": "boolean"
+          },
+          "native": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "configuration_mode",
+              "diagnostics",
+              "environment_codes",
+              "reason",
+              "report_valid",
+              "status",
+              "tool_sha256",
+              "version"
+            ],
+            "properties": {
+              "configuration_mode": {
+                "enum": [
+                  "not_applied",
+                  "frozen_project_rc",
+                  "builtin_without_global_rc"
+                ]
+              },
+              "diagnostics": {
+                "type": "array",
+                "maxItems": 128,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "rule_id",
+                    "severity",
+                    "line",
+                    "column",
+                    "end_line",
+                    "end_column"
+                  ],
+                  "properties": {
+                    "rule_id": {
+                      "type": "string",
+                      "pattern": "^SC[0-9]{4}$"
+                    },
+                    "severity": {
+                      "enum": [
+                        "error",
+                        "warning",
+                        "info",
+                        "style"
+                      ]
+                    },
+                    "line": {
+                      "type": "integer",
+                      "minimum": 1
+                    },
+                    "column": {
+                      "type": "integer",
+                      "minimum": 1
+                    },
+                    "end_line": {
+                      "type": "integer",
+                      "minimum": 1
+                    },
+                    "end_column": {
+                      "type": "integer",
+                      "minimum": 1
+                    }
+                  }
+                }
+              },
+              "environment_codes": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^SC[0-9]{4}$"
+                }
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              },
+              "report_valid": {
+                "type": "boolean"
+              },
+              "status": {
+                "enum": [
+                  "incomplete",
+                  "completed",
+                  "diagnostics_observed"
+                ]
+              },
+              "tool_sha256": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "version": {
+                "enum": [
+                  null,
+                  "0.11.0"
+                ]
+              }
+            }
+          },
+          "project_configuration": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "global_configuration",
+              "reason",
+              "sha256",
+              "source_path",
+              "status"
+            ],
+            "properties": {
+              "global_configuration": {
+                "const": "not_loaded"
+              },
+              "reason": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "sha256": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "source_path": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "status": {
+                "enum": [
+                  "configured",
+                  "missing",
+                  "invalid",
+                  "unknown"
+                ]
+              }
+            }
+          },
+          "task_workflow_status": {
+            "enum": [
+              "not_integrated",
+              "partial"
+            ]
+          },
+          "workbench": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "status",
+                  "reason",
+                  "workspace_id",
+                  "run_id",
+                  "task_ids",
+                  "sync"
+                ],
+                "properties": {
+                  "status": {
+                    "enum": [
+                      "incomplete",
+                      "synced_partial"
+                    ]
+                  },
+                  "reason": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "workspace_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "run_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "task_ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "pattern": "^CG-(B-)?[a-f0-9]{32}$"
+                    },
+                    "uniqueItems": true
+                  },
+                  "sync": {
+                    "oneOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "new_findings",
+                          "new_blockers",
+                          "imported_reports",
+                          "already_consumed_reports",
+                          "historical_findings"
+                        ],
+                        "properties": {
+                          "new_findings": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "new_blockers": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "imported_reports": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "already_consumed_reports": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "historical_findings": {
+                            "type": "integer",
+                            "minimum": 0
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "task_status": {
+      "enum": [
+        "not_connected",
+        "synced_partial",
+        "incomplete"
+      ]
+    },
+    "authority": {
+      "const": "local_unverified"
+    },
+    "coverage_proven": {
+      "const": false
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    },
+    "native_task_started": {
+      "type": "boolean"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "local_check_complete": {
+            "const": true
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "scope_stable": {
+            "const": true
+          },
+          "unobserved_count": {
+            "const": 0
+          },
+          "files": {
+            "minItems": 1,
+            "items": {
+              "properties": {
+                "input_stable": {
+                  "const": true
+                },
+                "source_sha256": {
+                  "type": "string"
+                },
+                "native": {
+                  "properties": {
+                    "status": {
+                      "enum": [
+                        "completed",
+                        "diagnostics_observed"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

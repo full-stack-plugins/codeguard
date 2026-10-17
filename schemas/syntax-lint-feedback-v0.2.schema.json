@@ -1,0 +1,406 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:syntax-lint-feedback:0.2",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "0.2.0"
+    },
+    "report_type": {
+      "const": "syntax_lint_feedback"
+    },
+    "selection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "category",
+        "language"
+      ],
+      "properties": {
+        "category": {
+          "const": "lint"
+        },
+        "language": {
+          "enum": [
+            "c",
+            "cpp"
+          ]
+        }
+      }
+    },
+    "status": {
+      "const": "incomplete"
+    },
+    "coverage_proven": {
+      "const": false
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    },
+    "findings": {
+      "const": []
+    },
+    "native": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "reason",
+        "version",
+        "tool_sha256",
+        "diagnostics"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "incomplete",
+            "completed",
+            "diagnostics_observed"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "pattern": "^[a-z_]+$"
+        },
+        "version": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "const": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+            }
+          ]
+        },
+        "tool_sha256": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          ]
+        },
+        "diagnostics": {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "rule_id",
+              "line",
+              "column_byte",
+              "level"
+            ],
+            "properties": {
+              "rule_id": {
+                "type": "string",
+                "pattern": "^clang\\.[A-Za-z0-9_]+$",
+                "maxLength": 134
+              },
+              "line": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "column_byte": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "level": {
+                "enum": [
+                  "error",
+                  "warning"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "incomplete"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "diagnostics": {
+                "const": []
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "version": {
+                "const": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+              },
+              "tool_sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "completed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "diagnostics": {
+                "const": []
+              },
+              "reason": {
+                "const": "clang_native_no_diagnostics"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "diagnostics_observed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "diagnostics": {
+                "minItems": 1
+              },
+              "reason": {
+                "const": "clang_native_diagnostics"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "syntax_candidates": {
+      "type": "null"
+    },
+    "syntax_tasks": {
+      "type": "null"
+    },
+    "setup": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requirement",
+        "task_id"
+      ],
+      "properties": {
+        "requirement": {
+          "const": "required"
+        },
+        "task_id": {
+          "type": "null"
+        }
+      }
+    },
+    "reason": {
+      "enum": [
+        "native_project_coverage_unverified",
+        "request_cancelled"
+      ]
+    },
+    "next_action": {
+      "type": "string",
+      "minLength": 1
+    },
+    "native_context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "standard",
+        "scope",
+        "project_configuration",
+        "warning_profile"
+      ],
+      "properties": {
+        "standard": {
+          "enum": [
+            "c11",
+            "c++17"
+          ]
+        },
+        "scope": {
+          "const": "explicit_standalone_stdin"
+        },
+        "project_configuration": {
+          "const": "unknown"
+        },
+        "warning_profile": {
+          "const": "clang-wall-extra-pedantic-v1"
+        }
+      }
+    },
+    "source_sha256": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      ]
+    },
+    "path": {
+      "type": "string",
+      "minLength": 1
+    },
+    "verification_command": {
+      "type": "array",
+      "minItems": 9,
+      "maxItems": 11,
+      "prefixItems": [
+        {
+          "const": "codeguard"
+        },
+        {
+          "const": "lint"
+        },
+        {
+          "enum": [
+            "c",
+            "cpp"
+          ]
+        },
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "const": "--clang-tool"
+        },
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "const": "--standard"
+        },
+        {
+          "enum": [
+            "c11",
+            "c++17"
+          ]
+        },
+        {
+          "const": "--format=json"
+        },
+        {
+          "const": "--workspace"
+        },
+        {
+          "type": "string",
+          "minLength": 1
+        }
+      ],
+      "items": false,
+      "oneOf": [
+        {
+          "minItems": 9,
+          "maxItems": 9
+        },
+        {
+          "minItems": 11,
+          "maxItems": 11
+        }
+      ]
+    }
+  },
+  "required": [
+    "schema_version",
+    "report_type",
+    "selection",
+    "status",
+    "coverage_proven",
+    "delivery_decision",
+    "findings",
+    "native",
+    "syntax_candidates",
+    "syntax_tasks",
+    "setup",
+    "reason",
+    "next_action",
+    "native_context",
+    "source_sha256",
+    "path",
+    "verification_command"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "selection": {
+            "properties": {
+              "language": {
+                "const": "c"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "native_context": {
+            "properties": {
+              "standard": {
+                "const": "c11"
+              }
+            }
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "native_context": {
+            "properties": {
+              "standard": {
+                "const": "c++17"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "native": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "completed",
+                  "diagnostics_observed"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "source_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        }
+      }
+    }
+  ]
+}

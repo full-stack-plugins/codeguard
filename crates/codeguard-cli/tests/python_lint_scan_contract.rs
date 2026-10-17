@@ -263,7 +263,9 @@ fn native_finding_for_disabled_rule_remains_visible_but_scan_is_incomplete() {
 
 #[test]
 fn docstring_report_without_enabled_native_rule_is_incomplete_not_an_actionable_comment() {
-    for rule_id in ["D100", "D101"] {
+    for rule_id in [
+        "D100", "D101", "DOC102", "DOC201", "DOC202", "DOC402", "DOC403", "DOC501", "DOC502",
+    ] {
         let project = Project::new();
         fs::write(
             project.0.join("app.py"),

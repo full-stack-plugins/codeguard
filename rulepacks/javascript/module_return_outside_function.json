@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0.0",
+  "rule_id": "codeguard.javascript.module_return_outside_function",
+  "rule_version": "1.0.0",
+  "qualification": "candidate_unqualified",
+  "basis": "codeguard_structure_rule",
+  "language": "javascript",
+  "required_mode": "module",
+  "root_kind": "program",
+  "return_kind": "return_statement",
+  "function_kinds": [
+    "function_declaration",
+    "function_expression",
+    "generator_function_declaration",
+    "generator_function",
+    "arrow_function",
+    "method_definition"
+  ],
+  "scope": "explicit_module_outside_function_only"
+}

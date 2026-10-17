@@ -1,0 +1,436 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:grammar-probe:0.8.0",
+  "title": "Explicit JavaScript module candidate with separate recovery and fixed structure identities",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/observed"
+    },
+    {
+      "$ref": "#/$defs/failed"
+    }
+  ],
+  "$defs": {
+    "digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "precheck": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "scope_complete",
+        "cancelled",
+        "selected_files",
+        "checked_files",
+        "incomplete_files",
+        "unsupported_files",
+        "unqualified_files",
+        "truncated_files",
+        "suspected_recoveries"
+      ],
+      "properties": {
+        "status": {
+          "const": "incomplete"
+        },
+        "scope_complete": {
+          "type": "boolean"
+        },
+        "cancelled": {
+          "const": false
+        },
+        "selected_files": {
+          "const": 1
+        },
+        "checked_files": {
+          "const": 1
+        },
+        "incomplete_files": {
+          "const": 0
+        },
+        "unsupported_files": {
+          "const": 0
+        },
+        "unqualified_files": {
+          "const": 1
+        },
+        "truncated_files": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "suspected_recoveries": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 128
+        }
+      }
+    },
+    "recovery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "group_id",
+        "syntax_kind",
+        "start_byte",
+        "end_byte",
+        "start_row",
+        "start_column_byte",
+        "end_row",
+        "end_column_byte"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "ERROR",
+            "MISSING"
+          ]
+        },
+        "group_id": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "syntax_kind": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "start_byte": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "end_byte": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "start_row": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "start_column_byte": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "end_row": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "end_column_byte": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "structure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "basis",
+        "rule_id",
+        "rule_version",
+        "rule_sha256",
+        "parent_syntax_kind",
+        "start_byte",
+        "end_byte",
+        "start_row",
+        "start_column_byte",
+        "end_row",
+        "end_column_byte"
+      ],
+      "properties": {
+        "basis": {
+          "const": "codeguard_structure_rule"
+        },
+        "rule_id": {
+          "const": "codeguard.javascript.duplicate_direct_lexical_binding"
+        },
+        "rule_version": {
+          "const": "1.0.0"
+        },
+        "rule_sha256": {
+          "const": "6d450c14bd4f89f0f3798f458fba371fb455a2642034d836c8ef988ef44641a4"
+        },
+        "parent_syntax_kind": {
+          "const": "program"
+        },
+        "start_byte": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "end_byte": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "start_row": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "start_column_byte": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "end_row": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "end_column_byte": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "module_structure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "basis",
+        "rule_id",
+        "rule_version",
+        "rule_sha256",
+        "parent_syntax_kind",
+        "start_byte",
+        "end_byte",
+        "start_row",
+        "start_column_byte",
+        "end_row",
+        "end_column_byte"
+      ],
+      "properties": {
+        "basis": {
+          "const": "codeguard_structure_rule"
+        },
+        "rule_id": {
+          "const": "codeguard.javascript.module_return_outside_function"
+        },
+        "rule_version": {
+          "const": "1.0.0"
+        },
+        "rule_sha256": {
+          "const": "a87fb74d19d215148c8be5c1785f7e872873f38fcf5e35a53631351a85455295"
+        },
+        "parent_syntax_kind": {
+          "const": "return_statement"
+        },
+        "start_byte": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "end_byte": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "start_row": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "start_column_byte": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "end_row": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "end_column_byte": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "observed": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "report_type",
+        "status",
+        "language",
+        "path",
+        "native",
+        "delivery_decision",
+        "source_sha256",
+        "grammar_sha256",
+        "grammar_qualified",
+        "precheck",
+        "recoveries",
+        "next_action",
+        "precheck_scope",
+        "structural_observations",
+        "structural_rule_scope",
+        "javascript_mode"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "0.8.0"
+        },
+        "report_type": {
+          "const": "grammar_candidate_probe"
+        },
+        "status": {
+          "const": "incomplete"
+        },
+        "language": {
+          "const": "javascript"
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_sha256": {
+          "$ref": "#/$defs/digest"
+        },
+        "grammar_sha256": {
+          "const": "7978e62bcc851ab1d1f6dcd4678f9eda79df2b3b3490e75f81dd819d9bccccfa"
+        },
+        "grammar_qualified": {
+          "const": false
+        },
+        "precheck": {
+          "$ref": "#/$defs/precheck"
+        },
+        "recoveries": {
+          "type": "array",
+          "maxItems": 128,
+          "items": {
+            "$ref": "#/$defs/recovery"
+          }
+        },
+        "native": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "reason"
+          ],
+          "properties": {
+            "status": {
+              "const": "not_run"
+            },
+            "reason": {
+              "const": "explicit_candidate_probe"
+            }
+          }
+        },
+        "delivery_decision": {
+          "const": "not_evaluated"
+        },
+        "next_action": {
+          "enum": [
+            "confirm_candidate_structure_with_applicable_native_tool",
+            "compare_original_source_with_native_tool_then_review_grammar",
+            "run_or_configure_applicable_native_lint_before_delivery",
+            "confirm_suspected_recoveries_with_applicable_native_tool"
+          ]
+        },
+        "precheck_scope": {
+          "const": "raw_parser_recoveries_and_observation_budgets"
+        },
+        "structural_observations": {
+          "type": "array",
+          "minItems": 0,
+          "maxItems": 128,
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/structure"
+              },
+              {
+                "$ref": "#/$defs/module_structure"
+              }
+            ]
+          }
+        },
+        "parser_error_location_unavailable": {
+          "const": true
+        },
+        "structural_rule_scope": {
+          "const": "direct_simple_lexical_names_and_explicit_module_returns"
+        },
+        "javascript_mode": {
+          "const": "module"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "parser_error_location_unavailable"
+            ]
+          },
+          "then": {
+            "properties": {
+              "precheck": {
+                "properties": {
+                  "truncated_files": {
+                    "minimum": 1
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "failed": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "report_type",
+        "language",
+        "path",
+        "status",
+        "reason",
+        "native",
+        "delivery_decision",
+        "javascript_mode"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "0.8.0"
+        },
+        "report_type": {
+          "const": "grammar_candidate_probe"
+        },
+        "language": {
+          "const": "javascript"
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "const": "incomplete"
+        },
+        "native": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "reason"
+          ],
+          "properties": {
+            "status": {
+              "const": "not_run"
+            },
+            "reason": {
+              "const": "explicit_candidate_probe"
+            }
+          }
+        },
+        "delivery_decision": {
+          "const": "not_evaluated"
+        },
+        "javascript_mode": {
+          "const": "module"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

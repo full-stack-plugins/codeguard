@@ -1,0 +1,165 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:java-p3c-file-feedback:0.2.0",
+  "title": "Bound single-file P3C feedback 0.2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "operation",
+    "language",
+    "checker_id",
+    "command_status",
+    "exit_code",
+    "scope",
+    "path",
+    "project_observation",
+    "workbench",
+    "next",
+    "coverage_proven",
+    "delivery_decision"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.2.0"
+    },
+    "report_type": {
+      "const": "java_p3c_file_feedback"
+    },
+    "operation": {
+      "const": "lint"
+    },
+    "language": {
+      "const": "java"
+    },
+    "checker_id": {
+      "const": "java.maven.p3c"
+    },
+    "command_status": {
+      "const": "incomplete"
+    },
+    "exit_code": {
+      "const": 3
+    },
+    "scope": {
+      "const": "single_file"
+    },
+    "path": {
+      "type": "string",
+      "minLength": 1
+    },
+    "project_observation": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "java-p3c-project-observation-v0.3.schema.json"
+            },
+            {
+              "properties": {
+                "workspace_binding": {
+                  "const": "bound"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "workbench": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "reason"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "synced_partial",
+            "backlog_update_failed",
+            "not_initialized"
+          ]
+        },
+        "reason": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[a-z][a-z0-9_]*$"
+        }
+      }
+    },
+    "next": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "coverage_proven": {
+      "const": false
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "workbench": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "backlog_update_failed",
+                  "not_initialized"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "next": {
+            "type": "null"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "workbench": {
+            "properties": {
+              "status": {
+                "const": "synced_partial"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "project_observation": {
+            "type": "object"
+          },
+          "next": {
+            "type": "object"
+          },
+          "workbench": {
+            "properties": {
+              "reason": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,194 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:java-comments-feedback:0.8.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "operation",
+    "language",
+    "category",
+    "coverage_proven",
+    "authority",
+    "delivery_decision",
+    "workbench_status",
+    "target_kind",
+    "command_status",
+    "exit_code",
+    "reason",
+    "execution_budget",
+    "native_observation",
+    "discovery",
+    "next_actions",
+    "workbench"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.8.0"
+    },
+    "report_type": {
+      "const": "java_comments_feedback"
+    },
+    "operation": {
+      "const": "comments"
+    },
+    "language": {
+      "const": "java"
+    },
+    "category": {
+      "const": "comments"
+    },
+    "coverage_proven": {
+      "const": false
+    },
+    "authority": {
+      "const": "local_unverified"
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    },
+    "workbench_status": {
+      "type": "string",
+      "minLength": 1
+    },
+    "target_kind": {
+      "enum": [
+        "file",
+        "project",
+        "unavailable"
+      ]
+    },
+    "command_status": {
+      "enum": [
+        "incomplete",
+        "cancelled"
+      ]
+    },
+    "exit_code": {
+      "enum": [
+        3,
+        130
+      ]
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1
+    },
+    "execution_budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "timeout_ms",
+        "source",
+        "enforcement"
+      ],
+      "properties": {
+        "timeout_ms": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 86400000
+        },
+        "source": {
+          "enum": [
+            "cli",
+            "registered_environment",
+            "builtin_default",
+            "project_default"
+          ]
+        },
+        "enforcement": {
+          "const": "native_execution_only"
+        }
+      }
+    },
+    "native_observation": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "java-javadoc-local-feedback-v0.2.schema.json"
+        },
+        {
+          "$ref": "java-javadoc-project-probe-v0.4.schema.json"
+        }
+      ]
+    },
+    "discovery": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "next_actions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "workbench": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "new_findings",
+        "new_blockers",
+        "next",
+        "task_verify_status"
+      ],
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "new_findings": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "new_blockers": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "next": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "task_verify_status": {
+          "const": "local_observation_only"
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "command_status": {
+            "const": "cancelled"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "exit_code": {
+            "const": 130
+          },
+          "reason": {
+            "const": "request_cancelled"
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "exit_code": {
+            "const": 3
+          }
+        }
+      }
+    }
+  ]
+}

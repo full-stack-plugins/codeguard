@@ -1,0 +1,512 @@
+{
+  "clean": {
+    "authority": "local_unverified",
+    "coverage_proven": false,
+    "delivery_decision": "not_evaluated",
+    "input_stable": true,
+    "language": "c",
+    "local_scan_complete": true,
+    "native": {
+      "diagnostics": [],
+      "reason": "clang_native_no_diagnostics",
+      "status": "completed",
+      "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+      "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+    },
+    "original_ref": {
+      "run_id": "clangdocstruct-74419-0-1791329173997755000",
+      "sha256": "0b2dc350c0995e5ba040bdf7703777ff6e43ae2a66e9e150599af0bbe21c2ba7"
+    },
+    "path": "sample.c",
+    "profile": "clang-documentation-structure-v1",
+    "report_type": "clang_documentation_structure_task_recheck",
+    "run_id": "clangdocstruct-74417-1-1791329174152897000",
+    "schema_version": "0.1.0",
+    "selected_tool": "/usr/bin/clang",
+    "source_sha256": "3ef5c2572626706a3dcca7c5c6be4e185cad629c15ef7d0a80fb035c1c86572e",
+    "standard": "c11",
+    "structure": {
+      "native_raw_diagnostic_count": 0,
+      "observation": {
+        "authority": "local_unverified",
+        "coverage_proven": false,
+        "errors_and_behavior": "not_evaluated",
+        "functions": [
+          {
+            "column_byte": 5,
+            "comment_presence": "present",
+            "line": 5,
+            "missing_components": [],
+            "name": "f",
+            "offset_byte": 79,
+            "parameters": [
+              {
+                "description": "nonempty",
+                "index": 0,
+                "name": "x"
+              }
+            ],
+            "purpose_description": "nonempty",
+            "return_description": "nonempty",
+            "structure_status": "observed_supported_subset"
+          }
+        ],
+        "observation_type": "clang_function_documentation_structure",
+        "qualification": "not_granted",
+        "schema_version": "0.1.0",
+        "semantic_accuracy": "not_evaluated",
+        "unresolved_declaration_kinds": []
+      },
+      "reason": "clang_structure_observed",
+      "status": "observed"
+    },
+    "task_id": "CG-3a40f8edc1a44f11fc9fb7ddbffaf141",
+    "task_kind": "finding",
+    "task_rule": "codeguard.documentation.function_structure_required",
+    "workspace_binding": "bound",
+    "workspace_id": "ws-fb8034bd531e343f91ef02a4c66a9b99"
+  },
+  "evidence_kind": "development_native_structural_recheck",
+  "expired": {
+    "authority": "local_unverified",
+    "coverage_proven": false,
+    "delivery_decision": "not_evaluated",
+    "input_stable": true,
+    "language": "c",
+    "local_scan_complete": false,
+    "native": {
+      "diagnostics": [],
+      "reason": "clang_execution_incomplete",
+      "status": "incomplete",
+      "tool_sha256": null,
+      "version": null
+    },
+    "original_ref": {
+      "run_id": "clangdocstruct-74419-0-1791329173997755000",
+      "sha256": "0b2dc350c0995e5ba040bdf7703777ff6e43ae2a66e9e150599af0bbe21c2ba7"
+    },
+    "path": "sample.c",
+    "profile": "clang-documentation-structure-v1",
+    "report_type": "clang_documentation_structure_task_recheck",
+    "run_id": "clangdocstruct-74417-2-1791329174154500000",
+    "schema_version": "0.1.0",
+    "selected_tool": "/usr/bin/clang",
+    "source_sha256": "3ef5c2572626706a3dcca7c5c6be4e185cad629c15ef7d0a80fb035c1c86572e",
+    "standard": "c11",
+    "structure": {
+      "native_raw_diagnostic_count": null,
+      "observation": null,
+      "reason": "clang_execution_incomplete",
+      "status": "incomplete"
+    },
+    "task_id": "CG-3a40f8edc1a44f11fc9fb7ddbffaf141",
+    "task_kind": "finding",
+    "task_rule": "codeguard.documentation.function_structure_required",
+    "workspace_binding": "bound",
+    "workspace_id": "ws-fb8034bd531e343f91ef02a4c66a9b99"
+  },
+  "first": {
+    "authority": "local_unverified",
+    "coverage_proven": false,
+    "delivery_decision": "not_evaluated",
+    "input_stable": true,
+    "language": "c",
+    "local_scan_complete": true,
+    "native": {
+      "diagnostics": [],
+      "reason": "clang_native_no_diagnostics",
+      "status": "completed",
+      "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+      "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+    },
+    "original_ref": {
+      "run_id": "clangdocstruct-74419-0-1791329173997755000",
+      "sha256": "0b2dc350c0995e5ba040bdf7703777ff6e43ae2a66e9e150599af0bbe21c2ba7"
+    },
+    "path": "sample.c",
+    "profile": "clang-documentation-structure-v1",
+    "report_type": "clang_documentation_structure_task_recheck",
+    "run_id": "clangdocstruct-74417-0-1791329174118333000",
+    "schema_version": "0.1.0",
+    "selected_tool": "/usr/bin/clang",
+    "source_sha256": "1a0efe604440d96561e3075b2ec8bb90f8847d9709d24add37f9ea016221918c",
+    "standard": "c11",
+    "structure": {
+      "native_raw_diagnostic_count": 0,
+      "observation": {
+        "authority": "local_unverified",
+        "coverage_proven": false,
+        "errors_and_behavior": "not_evaluated",
+        "functions": [
+          {
+            "column_byte": 5,
+            "comment_presence": "absent",
+            "line": 1,
+            "missing_components": [
+              "documentation_comment"
+            ],
+            "name": "f",
+            "offset_byte": 4,
+            "parameters": [],
+            "purpose_description": "unknown",
+            "return_description": "unknown",
+            "structure_status": "observed_supported_subset"
+          }
+        ],
+        "observation_type": "clang_function_documentation_structure",
+        "qualification": "not_granted",
+        "schema_version": "0.1.0",
+        "semantic_accuracy": "not_evaluated",
+        "unresolved_declaration_kinds": []
+      },
+      "reason": "clang_structure_observed",
+      "status": "observed"
+    },
+    "task_id": "CG-3a40f8edc1a44f11fc9fb7ddbffaf141",
+    "task_kind": "finding",
+    "task_rule": "codeguard.documentation.function_structure_required",
+    "workspace_binding": "bound",
+    "workspace_id": "ws-fb8034bd531e343f91ef02a4c66a9b99"
+  },
+  "helper_source_sha256": "7541a9ba01011918b5b971126e39fb2d84d80ade422a04f94fc4c8063a0a859b",
+  "initial_feedback": {
+    "authority": "local_unverified",
+    "command_status": "incomplete",
+    "coverage_proven": false,
+    "delivery_decision": "not_evaluated",
+    "detailed_contract_qualification": "not_granted",
+    "documentation_configuration": {
+      "comment_scope": "recognized_documentation_comments_only",
+      "origin": "explicit_probe_profile",
+      "profile": "clang-documentation-v1",
+      "project_configuration": "unknown",
+      "rule_coverage": "limited",
+      "standard": "c11"
+    },
+    "documentation_findings": [],
+    "documentation_structure": {
+      "native_raw_diagnostic_count": 0,
+      "observation": {
+        "authority": "local_unverified",
+        "coverage_proven": false,
+        "errors_and_behavior": "not_evaluated",
+        "functions": [
+          {
+            "column_byte": 5,
+            "comment_presence": "absent",
+            "line": 1,
+            "missing_components": [
+              "documentation_comment"
+            ],
+            "name": "f",
+            "offset_byte": 4,
+            "parameters": [],
+            "purpose_description": "unknown",
+            "return_description": "unknown",
+            "structure_status": "observed_supported_subset"
+          }
+        ],
+        "observation_type": "clang_function_documentation_structure",
+        "qualification": "not_granted",
+        "schema_version": "0.1.0",
+        "semantic_accuracy": "not_evaluated",
+        "unresolved_declaration_kinds": []
+      },
+      "reason": "clang_structure_observed",
+      "status": "observed"
+    },
+    "exit_code": 3,
+    "language": "c",
+    "local_scan_complete": true,
+    "native": {
+      "diagnostics": [],
+      "reason": "clang_native_no_diagnostics",
+      "status": "completed",
+      "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+      "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+    },
+    "next": {
+      "authority": "local_unverified",
+      "command_status": "complete",
+      "delivery_decision": "not_evaluated",
+      "disposition": "actionable",
+      "exit_code": 0,
+      "next_actions": [],
+      "operation": "next",
+      "reason": "local_task_selected",
+      "repair_brief": {
+        "action_id": "repair-source",
+        "affected_paths": [
+          "sample.c"
+        ],
+        "allowed_paths": [
+          "sample.c"
+        ],
+        "authority": "local_unverified",
+        "checker_id": "c.clang.documentation_structure",
+        "closure_condition": "原命令局部复扫不关闭；专用task verify记录局部观察；仍须跨输入语义无进展、完整详细准确性/项目覆盖与可信关闭/复发验收。",
+        "constraints": [
+          "仅修改当前文件文档注释，保留API及行为",
+          "同名/重载定位属于文件策略组，不能据名字选择单一函数",
+          "不关闭检查器、不以占位文本或白名单自批代替修复"
+        ],
+        "current_run_id": "clangdocstruct-74419-0-1791329173997755000",
+        "delivery_decision": "not_evaluated",
+        "disposition": "actionable",
+        "evidence_ref": {
+          "first_report_sha256": "0b2dc350c0995e5ba040bdf7703777ff6e43ae2a66e9e150599af0bbe21c2ba7",
+          "first_run_id": "clangdocstruct-74419-0-1791329173997755000"
+        },
+        "history": {
+          "attempt_count": 0,
+          "awaiting_verification": false,
+          "budget": 2,
+          "no_progress_count": 0,
+          "open_attempt_id": null,
+          "recent": [],
+          "unverified_prior_attempt_count": 0
+        },
+        "kind": "finding",
+        "observation_status": "structural_deficits_observed",
+        "reason_code": "structural_deficits_observed",
+        "recheck_argv": [
+          "codeguard",
+          "task",
+          "verify",
+          "CG-3a40f8edc1a44f11fc9fb7ddbffaf141",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-struct-recheck-74417-1791329173879289000",
+          "--clang-tool",
+          "/usr/bin/clang",
+          "--format=json"
+        ],
+        "rule_basis": "函数文档结构须包含文档、用途、命名参数及适用返回说明；原AST事实不是Clang警告或语义准确性证明。",
+        "rule_source": "codeguard_structural_policy",
+        "schema_version": "0.33.0",
+        "scope": "sample.c",
+        "source_sha256": "1a0efe604440d96561e3075b2ec8bb90f8847d9709d24add37f9ea016221918c",
+        "step": [
+          "按所有当前函数字节/行列证据，依据真实声明和行为补齐缺失组件。",
+          "使用绑定原工具、标准与工作区的task verify复检；未知或失稳时先诊断，不按旧位置改源码。"
+        ],
+        "structural_positions": [
+          {
+            "column_byte": 5,
+            "comment_presence": "absent",
+            "line": 1,
+            "missing_components": [
+              "documentation_comment"
+            ],
+            "name": "f",
+            "offset_byte": 4,
+            "parameters": [],
+            "purpose_description": "unknown",
+            "return_description": "unknown",
+            "structure_status": "observed_supported_subset"
+          }
+        ],
+        "structural_rule_id": "codeguard.documentation.function_structure_required",
+        "task_id": "CG-3a40f8edc1a44f11fc9fb7ddbffaf141"
+      },
+      "report_type": "repair_brief_preview",
+      "schema_version": "0.33.0"
+    },
+    "next_actions": [
+      "按当前原生规则和位置修正文档并运行原工具复扫；原警告稳定任务及局部task verify已接入；结构任务按工作台状态提供指引，专用结构task verify已提供局部观察，受控尝试记录已接入，可信关闭仍待实现。",
+      "Clang此档案不检查所有缺失注释或用途/异常/行为说明；零诊断不能证明详细文档合规，不能关闭历史任务或授予生产资格。",
+      "读取原生AST结构观察中的缺失文档/用途/参数/返回组件并依据真实API补充说明；已初始化工作区可读取结构任务的当前定位并运行原工具task verify；受控尝试记录已接入，可信关闭仍待接线，不把非空说明当准确性或关闭证据。"
+    ],
+    "operation": "comments",
+    "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-struct-recheck-74417-1791329173879289000/sample.c",
+    "reason": "native_documentation_coverage_unverified",
+    "report_type": "c_family_comments_feedback",
+    "schema_version": "0.9.0",
+    "source_sha256": "1a0efe604440d96561e3075b2ec8bb90f8847d9709d24add37f9ea016221918c",
+    "structural_next": {
+      "authority": "local_unverified",
+      "command_status": "complete",
+      "delivery_decision": "not_evaluated",
+      "disposition": "actionable",
+      "exit_code": 0,
+      "next_actions": [],
+      "operation": "next",
+      "reason": "local_task_selected",
+      "repair_brief": {
+        "action_id": "repair-source",
+        "affected_paths": [
+          "sample.c"
+        ],
+        "allowed_paths": [
+          "sample.c"
+        ],
+        "authority": "local_unverified",
+        "checker_id": "c.clang.documentation_structure",
+        "closure_condition": "原命令局部复扫不关闭；专用task verify记录局部观察；仍须跨输入语义无进展、完整详细准确性/项目覆盖与可信关闭/复发验收。",
+        "constraints": [
+          "仅修改当前文件文档注释，保留API及行为",
+          "同名/重载定位属于文件策略组，不能据名字选择单一函数",
+          "不关闭检查器、不以占位文本或白名单自批代替修复"
+        ],
+        "current_run_id": "clangdocstruct-74419-0-1791329173997755000",
+        "delivery_decision": "not_evaluated",
+        "disposition": "actionable",
+        "evidence_ref": {
+          "first_report_sha256": "0b2dc350c0995e5ba040bdf7703777ff6e43ae2a66e9e150599af0bbe21c2ba7",
+          "first_run_id": "clangdocstruct-74419-0-1791329173997755000"
+        },
+        "history": {
+          "attempt_count": 0,
+          "awaiting_verification": false,
+          "budget": 2,
+          "no_progress_count": 0,
+          "open_attempt_id": null,
+          "recent": [],
+          "unverified_prior_attempt_count": 0
+        },
+        "kind": "finding",
+        "observation_status": "structural_deficits_observed",
+        "reason_code": "structural_deficits_observed",
+        "recheck_argv": [
+          "codeguard",
+          "task",
+          "verify",
+          "CG-3a40f8edc1a44f11fc9fb7ddbffaf141",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-struct-recheck-74417-1791329173879289000",
+          "--clang-tool",
+          "/usr/bin/clang",
+          "--format=json"
+        ],
+        "rule_basis": "函数文档结构须包含文档、用途、命名参数及适用返回说明；原AST事实不是Clang警告或语义准确性证明。",
+        "rule_source": "codeguard_structural_policy",
+        "schema_version": "0.33.0",
+        "scope": "sample.c",
+        "source_sha256": "1a0efe604440d96561e3075b2ec8bb90f8847d9709d24add37f9ea016221918c",
+        "step": [
+          "按所有当前函数字节/行列证据，依据真实声明和行为补齐缺失组件。",
+          "使用绑定原工具、标准与工作区的task verify复检；未知或失稳时先诊断，不按旧位置改源码。"
+        ],
+        "structural_positions": [
+          {
+            "column_byte": 5,
+            "comment_presence": "absent",
+            "line": 1,
+            "missing_components": [
+              "documentation_comment"
+            ],
+            "name": "f",
+            "offset_byte": 4,
+            "parameters": [],
+            "purpose_description": "unknown",
+            "return_description": "unknown",
+            "structure_status": "observed_supported_subset"
+          }
+        ],
+        "structural_rule_id": "codeguard.documentation.function_structure_required",
+        "task_id": "CG-3a40f8edc1a44f11fc9fb7ddbffaf141"
+      },
+      "report_type": "repair_brief_preview",
+      "schema_version": "0.33.0"
+    },
+    "structural_task_workflow_status": "partial",
+    "structural_workbench": {
+      "reason": null,
+      "run_id": "clangdocstruct-74419-0-1791329173997755000",
+      "status": "synced_partial",
+      "task_ids": [
+        "CG-3a40f8edc1a44f11fc9fb7ddbffaf141"
+      ],
+      "workspace_id": "ws-fb8034bd531e343f91ef02a4c66a9b99"
+    },
+    "task_workflow_status": "partial",
+    "unclassified_native_diagnostics": [],
+    "verification_command": [
+      "codeguard",
+      "comments",
+      "c",
+      "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-struct-recheck-74417-1791329173879289000/sample.c",
+      "--clang-tool",
+      "/usr/bin/clang",
+      "--standard",
+      "c11",
+      "--timeout",
+      "1800000ms",
+      "--workspace",
+      "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-struct-recheck-74417-1791329173879289000",
+      "--format=json"
+    ],
+    "workbench": {
+      "reason": null,
+      "run_id": "clangdoc-74419-0-1791329173997755000",
+      "status": "synced_partial",
+      "sync": {
+        "already_consumed_reports": 0,
+        "historical_findings": 0,
+        "imported_reports": 1,
+        "new_blockers": 0,
+        "new_findings": 0
+      },
+      "task_ids": [],
+      "workspace_id": "ws-fb8034bd531e343f91ef02a4c66a9b99"
+    },
+    "workspace_binding": "bound"
+  },
+  "negative_cases": [
+    "source_changed_after_observation",
+    "forged_structural_rule",
+    "different_selected_tool",
+    "altered_first_report"
+  ],
+  "qualification": "not_granted",
+  "syntax_error": {
+    "authority": "local_unverified",
+    "coverage_proven": false,
+    "delivery_decision": "not_evaluated",
+    "input_stable": true,
+    "language": "c",
+    "local_scan_complete": false,
+    "native": {
+      "diagnostics": [
+        {
+          "column_byte": 16,
+          "level": "error",
+          "line": 1,
+          "rule_id": "clang.ext_return_missing_expr"
+        },
+        {
+          "column_byte": 24,
+          "level": "error",
+          "line": 1,
+          "rule_id": "clang.err_expected"
+        }
+      ],
+      "reason": "clang_native_diagnostics",
+      "status": "diagnostics_observed",
+      "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+      "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+    },
+    "original_ref": {
+      "run_id": "clangdocstruct-74419-0-1791329173997755000",
+      "sha256": "0b2dc350c0995e5ba040bdf7703777ff6e43ae2a66e9e150599af0bbe21c2ba7"
+    },
+    "path": "sample.c",
+    "profile": "clang-documentation-structure-v1",
+    "report_type": "clang_documentation_structure_task_recheck",
+    "run_id": "clangdocstruct-74417-3-1791329174192092000",
+    "schema_version": "0.1.0",
+    "selected_tool": "/usr/bin/clang",
+    "source_sha256": "0a2d5e870bc4f05be9a2f12a377b4ddf5fac2d0142839a476d5b61601a5d2a2e",
+    "standard": "c11",
+    "structure": {
+      "native_raw_diagnostic_count": 2,
+      "observation": null,
+      "reason": "clang_execution_incomplete",
+      "status": "incomplete"
+    },
+    "task_id": "CG-3a40f8edc1a44f11fc9fb7ddbffaf141",
+    "task_kind": "finding",
+    "task_rule": "codeguard.documentation.function_structure_required",
+    "workspace_binding": "bound",
+    "workspace_id": "ws-fb8034bd531e343f91ef02a4c66a9b99"
+  },
+  "test_source_sha256": "5ac88014e68edb0942630301d57c8fa681224e047ab4eb86102c8c28ba9e4fd0",
+  "unsupported_standard_exit_code": 2
+}

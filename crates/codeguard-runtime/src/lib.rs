@@ -30,6 +30,15 @@ mod wasm_root_child_scan;
 #[cfg(feature = "wasm-precheck")]
 pub use wasm_root_child_scan::{WasmRootChildScan, scan_wasm_root_child};
 
+#[cfg(feature = "wasm-precheck")]
+mod wasm_duplicate_binding;
+#[cfg(feature = "wasm-precheck")]
+pub use wasm_duplicate_binding::WasmDuplicateBinding;
+#[cfg(feature = "wasm-precheck")]
+mod wasm_sibling_binding_scan;
+#[cfg(feature = "wasm-precheck")]
+pub use wasm_sibling_binding_scan::{WasmSiblingBindingScan, scan_wasm_sibling_bindings};
+
 #[cfg(unix)]
 mod installed_artifact;
 #[cfg(unix)]
@@ -215,3 +224,38 @@ pub use package_download::{
 };
 #[cfg(test)]
 mod download_test_server;
+
+#[cfg(feature = "wasm-precheck")]
+mod wasm_keyword_sequence;
+#[cfg(feature = "wasm-precheck")]
+pub use wasm_keyword_sequence::{WasmKeywordSequence, scan_wasm_keyword_sequence};
+
+#[cfg(feature = "wasm-precheck")]
+mod wasm_form_terminator;
+#[cfg(feature = "wasm-precheck")]
+pub use wasm_form_terminator::WasmFormTerminator;
+#[cfg(feature = "wasm-precheck")]
+mod wasm_form_terminator_scan;
+#[cfg(feature = "wasm-precheck")]
+pub use wasm_form_terminator_scan::scan_wasm_form_terminators;
+
+#[cfg(feature = "wasm-precheck")]
+mod wasm_outer_return;
+#[cfg(feature = "wasm-precheck")]
+pub use wasm_outer_return::WasmOuterReturn;
+#[cfg(feature = "wasm-precheck")]
+mod wasm_outer_return_scan;
+#[cfg(feature = "wasm-precheck")]
+pub use wasm_outer_return_scan::{WasmOuterReturnScan, scan_wasm_outer_returns};
+pub mod concurrent_stream;
+pub mod process_cancellation;
+pub mod task_dag;
+pub mod work_tree_snapshot;
+pub mod evidence_index;
+pub mod offline_boundary;
+pub mod git_index_input;
+pub mod evidence_retention;
+pub mod content_identity;
+pub mod strict_cache;
+pub mod correlation_trace;
+pub mod offline_boundary_v2;

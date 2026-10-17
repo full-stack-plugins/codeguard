@@ -25,7 +25,7 @@ Codeguard 的目标是调用传统静态工具，完成多语言代码规范、�
 
 ### New Capabilities
 
-- `syntax-precheck`：Rust 内置 WASM 初检、原生优先、准确覆盖状态、修复指引与原生确认；全部待实施。
+- `syntax-precheck`：已实现32份候选grammar的Rust隔离加载、路由、初检和部分原生优先/修复反馈；版本/方言覆盖、独立精度、完整宿主及正式发行资格仍待验收，不以候选执行代替原生lint。
 
 - `unified-cli-contract`：统一命令、选择范围、版本化报告、CLI/MCP 协议。
 - `native-tool-adapters`：工具适配、类别覆盖、Java 原生工具链和全语言迁移。
@@ -44,7 +44,7 @@ Codeguard 的目标是调用传统静态工具，完成多语言代码规范、�
 
 ## Impact
 
-当前代码归属：独立 [codeguard 仓库](https://github.com/full-stack-plugins/codeguard) 持有 Rust 内核、适配器、规则、协议和本 change；codeguard-plugin 持有宿主实现，codeguard-skills 持有技能事实源。原生能力已有有界实现，macOS arm64 npm 0.1.0 已发布；详见 [实现基线](implementation-baseline.md)。WASM 仍待实现。完整交付未完成，不 sync/archive。
+当前代码归属：独立 [codeguard 仓库](https://github.com/full-stack-plugins/codeguard) 持有 Rust 内核、适配器、规则、协议和本 change；codeguard-plugin 持有宿主实现，codeguard-skills 持有技能事实源。原生适配和npm安装入口已有实现；源码新增能力与公开发行分别验收，详见 [实现基线](implementation-baseline.md)。WASM已接入32份候选grammar，但released_count=0，正式资格和完整交付未完成，不 sync/archive。
 
 2026-09-28 经用户要求迁移规格所有权。原插件 MODIFIED 条款在本仓没有旧基线，按 ADDED 引入，条款正文及 legacy 适用边界保留；不会改写插件旧运行行为。详情见 [迁移记录](migration.md)。
 

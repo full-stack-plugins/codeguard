@@ -1,0 +1,4507 @@
+{
+  "schema_version": "0.1.0",
+  "corpus_type": "grammar_regression",
+  "manifest_sha256": "9fe2fa77181aedd74755a2ac5b8fe694b2d4f2d33f03518d814476a911b2a610",
+  "cases": [
+    {
+      "id": "py_valid_def_0",
+      "language": "python",
+      "source": "def f0():\n    return 0\n",
+      "source_sha256": "a6af50979fa79318ea9d0337b961930f1021172cf7435f5eb281b9732a9af7f9",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_def_1",
+      "language": "python",
+      "source": "def f1():\n    return 1\n",
+      "source_sha256": "55d6687746aba14d8a91cbf1fc750cbfbd8860acc23097ccb24052fe49d0851b",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_def_2",
+      "language": "python",
+      "source": "def f2():\n    return 2\n",
+      "source_sha256": "6f494a9dafed5ad26d4b106a6c3c06876614f5e2356c3762924f3e2bdf4e06d3",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_def_3",
+      "language": "python",
+      "source": "def f3():\n    return 3\n",
+      "source_sha256": "0de8f0c7daa649e9e77c289b0157db4d1407b20f41ace75a6fce3640a3773058",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_def_4",
+      "language": "python",
+      "source": "def f4():\n    return 4\n",
+      "source_sha256": "216868ae60bb060c59cb9197ddfda46fa8bfc248fc0ab7057ffb094cf65b66cb",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_def_5",
+      "language": "python",
+      "source": "def f5():\n    return 5\n",
+      "source_sha256": "5c2adf77db3d587d07d4c80b5774eae17b13355fea29f3928af5102af2935647",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_def_6",
+      "language": "python",
+      "source": "def f6():\n    return 6\n",
+      "source_sha256": "116a963a2737025dbb6d5ff3e4479e625cab90322096c9a242ef3f7039b17fc5",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_def_7",
+      "language": "python",
+      "source": "def f7():\n    return 7\n",
+      "source_sha256": "a823ffeefc3a55e6d838c7e96e58a548f07c88747fa8149e89bd1b897aa02acd",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_def_8",
+      "language": "python",
+      "source": "def f8():\n    return 8\n",
+      "source_sha256": "ede9459ff8933d5bf75fc4807b353975ab6e9fd7fa5fde47d3b3b927d13c6061",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_def_9",
+      "language": "python",
+      "source": "def f9():\n    return 9\n",
+      "source_sha256": "eea877885d1b74f1e990d2cd0d7cea5cc3345327914cb36a8603ca461411e387",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_def_10",
+      "language": "python",
+      "source": "def f10():\n    return 10\n",
+      "source_sha256": "67b3f8a88eec11c4cb61b1643b6ee913b8ae50f9d4709c20612be7b43bdb13b3",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_def_11",
+      "language": "python",
+      "source": "def f11():\n    return 11\n",
+      "source_sha256": "efdd435bcb9f2485fa17559496c2ecfbc2432e1a0336fae9156504991f751b5b",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_def_12",
+      "language": "python",
+      "source": "def f12():\n    return 12\n",
+      "source_sha256": "8c2a67fdc8301f66db120b687390ddf59f70766f61b13177cbf63d9a1d3310f8",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_def_13",
+      "language": "python",
+      "source": "def f13():\n    return 13\n",
+      "source_sha256": "c880483e3686ae125fcb800b128db3b9bedad28225793cc1bfc397ccbd92c153",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_def_14",
+      "language": "python",
+      "source": "def f14():\n    return 14\n",
+      "source_sha256": "b34eb8cb4e85484498ceac741aab1cdb8b1e35877bf66397dbe3cc1de8fe0106",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_def_15",
+      "language": "python",
+      "source": "def f15():\n    return 15\n",
+      "source_sha256": "0251f8c7c63012fe60fffe543fe787d55ad39b780c4b938a7db3d06234f52f9f",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_def_16",
+      "language": "python",
+      "source": "def f16():\n    return 16\n",
+      "source_sha256": "46c7fe8e10eaab832162ee3f3a3cd85b73d5a1e2e144adc2f3d8fdc690f610ba",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_def_17",
+      "language": "python",
+      "source": "def f17():\n    return 17\n",
+      "source_sha256": "32180ef2a13be8a2cf792c8a38cdb36d33d234668f9057a088ae6a50ea93c0bc",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_def_18",
+      "language": "python",
+      "source": "def f18():\n    return 18\n",
+      "source_sha256": "5b7ec9f817a15a0af94423200426b1b0d47d2c0f53a04b5dd1a50a2190f1b954",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_def_19",
+      "language": "python",
+      "source": "def f19():\n    return 19\n",
+      "source_sha256": "ab3ca441cd153267c36b0343a04e501ef465dd2265e03baa19b38488099a078d",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_def_20",
+      "language": "python",
+      "source": "def f20():\n    return 20\n",
+      "source_sha256": "82b829c9230f6be1c0d318af04202fe1f21c86d99a1c8daef7d16e45fa01b585",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_def_21",
+      "language": "python",
+      "source": "def f21():\n    return 21\n",
+      "source_sha256": "910471943990042c008f24835f411bf7bbd95de5adaef2dee19738e07e3be538",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_def_22",
+      "language": "python",
+      "source": "def f22():\n    return 22\n",
+      "source_sha256": "6ed79536fee02790d324d79548b2f43ce51c787be8a0b122a67e29faf3978996",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_def_23",
+      "language": "python",
+      "source": "def f23():\n    return 23\n",
+      "source_sha256": "bfd93d1273048ce065688320cc9fef0e3175ac0e7c7d24748a6086279a27c4a9",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_def_24",
+      "language": "python",
+      "source": "def f24():\n    return 24\n",
+      "source_sha256": "cff6ca7785fbb992b764144598fc5d6f8c60686db236442bcfd2e1ed13e4a74d",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_def_25",
+      "language": "python",
+      "source": "def f25():\n    return 25\n",
+      "source_sha256": "9d2bf4dbd5eca20bb6d034b375ff73b67cb0a5dace02c15cc349aa04efd7ebfc",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_def_26",
+      "language": "python",
+      "source": "def f26():\n    return 26\n",
+      "source_sha256": "b9f35852c4bbed4e16b0715848baab54bc0ab29b1a0de0ac2b1c7c8c08f7b9df",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_def_27",
+      "language": "python",
+      "source": "def f27():\n    return 27\n",
+      "source_sha256": "e02607e3c02e872a761c1356057b27f09d1cce7c21b78ea281d4ea946460d46e",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_def_28",
+      "language": "python",
+      "source": "def f28():\n    return 28\n",
+      "source_sha256": "7cf5e5e4d3925141b59c00b799381bd36fcdbbc9f1dcfba9a400449a6a684e54",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_def_29",
+      "language": "python",
+      "source": "def f29():\n    return 29\n",
+      "source_sha256": "63297d586847e632dfadd680bf3b4233b043a8eebc15cd1898b4180346f25299",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_def_30",
+      "language": "python",
+      "source": "def f30():\n    return 30\n",
+      "source_sha256": "08321aa56d65957a4d5561764db39ec5c06b60b1afd9e5f5d3851e36219f631f",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_def_31",
+      "language": "python",
+      "source": "def f31():\n    return 31\n",
+      "source_sha256": "8b50ff811ebd0cd1a4e3a7c45a3d89b938f5398122c1778eae10b1f618514dd0",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_def_32",
+      "language": "python",
+      "source": "def f32():\n    return 32\n",
+      "source_sha256": "65a9a0a64eeff8b4d6567698eeaf9a4d2f93ea3b6540978d363ac7659df1bceb",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_def_33",
+      "language": "python",
+      "source": "def f33():\n    return 33\n",
+      "source_sha256": "a7bd2d6a6ef9d1d0b008e635c62f51fc43226a7b3f7b506a5ac5d6fe7fa543f3",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_def_34",
+      "language": "python",
+      "source": "def f34():\n    return 34\n",
+      "source_sha256": "8bc1c2113aaff07e2281ffe63040db4a2fdc4b3bc28b2d445c035cfd2b070869",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_def_35",
+      "language": "python",
+      "source": "def f35():\n    return 35\n",
+      "source_sha256": "56b9430d98dfd8d29cfe0067183238bcd1c95bfe48898ed979478835ae374e9a",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_def_36",
+      "language": "python",
+      "source": "def f36():\n    return 36\n",
+      "source_sha256": "7e8dc6b308810fcff96bd1448dd6da053c3deac94222e7549e0780311c62c005",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_def_37",
+      "language": "python",
+      "source": "def f37():\n    return 37\n",
+      "source_sha256": "7b8ad2f1db71fb9f9f7384b5435fb52073e142eaba749b04e9a4ef9cba869b41",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_def_38",
+      "language": "python",
+      "source": "def f38():\n    return 38\n",
+      "source_sha256": "3966e853525379d5667934f84984c3cf701e2d3e19d949561c4400791b16c703",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_def_39",
+      "language": "python",
+      "source": "def f39():\n    return 39\n",
+      "source_sha256": "ba57dfeb4d210cafb6727b2a33f6b775c4fe0e1c22c94efec28ed17c820eb325",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_def_40",
+      "language": "python",
+      "source": "def f40():\n    return 40\n",
+      "source_sha256": "5d73267ce1c5c32a243c6fd155fa36bbb2bb6e148efec641b82e36b1696328df",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_def_41",
+      "language": "python",
+      "source": "def f41():\n    return 41\n",
+      "source_sha256": "ef3bb74f7787b0aea82300ef98f200c646189cdee01b83941483f6e93a1f9f7f",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_def_42",
+      "language": "python",
+      "source": "def f42():\n    return 42\n",
+      "source_sha256": "c4a186597227602032c4a6707f7957a2cb6423a207aa20895af0b280f95ac964",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_def_43",
+      "language": "python",
+      "source": "def f43():\n    return 43\n",
+      "source_sha256": "32a2e82fc14c5dacbe3aac4ad9d559bdacf0bb24ee57286027cea818fa3446a4",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_def_44",
+      "language": "python",
+      "source": "def f44():\n    return 44\n",
+      "source_sha256": "77a1797119f6e1c73653365547f492f29860cde44f36fb3fb79c370182a7784c",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_def_45",
+      "language": "python",
+      "source": "def f45():\n    return 45\n",
+      "source_sha256": "c25e16017807d657be60f3480ae89f871cd584aa2f13f4cddb3cfc66adbe9db5",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_def_46",
+      "language": "python",
+      "source": "def f46():\n    return 46\n",
+      "source_sha256": "53c7f523c5ffba18927025f4e682e9bd1716bb5ce738c947e8ace0f37c9fc5d0",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_def_47",
+      "language": "python",
+      "source": "def f47():\n    return 47\n",
+      "source_sha256": "b5a405ffd83156aa44fe1e653d022a1c89a6c133f6eede4889b33cf4f9466cc8",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_def_48",
+      "language": "python",
+      "source": "def f48():\n    return 48\n",
+      "source_sha256": "413bbda891dd5717e8659698348b573bf85f01fa88cf95148bd16f276da61e09",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_def_49",
+      "language": "python",
+      "source": "def f49():\n    return 49\n",
+      "source_sha256": "42b287556a552d19fe4fc8ade4b13241cb9187e37a4e317d3af95555836a9d84",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_class_0",
+      "language": "python",
+      "source": "class C0:\n    def m(self):\n        pass\n",
+      "source_sha256": "67afd28e807e3426aed5116036b75c735c9c9c2e3f34de6fbfab2e2036ffe3ae",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_class_1",
+      "language": "python",
+      "source": "class C1:\n    def m(self):\n        pass\n",
+      "source_sha256": "e62ab81861ff0031cb0395b7ae425a8e34639b802446bc393219fbd17de337c4",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_class_2",
+      "language": "python",
+      "source": "class C2:\n    def m(self):\n        pass\n",
+      "source_sha256": "79c3e88641ca70bc5e37242f6e949d65bbb135c942ce659a56520edd48210b46",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_class_3",
+      "language": "python",
+      "source": "class C3:\n    def m(self):\n        pass\n",
+      "source_sha256": "440a11b0d2713ad8334b1dfc5edb708a0e4a91094e3af8693b53b401f5aaf31c",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_class_4",
+      "language": "python",
+      "source": "class C4:\n    def m(self):\n        pass\n",
+      "source_sha256": "74e3777fe54c3aef1b5e88caf90868b8f5975d9d8c6c6c831b4e45b440641fd9",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_class_5",
+      "language": "python",
+      "source": "class C5:\n    def m(self):\n        pass\n",
+      "source_sha256": "4e52172c7a40ccadf4e453ae6475a5984293cc6b029e7f805de5aa41757faf8b",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_class_6",
+      "language": "python",
+      "source": "class C6:\n    def m(self):\n        pass\n",
+      "source_sha256": "9be81813eb0a719b36a6da5803325d5254fdd0941dda878a88a521c9f9d14d71",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_class_7",
+      "language": "python",
+      "source": "class C7:\n    def m(self):\n        pass\n",
+      "source_sha256": "82c78eabc7b83f7473dd12392d45c691400da14fadce13a3ef8da46c4a73b743",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_class_8",
+      "language": "python",
+      "source": "class C8:\n    def m(self):\n        pass\n",
+      "source_sha256": "f022d031f0e541793c51335a3bcb76456419ece8ad31f7b1d44830611624de89",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_class_9",
+      "language": "python",
+      "source": "class C9:\n    def m(self):\n        pass\n",
+      "source_sha256": "fce7cbeee5a02151571cb95fe3d55ef456c0e3f681ee63ac618edd8af68f6109",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_class_10",
+      "language": "python",
+      "source": "class C10:\n    def m(self):\n        pass\n",
+      "source_sha256": "620fc1816f1a530da4ccaa08623c31ee55c73bd9be5dfe7564269bba229d085d",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_class_11",
+      "language": "python",
+      "source": "class C11:\n    def m(self):\n        pass\n",
+      "source_sha256": "11993b9aac6f60e8903270ce13681430bfc423431d27fbce65045402b943999e",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_class_12",
+      "language": "python",
+      "source": "class C12:\n    def m(self):\n        pass\n",
+      "source_sha256": "0b5d050a922705e462105634180d4442f7110886e315f57400c0bb6200c162ff",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_class_13",
+      "language": "python",
+      "source": "class C13:\n    def m(self):\n        pass\n",
+      "source_sha256": "e6435c3c4a3d05c507208739dca4cacaf3622b38aa898c2d608be220b9cade22",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_class_14",
+      "language": "python",
+      "source": "class C14:\n    def m(self):\n        pass\n",
+      "source_sha256": "1f4665abe69297d428156a6e8ac719584f3ccf2b3558eac8744832a8cb5748a6",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_class_15",
+      "language": "python",
+      "source": "class C15:\n    def m(self):\n        pass\n",
+      "source_sha256": "efe5cbf0178678a5590f1755b365a6f141939353066e1aee182d6e3c953a9e5f",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_class_16",
+      "language": "python",
+      "source": "class C16:\n    def m(self):\n        pass\n",
+      "source_sha256": "31f03f69bd489962d7317d0b4c4d9a2174b84dbf7ff7a72507e3facc2d8c372b",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_class_17",
+      "language": "python",
+      "source": "class C17:\n    def m(self):\n        pass\n",
+      "source_sha256": "24e8d7246240d52eebf643de9b47b14a4e793cc981c594c224ea660ae4413a82",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_class_18",
+      "language": "python",
+      "source": "class C18:\n    def m(self):\n        pass\n",
+      "source_sha256": "0fb2bb089fd5e0a23c7ac07a83ce4f6493152c8f6e1146ec3348822aa957f2ee",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_class_19",
+      "language": "python",
+      "source": "class C19:\n    def m(self):\n        pass\n",
+      "source_sha256": "6f248b14eea48f1983b4977cb1dc494a476a92c3d734325b7a32cdac4395aa94",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_class_20",
+      "language": "python",
+      "source": "class C20:\n    def m(self):\n        pass\n",
+      "source_sha256": "691d5e095eda0362f90d3a89c3a24848b894f15145c6fe22ed985a469366dee3",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_class_21",
+      "language": "python",
+      "source": "class C21:\n    def m(self):\n        pass\n",
+      "source_sha256": "0e219263b850fae16fc0e422cd3b7ebdcb3bc28a3703a176964484f72f548fa9",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_class_22",
+      "language": "python",
+      "source": "class C22:\n    def m(self):\n        pass\n",
+      "source_sha256": "400e3ed594574bed05bd5793a7893de8567a82be238bf914e0125f99a5ff32ef",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_class_23",
+      "language": "python",
+      "source": "class C23:\n    def m(self):\n        pass\n",
+      "source_sha256": "a54e2db6d1cf7e3d20535e4ce1c42825ddec04da850cb05edd98e208b49c30d5",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_class_24",
+      "language": "python",
+      "source": "class C24:\n    def m(self):\n        pass\n",
+      "source_sha256": "4a90362f2c611c85bc336a92df4cf6e57cc3e466dc5eb251838ce0137dfec246",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_class_25",
+      "language": "python",
+      "source": "class C25:\n    def m(self):\n        pass\n",
+      "source_sha256": "8e4eafa7ebc1477023b49095ca7201d620ed95e72a5d02d2491f7e851cede770",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_class_26",
+      "language": "python",
+      "source": "class C26:\n    def m(self):\n        pass\n",
+      "source_sha256": "d596e370bdf21bff33bfb6ef4ea6537936a3fdeaf50c87cfef77c461f5c29707",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_class_27",
+      "language": "python",
+      "source": "class C27:\n    def m(self):\n        pass\n",
+      "source_sha256": "b8505c0a83ea3b83c92194720faa9e5de2e2945bbaafe889cf40a301bbcfcfb2",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_class_28",
+      "language": "python",
+      "source": "class C28:\n    def m(self):\n        pass\n",
+      "source_sha256": "67c69909aaa7e6fcf4deb08ced3184d22f2be251db22984bf40f11b7b7682ac4",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_class_29",
+      "language": "python",
+      "source": "class C29:\n    def m(self):\n        pass\n",
+      "source_sha256": "f4f35d95d9d41b7fc275258db216440c46ba9392e30422459f5ed8896f33b715",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_if_0",
+      "language": "python",
+      "source": "if True:\n    x = 0\n",
+      "source_sha256": "2d6d11cd05308771c991c91a22c7ef3569199b627d738633c67dd5d6c0277849",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_if_1",
+      "language": "python",
+      "source": "if True:\n    x = 1\n",
+      "source_sha256": "f0a78e716821cfcc5adc9708c5b0342827238202a47879d2e3e7be93f73177e8",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_if_2",
+      "language": "python",
+      "source": "if True:\n    x = 2\n",
+      "source_sha256": "9a899cbe122a20b9f8acac4a4aa50dea682b65a7723fac526f93246b4b4c5418",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_if_3",
+      "language": "python",
+      "source": "if True:\n    x = 3\n",
+      "source_sha256": "6a1799f0dfc8c422688e066b68d0cb9221ef9458d43b862e1fb66d0d9710a8aa",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_if_4",
+      "language": "python",
+      "source": "if True:\n    x = 4\n",
+      "source_sha256": "f8db5cbee73f9746dc01bbdaba61e42390866998615c38be652a04df82ea1058",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_if_5",
+      "language": "python",
+      "source": "if True:\n    x = 5\n",
+      "source_sha256": "a2fec5fed38cbf3be3c1beaec6aa3d95ee2b6635e0efb99ab055627202ffc704",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_if_6",
+      "language": "python",
+      "source": "if True:\n    x = 6\n",
+      "source_sha256": "7425a626b08001de599d590a3965a0ade561edf0b90f67231d0ac24445ab769c",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_if_7",
+      "language": "python",
+      "source": "if True:\n    x = 7\n",
+      "source_sha256": "9e652bc1eb1667a6bdda1d0317e60c5f3cc0aeef5f2bc9434225327cc2272151",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_if_8",
+      "language": "python",
+      "source": "if True:\n    x = 8\n",
+      "source_sha256": "c262ee4ea073ca11416641e3e2510409eef8ad9588dc939902c72712a9e97c94",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_if_9",
+      "language": "python",
+      "source": "if True:\n    x = 9\n",
+      "source_sha256": "625346db34556f2cfb66b106862be232403e07589b1d30959e0eb75b41c52a2a",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_if_10",
+      "language": "python",
+      "source": "if True:\n    x = 10\n",
+      "source_sha256": "17d43941255504a9203cc34c227677a58ff47cd5c6cd96c733dceea3423faa3d",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_if_11",
+      "language": "python",
+      "source": "if True:\n    x = 11\n",
+      "source_sha256": "7e9dc4487cc92effe59b8b475b5e56e028e1484d7c5096974dd360b14041f3fd",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_if_12",
+      "language": "python",
+      "source": "if True:\n    x = 12\n",
+      "source_sha256": "3ade51d5653151b3a799eb8203b312b3fd1e1241df037733443c265092bff638",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_if_13",
+      "language": "python",
+      "source": "if True:\n    x = 13\n",
+      "source_sha256": "a52e48172194054f6e92f1de9141151fee351d7f85d59fe62d97154e64585598",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_if_14",
+      "language": "python",
+      "source": "if True:\n    x = 14\n",
+      "source_sha256": "0d73f6801901c2ced7316e8e60bd257b3a481221a7fff489b6e77e0ad8aa9865",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_if_15",
+      "language": "python",
+      "source": "if True:\n    x = 15\n",
+      "source_sha256": "b0e91c7d64ffdd1735dbf68086359bca3ccb9a4d97f0da0c7c564e57eb4a62ec",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_if_16",
+      "language": "python",
+      "source": "if True:\n    x = 16\n",
+      "source_sha256": "9f17bae9cc370c1da2a5dc54efbae3ed3cb48c516c15d20edfea0679c14a1d2d",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_if_17",
+      "language": "python",
+      "source": "if True:\n    x = 17\n",
+      "source_sha256": "338d059038169d2f5e8a1054a4abc0c22cf60a10f4f3f10215241e42c9e60387",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_if_18",
+      "language": "python",
+      "source": "if True:\n    x = 18\n",
+      "source_sha256": "68241cb9f48538204c457d1a1831ea5e2bf55ea3257dc33111b9e6cab005d9ea",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_if_19",
+      "language": "python",
+      "source": "if True:\n    x = 19\n",
+      "source_sha256": "dcb38abdd4e85f7a0ba2743c856867eed059e645a119dda2213844434188c8a7",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_if_20",
+      "language": "python",
+      "source": "if True:\n    x = 20\n",
+      "source_sha256": "36e60de18b7f04b80288d0f082cbcf79dce58ed22d6361a37ecaba87b3528b9b",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_if_21",
+      "language": "python",
+      "source": "if True:\n    x = 21\n",
+      "source_sha256": "54cddf6cc87e8375ea4d2116ebfc47ec0e47eb792755e21b17f01f275fcd6a7b",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_if_22",
+      "language": "python",
+      "source": "if True:\n    x = 22\n",
+      "source_sha256": "f86e8b5d0463f5b3ec35d6b92a212a1fceea4aaff3a006a57a498579e6c36951",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_if_23",
+      "language": "python",
+      "source": "if True:\n    x = 23\n",
+      "source_sha256": "f9603bb3980a13a0a48d5e11c7ce4274a6de1aa3d9f0d2cb05f0fc8bea3a5bc5",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_if_24",
+      "language": "python",
+      "source": "if True:\n    x = 24\n",
+      "source_sha256": "cfe951997c21ab5c1be39856c32e7fa9429d4e6b3abf82345206a156dd0f6766",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_if_25",
+      "language": "python",
+      "source": "if True:\n    x = 25\n",
+      "source_sha256": "55ecccc3a49b63468aef1b2787c7cb8b4cfeca522a9a4ab0e6042f5f954c8e08",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_if_26",
+      "language": "python",
+      "source": "if True:\n    x = 26\n",
+      "source_sha256": "5228818323eca614dc00b97386e16beabf05c5c4f7b32723add0e00a939d735e",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_if_27",
+      "language": "python",
+      "source": "if True:\n    x = 27\n",
+      "source_sha256": "c8eb31602a3aedb1da95fc3933363407c8d1df99563a4002e3e2d52d36d5e127",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_if_28",
+      "language": "python",
+      "source": "if True:\n    x = 28\n",
+      "source_sha256": "fa81db25add7576b9c261a910559ab589c1e1eb31fe6b7a1d2b6ce4c5824038f",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_if_29",
+      "language": "python",
+      "source": "if True:\n    x = 29\n",
+      "source_sha256": "0426410d1aebdcf209581628f4ba1b501dd00e8786a0df2c6c06a4bc565c79ff",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_for_0",
+      "language": "python",
+      "source": "for i in range(0):\n    pass\n",
+      "source_sha256": "4875da41ac6e4e2bc801a3dac7318d5efad3d6ddae617422efc56bd1470f7644",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_for_1",
+      "language": "python",
+      "source": "for i in range(1):\n    pass\n",
+      "source_sha256": "3352e04e81d6450c4017fed5deffb0a1df1ba90c60d43cc047385a4303d794e0",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_for_2",
+      "language": "python",
+      "source": "for i in range(2):\n    pass\n",
+      "source_sha256": "3489c6b024e3f63eec372854fba2a38abf460c988e37f86ebf434e72682cecb0",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_for_3",
+      "language": "python",
+      "source": "for i in range(3):\n    pass\n",
+      "source_sha256": "83e49cd886e52af73bad29361dff2ea7a537c3d010e831e62b2a72db3d898ecb",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_for_4",
+      "language": "python",
+      "source": "for i in range(4):\n    pass\n",
+      "source_sha256": "757e4d16933591d0c05e27850770e9aeee515ea08eef9897c120e8a3f089406d",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_for_5",
+      "language": "python",
+      "source": "for i in range(5):\n    pass\n",
+      "source_sha256": "ac2aec32c8432b962878ce53109926a76ed7ebc54d85cfb27693a866adfff8d6",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_for_6",
+      "language": "python",
+      "source": "for i in range(6):\n    pass\n",
+      "source_sha256": "fbfb42a0f899c17d1c062542da9781f1c8cb962a397ed0ee9a573105da11a39d",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_for_7",
+      "language": "python",
+      "source": "for i in range(7):\n    pass\n",
+      "source_sha256": "1cbb0036bf83e2232533e49c5701e1bad5151463f0ffc905be0e437f465255fd",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_for_8",
+      "language": "python",
+      "source": "for i in range(8):\n    pass\n",
+      "source_sha256": "5e339f6175b4038a47cd028a0dd68d30d549ce5539973d5701e6e055e46d4eb0",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_for_9",
+      "language": "python",
+      "source": "for i in range(9):\n    pass\n",
+      "source_sha256": "c19af3fef3b16cc7eae6815d38ad5b95f6f09daf34def853174785b782c46bbb",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_for_10",
+      "language": "python",
+      "source": "for i in range(10):\n    pass\n",
+      "source_sha256": "6c77636ae111df73b42a0bbae34f273f97bcb0fcee40e1eef7e5411b9614c022",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_for_11",
+      "language": "python",
+      "source": "for i in range(11):\n    pass\n",
+      "source_sha256": "fdbdcb51162434694ac7c5ed832ec4278b7863e0b327b559fa426f3081d53342",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_for_12",
+      "language": "python",
+      "source": "for i in range(12):\n    pass\n",
+      "source_sha256": "90d3e0d8dc38d3b3b2939cd9bbd6a8839ae18de7caf3ebba2278b2060c836b5f",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_for_13",
+      "language": "python",
+      "source": "for i in range(13):\n    pass\n",
+      "source_sha256": "92e43a16f077e14ce19cf155d4c930e08568e1bc7a54447ad9adeb25c57e82a9",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_for_14",
+      "language": "python",
+      "source": "for i in range(14):\n    pass\n",
+      "source_sha256": "62c871f9e65280827d8abacfa28d27adf0cfed2501126870c41c2028a47c4ca1",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_for_15",
+      "language": "python",
+      "source": "for i in range(15):\n    pass\n",
+      "source_sha256": "cc8d20b4f0aa82e12e2d1c2ff9e6be47f70255e670e1e104e42e0333509fb07b",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_for_16",
+      "language": "python",
+      "source": "for i in range(16):\n    pass\n",
+      "source_sha256": "c6ed5f7c8e77f527e275d83526a2fd3bc47047cbd5ff9b492f574184a80bdf7c",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_for_17",
+      "language": "python",
+      "source": "for i in range(17):\n    pass\n",
+      "source_sha256": "f5dd0a2d3b33a6b122b6e30504bcaf21ed011d5bb1d0d84402b8a91c8d4935da",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_for_18",
+      "language": "python",
+      "source": "for i in range(18):\n    pass\n",
+      "source_sha256": "30788d3cbb2e01dc7cda35a8b5bbea72ba143941f01de9f455efe1981a288c9b",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_for_19",
+      "language": "python",
+      "source": "for i in range(19):\n    pass\n",
+      "source_sha256": "68237cea996001c269d8f1e2f8da9c24d8c0225a7a7b10d399b45991493b46f8",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_for_20",
+      "language": "python",
+      "source": "for i in range(20):\n    pass\n",
+      "source_sha256": "f3c9746132c2149bbc08468aeaed5c4a1a62052066036b62baae381fb69032f7",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_for_21",
+      "language": "python",
+      "source": "for i in range(21):\n    pass\n",
+      "source_sha256": "97747d0c2f96bbaa30770a88d72ba99b83f88396085b9703e71e894415b55f72",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_for_22",
+      "language": "python",
+      "source": "for i in range(22):\n    pass\n",
+      "source_sha256": "bf4a2fba2bdfb0541f5451ebcf58a164e3668da39a444af01f2fae3ddbf13de9",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_for_23",
+      "language": "python",
+      "source": "for i in range(23):\n    pass\n",
+      "source_sha256": "d88baa64d97d602c44a152603ce05152cf1f0cf19ae2d73b6d9ccb5586998ab4",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_for_24",
+      "language": "python",
+      "source": "for i in range(24):\n    pass\n",
+      "source_sha256": "dfcc9263de162849e643f5a459dfb8ac6424e76e652f784aeaa59d274b1a1016",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_for_25",
+      "language": "python",
+      "source": "for i in range(25):\n    pass\n",
+      "source_sha256": "398afd9430d72c2e7e34d45bf292a5ba37dc1af2b0a051e169ebaeae3149eaa6",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_for_26",
+      "language": "python",
+      "source": "for i in range(26):\n    pass\n",
+      "source_sha256": "56e58d8c6af2de2c65f95bcba2a1c2a6e0fae687b31c976f2456564569450b7f",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_for_27",
+      "language": "python",
+      "source": "for i in range(27):\n    pass\n",
+      "source_sha256": "8970ec4387e1ef447cb588f94be91004535df4b77a119870026579458abe5ac0",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_for_28",
+      "language": "python",
+      "source": "for i in range(28):\n    pass\n",
+      "source_sha256": "87ec327773f6b7a68b0067c680ce2536400a65d3c0e434a2bb3eda4ad72f55fc",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_for_29",
+      "language": "python",
+      "source": "for i in range(29):\n    pass\n",
+      "source_sha256": "38605504ad4b6f71400941c581a21e6bd4fd47f06e08c77d8248f6814c2b5893",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_import_0",
+      "language": "python",
+      "source": "import os\n",
+      "source_sha256": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_import_1",
+      "language": "python",
+      "source": "import os\n",
+      "source_sha256": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_import_2",
+      "language": "python",
+      "source": "import os\n",
+      "source_sha256": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_import_3",
+      "language": "python",
+      "source": "import os\n",
+      "source_sha256": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_import_4",
+      "language": "python",
+      "source": "import os\n",
+      "source_sha256": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_import_5",
+      "language": "python",
+      "source": "import os\n",
+      "source_sha256": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_import_6",
+      "language": "python",
+      "source": "import os\n",
+      "source_sha256": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_import_7",
+      "language": "python",
+      "source": "import os\n",
+      "source_sha256": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_import_8",
+      "language": "python",
+      "source": "import os\n",
+      "source_sha256": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_import_9",
+      "language": "python",
+      "source": "import os\n",
+      "source_sha256": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_import_10",
+      "language": "python",
+      "source": "import os\n",
+      "source_sha256": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_import_11",
+      "language": "python",
+      "source": "import os\n",
+      "source_sha256": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_import_12",
+      "language": "python",
+      "source": "import os\n",
+      "source_sha256": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_import_13",
+      "language": "python",
+      "source": "import os\n",
+      "source_sha256": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_import_14",
+      "language": "python",
+      "source": "import os\n",
+      "source_sha256": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_import_15",
+      "language": "python",
+      "source": "import os\n",
+      "source_sha256": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_import_16",
+      "language": "python",
+      "source": "import os\n",
+      "source_sha256": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_import_17",
+      "language": "python",
+      "source": "import os\n",
+      "source_sha256": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_import_18",
+      "language": "python",
+      "source": "import os\n",
+      "source_sha256": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_import_19",
+      "language": "python",
+      "source": "import os\n",
+      "source_sha256": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_import_20",
+      "language": "python",
+      "source": "import os\n",
+      "source_sha256": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_import_21",
+      "language": "python",
+      "source": "import os\n",
+      "source_sha256": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_import_22",
+      "language": "python",
+      "source": "import os\n",
+      "source_sha256": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_import_23",
+      "language": "python",
+      "source": "import os\n",
+      "source_sha256": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_import_24",
+      "language": "python",
+      "source": "import os\n",
+      "source_sha256": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_import_25",
+      "language": "python",
+      "source": "import os\n",
+      "source_sha256": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_import_26",
+      "language": "python",
+      "source": "import os\n",
+      "source_sha256": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_import_27",
+      "language": "python",
+      "source": "import os\n",
+      "source_sha256": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_import_28",
+      "language": "python",
+      "source": "import os\n",
+      "source_sha256": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_import_29",
+      "language": "python",
+      "source": "import os\n",
+      "source_sha256": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_lambda_0",
+      "language": "python",
+      "source": "f = lambda x: x + 0\n",
+      "source_sha256": "4b3a87a85da11a84ca3e24084cb9f880a8f98ab573f3ee4ebbe162758f630e78",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_lambda_1",
+      "language": "python",
+      "source": "f = lambda x: x + 1\n",
+      "source_sha256": "2f12f2711dc4c695a8400ce5f5750c1633aa485c81c30488e3d3f5f3ccbea4f1",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_lambda_2",
+      "language": "python",
+      "source": "f = lambda x: x + 2\n",
+      "source_sha256": "e74831b94e200c7b957dc0ff321cf814ca0cf487637508390c9603d618a49f29",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_lambda_3",
+      "language": "python",
+      "source": "f = lambda x: x + 3\n",
+      "source_sha256": "45aca8f35823ec9128863661590ef8ea30b06153e4e5f22b2012e6258f13d199",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_lambda_4",
+      "language": "python",
+      "source": "f = lambda x: x + 4\n",
+      "source_sha256": "bf37b56626b794cf0a379b52e921c1d5faecd7511243fa91688c44aa12aad9e5",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_lambda_5",
+      "language": "python",
+      "source": "f = lambda x: x + 5\n",
+      "source_sha256": "e45dc1d85e86e695366e8211369370ce60e90aeae96134d1c56c8469f196ea46",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_lambda_6",
+      "language": "python",
+      "source": "f = lambda x: x + 6\n",
+      "source_sha256": "a6c37f3605d92161a4a8c4fb1b6a01bb6baf6770b63827694c1eb33958b3f3c2",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_lambda_7",
+      "language": "python",
+      "source": "f = lambda x: x + 7\n",
+      "source_sha256": "2dd8fe2830d6e07851093ac76e86d968bfb6346dab2c6c680db20750c4cb8085",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_lambda_8",
+      "language": "python",
+      "source": "f = lambda x: x + 8\n",
+      "source_sha256": "3f2ee1998d6f016f372ea5a61d7809cef097afb79aad3d3d5e1c58e8680fc795",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_lambda_9",
+      "language": "python",
+      "source": "f = lambda x: x + 9\n",
+      "source_sha256": "94be40f06bccbcc4ed8679ddf1d1f676bc59bfcfe18b7e3875afac5a1e0826c0",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_lambda_10",
+      "language": "python",
+      "source": "f = lambda x: x + 10\n",
+      "source_sha256": "f45ec5f0a17a3280c2c010ef12bfeeb9ff1273f1e76c3c5e0767e046fa820134",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_lambda_11",
+      "language": "python",
+      "source": "f = lambda x: x + 11\n",
+      "source_sha256": "1d30a74bd09c4bff8741371fc96d2e3daa13bdf80f12f31543425f1f59215d9e",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_lambda_12",
+      "language": "python",
+      "source": "f = lambda x: x + 12\n",
+      "source_sha256": "d54b231ee7610eec100e1e3d70562f102bda066ed555e28a060bb644f7648751",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_lambda_13",
+      "language": "python",
+      "source": "f = lambda x: x + 13\n",
+      "source_sha256": "393771fdc22e2c3e9fee1d3c21f8f4ac62ce4bed4168eb5d2dc1c415630420ce",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_lambda_14",
+      "language": "python",
+      "source": "f = lambda x: x + 14\n",
+      "source_sha256": "12c64b0fe3f540e037ac51154953debb7b4018cfb34735a5e2a4a4be45019b49",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_lambda_15",
+      "language": "python",
+      "source": "f = lambda x: x + 15\n",
+      "source_sha256": "d71adaab2479f3e4d371f33b2dc40072264f82bc611f8d3a9b2cd2f47cecbab2",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_lambda_16",
+      "language": "python",
+      "source": "f = lambda x: x + 16\n",
+      "source_sha256": "7b663f96a357788926e6647897b44e3174a694ec4761aa1533e5e1b08f8bf341",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_lambda_17",
+      "language": "python",
+      "source": "f = lambda x: x + 17\n",
+      "source_sha256": "a622d245a34b4bb00579035b76b65f9a999bf8ff860f21c4516fec3913289fb8",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_lambda_18",
+      "language": "python",
+      "source": "f = lambda x: x + 18\n",
+      "source_sha256": "d3fe2df83f2d3be86cbe87ffbfc931f6803885f39baf99be5aa91363a7226ec8",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_lambda_19",
+      "language": "python",
+      "source": "f = lambda x: x + 19\n",
+      "source_sha256": "975e53680dfa3df9d9e11aacfd7d7672781bdb6894da3124660b18670b45fb48",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_lambda_20",
+      "language": "python",
+      "source": "f = lambda x: x + 20\n",
+      "source_sha256": "21c77c67a98bc9ee85d952f59dd157569eb8597e2560e7d1d07fa55e3eb1f481",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_lambda_21",
+      "language": "python",
+      "source": "f = lambda x: x + 21\n",
+      "source_sha256": "c2a2f707f5593c6c92c9b829b377c93c975acfb2817b56b9fe15878a9474e105",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_lambda_22",
+      "language": "python",
+      "source": "f = lambda x: x + 22\n",
+      "source_sha256": "76ddcbc889875fcf48a670bce7c202b53a177459fa24ed934d9d713efb2be679",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_lambda_23",
+      "language": "python",
+      "source": "f = lambda x: x + 23\n",
+      "source_sha256": "4da21b4b9630b1f21991ea85e437765f1bd78ff95cef26d01e99f52d9506b25b",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_lambda_24",
+      "language": "python",
+      "source": "f = lambda x: x + 24\n",
+      "source_sha256": "9823c2a782a104c5d41969db176629a06f2a3efc0888286bec7ae410abfb078f",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_lambda_25",
+      "language": "python",
+      "source": "f = lambda x: x + 25\n",
+      "source_sha256": "36fcf959baed663a537d224a2a871afd3cfa05359db84c585686cb9d0de2ef83",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_lambda_26",
+      "language": "python",
+      "source": "f = lambda x: x + 26\n",
+      "source_sha256": "6afc5bfb5d47c3779eb4b008d910f7cf3644246b492540e7cc5614ecd031398c",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_lambda_27",
+      "language": "python",
+      "source": "f = lambda x: x + 27\n",
+      "source_sha256": "12a233451bc357a4b3aeb8dd02454753bfc8abc171cc9fe200a7b21195b854d4",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_lambda_28",
+      "language": "python",
+      "source": "f = lambda x: x + 28\n",
+      "source_sha256": "8644bbe8aa0ff0aca87dea9014d742c4ba2b755bd32996eaec5c6d48232ab526",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_valid_lambda_29",
+      "language": "python",
+      "source": "f = lambda x: x + 29\n",
+      "source_sha256": "e5dfd23dd0bace0f74088422b8c709427f18f0dd8c18ab305269bfbfb221164e",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_0",
+      "language": "python",
+      "source": "def f0():\nreturn 0\n",
+      "source_sha256": "b7432d214c4c25424ca63d6304cf067b17efcccdacf1e66b890333a1c4450659",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_1",
+      "language": "python",
+      "source": "def f1():\nreturn 1\n",
+      "source_sha256": "06e07812993bbe71a3602c20461532e165f88d4087bf67c0dedb797a0fba9c6f",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_2",
+      "language": "python",
+      "source": "def f2():\nreturn 2\n",
+      "source_sha256": "8d6e8ece94892cb028a65e0eb0f3a6c299a360ab2db6391cef801ea669a53d8a",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_3",
+      "language": "python",
+      "source": "def f3():\nreturn 3\n",
+      "source_sha256": "219e70f4a8d478f72480e4f8a19c44dea77cf06b37c04b3a94bdf04b481932f0",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_4",
+      "language": "python",
+      "source": "def f4():\nreturn 4\n",
+      "source_sha256": "beef58d19fd3aea7093fbac754a6e2b853fbeb76dad00c3c612ece8073d29f1e",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_5",
+      "language": "python",
+      "source": "def f5():\nreturn 5\n",
+      "source_sha256": "1223fb6fc0ecb87de48b7c7aa11494670ea03f27b6483deb53c2c02344db4b37",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_6",
+      "language": "python",
+      "source": "def f6():\nreturn 6\n",
+      "source_sha256": "2c50534aead2fe3e497d58fcae41f7178ecba66fb474c406a6a5c8ad2ab78620",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_7",
+      "language": "python",
+      "source": "def f7():\nreturn 7\n",
+      "source_sha256": "56e10b619e815d5cfd83d6a7edb76a32934643b4efd2771def42fa5601a3c9a2",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_8",
+      "language": "python",
+      "source": "def f8():\nreturn 8\n",
+      "source_sha256": "ea631ae4fe817953ef6a438d5584a0204f773cec7720b43b0a0de581e5979913",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_9",
+      "language": "python",
+      "source": "def f9():\nreturn 9\n",
+      "source_sha256": "ba44bc1b26413cfd8c265f1357ec92bfde527747505cc9f12918d862db3ed521",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_10",
+      "language": "python",
+      "source": "def f10():\nreturn 10\n",
+      "source_sha256": "ef8069fc963b3acd2a0f0241875871a3d9a987bde8b0813180582f515b42c32d",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_11",
+      "language": "python",
+      "source": "def f11():\nreturn 11\n",
+      "source_sha256": "bca26aaccfca9e1bcf28ae4fbff4b63f351ae9ce25c6c28c536eb78efd2395b9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_12",
+      "language": "python",
+      "source": "def f12():\nreturn 12\n",
+      "source_sha256": "5c0567fbd37b3ab296cbb903786359f63fa4d41320608e3e1abd14ab6b14c3f7",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_13",
+      "language": "python",
+      "source": "def f13():\nreturn 13\n",
+      "source_sha256": "5403467723838ad706196d10bde06f5d137605b72897d806c5eda618abd17327",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_14",
+      "language": "python",
+      "source": "def f14():\nreturn 14\n",
+      "source_sha256": "b0f300bd853bd2364c0344ca980ba386ae739246dd9d72eec32a7b7169097e6c",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_15",
+      "language": "python",
+      "source": "def f15():\nreturn 15\n",
+      "source_sha256": "d0cbdb9dde115ea6c9216c15ce9db1bc71d1f0a48dc0190200e816533a70490f",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_16",
+      "language": "python",
+      "source": "def f16():\nreturn 16\n",
+      "source_sha256": "0621b1ec5a2186edccea432d52055cd26b2685b1c3a651d2f3781b7aa5de7ece",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_17",
+      "language": "python",
+      "source": "def f17():\nreturn 17\n",
+      "source_sha256": "f0efaaa88dc3fba44570f3b36cd5d615f44677398233047f22e89fcfe401b781",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_18",
+      "language": "python",
+      "source": "def f18():\nreturn 18\n",
+      "source_sha256": "5c66994a50b6f72b66f25db7923da67b4072c0395bf5ce8abfeb66ffa98ee2e9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_19",
+      "language": "python",
+      "source": "def f19():\nreturn 19\n",
+      "source_sha256": "9b292d88b84b6e0a6bc431e015f9f60e41b5f7e6eee8625c855d0becd2e4e6c1",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_20",
+      "language": "python",
+      "source": "def f20():\nreturn 20\n",
+      "source_sha256": "4acb0e2f60dc587b8d08f360234c5145b4b6cb374ca5da2c9a700dc95317a135",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_21",
+      "language": "python",
+      "source": "def f21():\nreturn 21\n",
+      "source_sha256": "c03dc232084ce5393effb664aabab7771470cf1aab7ce3fa8f263508bfd02779",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_22",
+      "language": "python",
+      "source": "def f22():\nreturn 22\n",
+      "source_sha256": "57d8325da951eb149cab59399eadfad7ac3055b9314427bfdd277935809e1682",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_23",
+      "language": "python",
+      "source": "def f23():\nreturn 23\n",
+      "source_sha256": "2db51741dbf01083affb7776c8532e3c3eb337bb3ad9919cecc10b23646cf1f8",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_24",
+      "language": "python",
+      "source": "def f24():\nreturn 24\n",
+      "source_sha256": "2332be7d79e33d775bb4304a692dc7d4f233c340d8d81cb08ded21b2878c33ec",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_25",
+      "language": "python",
+      "source": "def f25():\nreturn 25\n",
+      "source_sha256": "8cdeb4f6dbe30755d6c21bfd3c381a2336311b3386139a8f11ed232c26fb269e",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_26",
+      "language": "python",
+      "source": "def f26():\nreturn 26\n",
+      "source_sha256": "085a710705404523a83e5d9359be855e0f9401d6c1f3b39e3aee816c1bc6cae7",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_27",
+      "language": "python",
+      "source": "def f27():\nreturn 27\n",
+      "source_sha256": "571e14fc00b616157dcbb0b286e0536ffca401dfcdd920212c2cffa4085f951a",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_28",
+      "language": "python",
+      "source": "def f28():\nreturn 28\n",
+      "source_sha256": "b8ded76df7fa97b32b0713eea36b02c232d8d1f36f39ec0f9eafa346b8923332",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_29",
+      "language": "python",
+      "source": "def f29():\nreturn 29\n",
+      "source_sha256": "e3ec311403042ad3ef055294b1ceb2600c2f1daab2523f38be9dcb983e4f3cb4",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_30",
+      "language": "python",
+      "source": "def f30():\nreturn 30\n",
+      "source_sha256": "63f18f47b6e472de802a8bafa75dcf1b9dc4b75b506c806b152a06ed4aaf5135",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_31",
+      "language": "python",
+      "source": "def f31():\nreturn 31\n",
+      "source_sha256": "4464bfbb95b7c0a862daaf8d3748f5d32b6ad77abd3144f346808cb9fd9dc135",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_32",
+      "language": "python",
+      "source": "def f32():\nreturn 32\n",
+      "source_sha256": "9217608b7e5ec3f69c5518095106c807d766f99c1e48dbf0bb179215b0613bd8",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_33",
+      "language": "python",
+      "source": "def f33():\nreturn 33\n",
+      "source_sha256": "ef24ae84c01621170610d674ad99331635b5b2b5e14c3a5cb7a57493b6520cd7",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_34",
+      "language": "python",
+      "source": "def f34():\nreturn 34\n",
+      "source_sha256": "1a3e171ef0670aec15d87571230d4802f02d186320eb63e6c039b92c614e4fa6",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_35",
+      "language": "python",
+      "source": "def f35():\nreturn 35\n",
+      "source_sha256": "54e08d9215ba1a0284eaffa4c9af8a8029378547d8a3c74677e338819eb0ff1e",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_36",
+      "language": "python",
+      "source": "def f36():\nreturn 36\n",
+      "source_sha256": "50ad8378b120e58a929c1850c0742fa2242dfadcac810521f2cd648eb1a1e8c8",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_37",
+      "language": "python",
+      "source": "def f37():\nreturn 37\n",
+      "source_sha256": "952174e9cfd13d3edcfaf3d5212e005db2abde623eb8e13237199aef98aa87a9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_38",
+      "language": "python",
+      "source": "def f38():\nreturn 38\n",
+      "source_sha256": "de78b5a47aef5a7f8fff7d187645c1d318f66cfcfd786d16e2293b6eadd1fa61",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_39",
+      "language": "python",
+      "source": "def f39():\nreturn 39\n",
+      "source_sha256": "30ae51901063c5ec986e239ce643580960f899dc6aa48327c6becf82f5378ba2",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_40",
+      "language": "python",
+      "source": "def f40():\nreturn 40\n",
+      "source_sha256": "0cd3c73506ec8860fa66d90bb6957da49e73955eb7a4876945549a0563a3ebf5",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_41",
+      "language": "python",
+      "source": "def f41():\nreturn 41\n",
+      "source_sha256": "55eb2f25be91b0cced5beb141a7464431c0c0739066c2964336aac6d702bc721",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_42",
+      "language": "python",
+      "source": "def f42():\nreturn 42\n",
+      "source_sha256": "9a5433e60027f7315037ffb3eca6b42d50242c57895714c1ec1dd3fe203b2737",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_43",
+      "language": "python",
+      "source": "def f43():\nreturn 43\n",
+      "source_sha256": "f273dfe1ebb33d34a80114b42a2e6b104aa9e0d622f96269624eb465441a2afd",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_44",
+      "language": "python",
+      "source": "def f44():\nreturn 44\n",
+      "source_sha256": "705ffa4a048f024d6a05083cb4b2dd4dd16e422f656d0f869dd9e7aae9a8d893",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_45",
+      "language": "python",
+      "source": "def f45():\nreturn 45\n",
+      "source_sha256": "b46b66b2a654c55d6243e03110ebc7547dacbd9ae2dc1744860ad5544885e029",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_46",
+      "language": "python",
+      "source": "def f46():\nreturn 46\n",
+      "source_sha256": "73f609db71f517ec9239a910d6a1ec715ae3f3a360a6f314b9f82171ca98efb4",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_47",
+      "language": "python",
+      "source": "def f47():\nreturn 47\n",
+      "source_sha256": "282a93917a5ec264d39091075e3c6f51d330fd502c12555918c231e4b7c6f9ec",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_48",
+      "language": "python",
+      "source": "def f48():\nreturn 48\n",
+      "source_sha256": "ee6973fdd3b910bd2464b8fedd1353e39cabca207be51b133173097a4ad4f1c7",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_49",
+      "language": "python",
+      "source": "def f49():\nreturn 49\n",
+      "source_sha256": "93d293b49801ce0dcfe5a427c16eee76daa8e853002477dc0f450bdc6d555425",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_50",
+      "language": "python",
+      "source": "def f50():\nreturn 50\n",
+      "source_sha256": "9702f88ca1ee9411cbdf8e93ce9dc6f82914c04cdaef0314ea1702acca6ba99c",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_51",
+      "language": "python",
+      "source": "def f51():\nreturn 51\n",
+      "source_sha256": "6ad6a54d255bc45d4add51104bec28b2b5e49bfaf57c40ef7d1b0d76dfc9617b",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_52",
+      "language": "python",
+      "source": "def f52():\nreturn 52\n",
+      "source_sha256": "ebcea57f994cd0bc4954b7396f94e9cd7e3e8c5c0cb7b56e26f829739a0cfed3",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_53",
+      "language": "python",
+      "source": "def f53():\nreturn 53\n",
+      "source_sha256": "3743ff83b89167ed5563c2afafac554f30393e69b7dbda1ca8b619b33a3eb0d5",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_54",
+      "language": "python",
+      "source": "def f54():\nreturn 54\n",
+      "source_sha256": "8b566559aae6fd05199618d6dcf01f3bae6d1ef1a47020c8b77b6ef0bd0f175d",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_55",
+      "language": "python",
+      "source": "def f55():\nreturn 55\n",
+      "source_sha256": "e7a08f98b7397ebc7231a4a08b81525cbaff8b82df9603b43f2225de497bd253",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_56",
+      "language": "python",
+      "source": "def f56():\nreturn 56\n",
+      "source_sha256": "998e27e9d05f11b096d3c0c94281d13ef8edd32ab97cab98cf8852f7f0b4174d",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_57",
+      "language": "python",
+      "source": "def f57():\nreturn 57\n",
+      "source_sha256": "d51a06f0fad4482db14f2d020c975452670666a9b0ac372617ae8749e0fadfad",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_58",
+      "language": "python",
+      "source": "def f58():\nreturn 58\n",
+      "source_sha256": "039a8eb41ab840c42575862a4da875980c458fde6e1041861965b559bda840d5",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_indent_59",
+      "language": "python",
+      "source": "def f59():\nreturn 59\n",
+      "source_sha256": "a870a68d2bc154431c9af966762db2359f7b91d59afa96567e17f5591c569e1d",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_0",
+      "language": "python",
+      "source": "def f0(\n    return 0\n",
+      "source_sha256": "a91f3ecd1e6af8069ba7cd6afa9c1a10e060bc4f37bd66c8f9bd66eaa36d3567",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_1",
+      "language": "python",
+      "source": "def f1(\n    return 1\n",
+      "source_sha256": "f2ec0eec001a9eae4d55cc2f02b9597af5e07ec5f3b317c6e16f1b6d5e0bd409",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_2",
+      "language": "python",
+      "source": "def f2(\n    return 2\n",
+      "source_sha256": "8fddd4cd89f96b922e2085f54d381b08ba8e97ed43b68918afaf361294d387b5",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_3",
+      "language": "python",
+      "source": "def f3(\n    return 3\n",
+      "source_sha256": "fee5a48f4af8b36a38d5576e70ebff1c6d3b5d06b911e04764f60b6a34b814ff",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_4",
+      "language": "python",
+      "source": "def f4(\n    return 4\n",
+      "source_sha256": "e701a8694c056c3d9072f336ffb4ca1c00d4bf47e043b44f9460cffddbd05898",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_5",
+      "language": "python",
+      "source": "def f5(\n    return 5\n",
+      "source_sha256": "6e678e56ff83d6200be0d8c733ffd8b6b7ba8a10c4f7c3f5537325ff439ab53d",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_6",
+      "language": "python",
+      "source": "def f6(\n    return 6\n",
+      "source_sha256": "e7c4da3ce3a57d366317c05a6cd462b8d9733802a82fe91adc74f0078623866b",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_7",
+      "language": "python",
+      "source": "def f7(\n    return 7\n",
+      "source_sha256": "93d3dd415432997d05378fae3855b28a967c3d14d5e8ef96ad5dbe83de0888cd",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_8",
+      "language": "python",
+      "source": "def f8(\n    return 8\n",
+      "source_sha256": "54e5c5de8d634c8ebf96d9a43d496ba788ad392e1968ae5bdaa751949582d38f",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_9",
+      "language": "python",
+      "source": "def f9(\n    return 9\n",
+      "source_sha256": "130965497c8e60db8adb47f7c58458851c964a8130aba3d7380c3f530c4675fe",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_10",
+      "language": "python",
+      "source": "def f10(\n    return 10\n",
+      "source_sha256": "310e97e00f9c7173326c968149d243661dce52535583a31a68b1a40bcb65c272",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_11",
+      "language": "python",
+      "source": "def f11(\n    return 11\n",
+      "source_sha256": "34a22618db51e321a4672d86dc25793e4b2e31f964754cec5a3ccebc7d769644",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_12",
+      "language": "python",
+      "source": "def f12(\n    return 12\n",
+      "source_sha256": "83488e955a9ff347178dc3d71690bee985c8f87705b9dbe180ff087eb89bb210",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_13",
+      "language": "python",
+      "source": "def f13(\n    return 13\n",
+      "source_sha256": "466931ebbed2455f64b896eb9c50276e4e3db1ffc75b7664dff3d1ab7a2845d7",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_14",
+      "language": "python",
+      "source": "def f14(\n    return 14\n",
+      "source_sha256": "49dca5fe3617fa703438ddb0625ff8be8faebecd21ade67269558296f62c4e58",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_15",
+      "language": "python",
+      "source": "def f15(\n    return 15\n",
+      "source_sha256": "4d25bccee6cbd9f530d646c5b7a3227a66fcdfe7208cff3d3f7ebdd952a0f3d2",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_16",
+      "language": "python",
+      "source": "def f16(\n    return 16\n",
+      "source_sha256": "f51c37000f6ac6e28c6afd011f1e965278c78ba68103a42ee75d6eba70fe0fa0",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_17",
+      "language": "python",
+      "source": "def f17(\n    return 17\n",
+      "source_sha256": "2e66970f0dce2a19ef06e4ba10722f712293fc3abf976f18e4705532c064ec25",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_18",
+      "language": "python",
+      "source": "def f18(\n    return 18\n",
+      "source_sha256": "7099433b5772e20ff4cfedaa508b19228d43f339c4d308ff406ce6fe60ed6d8b",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_19",
+      "language": "python",
+      "source": "def f19(\n    return 19\n",
+      "source_sha256": "ca320d5fd523f4b08d51f53ddfc0af33105d29e12debf1583c70ae9a45f8fea5",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_20",
+      "language": "python",
+      "source": "def f20(\n    return 20\n",
+      "source_sha256": "d639b41f87b5a4f149eab39a3fa3755691dd29621f59868c5e2fea075247293b",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_21",
+      "language": "python",
+      "source": "def f21(\n    return 21\n",
+      "source_sha256": "5a1b105ac285975419c125f8d4b4c1cc29eb450cec3632027934287beb74286d",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_22",
+      "language": "python",
+      "source": "def f22(\n    return 22\n",
+      "source_sha256": "87db804a5d8115bf223b76b875cd3d7e1b7e582e4231cd2842eba14310cf78c5",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_23",
+      "language": "python",
+      "source": "def f23(\n    return 23\n",
+      "source_sha256": "12a5af207adab715a79e4538fe7dd1542ec8b2c7cf7426f43dfb5c1213773cd4",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_24",
+      "language": "python",
+      "source": "def f24(\n    return 24\n",
+      "source_sha256": "7d3a196852a18e2199e6ba3058beb331ea31caa2b7b14807e071b3d812fb905a",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_25",
+      "language": "python",
+      "source": "def f25(\n    return 25\n",
+      "source_sha256": "cfd47f4c45b216e01e6b96de1440bde9fd63315cf24cf1129ee02667bef1c528",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_26",
+      "language": "python",
+      "source": "def f26(\n    return 26\n",
+      "source_sha256": "1b734820d6ffbeea40824e8c88023a9257aa335347df44fc6f415e1d1c8c2721",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_27",
+      "language": "python",
+      "source": "def f27(\n    return 27\n",
+      "source_sha256": "65d81e09a77ddadc80270e0aeb51f5b45650a8181e3ef12b37301f5849224799",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_28",
+      "language": "python",
+      "source": "def f28(\n    return 28\n",
+      "source_sha256": "f40091adc048d898aa8c369f1f08b2e8b3608727a6dbe9ec85dafe8ad49af433",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_29",
+      "language": "python",
+      "source": "def f29(\n    return 29\n",
+      "source_sha256": "8886007e4522e874e8a94f2f76e71d46c61c2bc5487b8912eb28458b77d69a4b",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_30",
+      "language": "python",
+      "source": "def f30(\n    return 30\n",
+      "source_sha256": "72e7d60fcae241f80eaed17b8f043b2191b297f178d2b7a9fa20e4914810e067",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_31",
+      "language": "python",
+      "source": "def f31(\n    return 31\n",
+      "source_sha256": "fc59ea5c469c58620799b40bb0829d6a1a0df3a11a46a9c18a2036f9aff31352",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_32",
+      "language": "python",
+      "source": "def f32(\n    return 32\n",
+      "source_sha256": "52762c60ee2775217c37f693ddcc406f0cb0775b7f166728340af7a2be15c475",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_33",
+      "language": "python",
+      "source": "def f33(\n    return 33\n",
+      "source_sha256": "81299ec47b9f76d5b55b777c1913362f13f0c1dad2bbc263258525c409275306",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_34",
+      "language": "python",
+      "source": "def f34(\n    return 34\n",
+      "source_sha256": "707ea0586c18c304ebfd2dc6f7d970323469cbbe97738a9b2d9793ef22301411",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_35",
+      "language": "python",
+      "source": "def f35(\n    return 35\n",
+      "source_sha256": "c64a1295489e1bce4175799fd0717c37f528a1af289ecba5d4b4dbaad6ec6a1c",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_36",
+      "language": "python",
+      "source": "def f36(\n    return 36\n",
+      "source_sha256": "726682e0b05cc0cb54906e172b8b3bec5abdef357717b22208d52552f7d1192f",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_37",
+      "language": "python",
+      "source": "def f37(\n    return 37\n",
+      "source_sha256": "118ce1b5578c13c23d676ff9897ed2117ccb064a7087d330e9656681c2d58bef",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_38",
+      "language": "python",
+      "source": "def f38(\n    return 38\n",
+      "source_sha256": "dad565cb1ea9c04e58990c697179c5cddddc5ed96805564fdaee0a52dbba1b49",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_39",
+      "language": "python",
+      "source": "def f39(\n    return 39\n",
+      "source_sha256": "558162b1f619155d2c716ecfc3cac017b2609a80f9d94089d0bbcf53757f6e2c",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_40",
+      "language": "python",
+      "source": "def f40(\n    return 40\n",
+      "source_sha256": "50e308437fbf48713a0d84280b97788cf271050633d20ab6ff34510dd2ced74a",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_41",
+      "language": "python",
+      "source": "def f41(\n    return 41\n",
+      "source_sha256": "4c9bd1a2534a63b4c11d25e14707d516aa33378ecde3be4243e659b46856557e",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_42",
+      "language": "python",
+      "source": "def f42(\n    return 42\n",
+      "source_sha256": "260988cf14885f5cb017df80cb3f8da9f0ff1d992d9ae5ff94686b2130a2996a",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_43",
+      "language": "python",
+      "source": "def f43(\n    return 43\n",
+      "source_sha256": "18cfff135f55c7c65e2f1ae32c8d8e9a107b7488516ddbe9b34498d0dc1bc3df",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_44",
+      "language": "python",
+      "source": "def f44(\n    return 44\n",
+      "source_sha256": "b9102922f5cbcefe8067023988746d810feaf89ab33356d0c20b045ba12b5fde",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_45",
+      "language": "python",
+      "source": "def f45(\n    return 45\n",
+      "source_sha256": "f1d821477635a9b38308a4c4784a586a9e2ae5226ae19c31b256552b361b6cfc",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_46",
+      "language": "python",
+      "source": "def f46(\n    return 46\n",
+      "source_sha256": "385936aab194963487adaf222d5503df225620ea88d21aaa52892a83ff6415d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_47",
+      "language": "python",
+      "source": "def f47(\n    return 47\n",
+      "source_sha256": "6e225d6d9624b8120e77c769bd394f8703235b9bdea751f079f94a91ddd1d284",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_48",
+      "language": "python",
+      "source": "def f48(\n    return 48\n",
+      "source_sha256": "cdcdedd766a43aede460ff25a5f69a3e24e8927a96da7f70a426565d80e1e2bd",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_49",
+      "language": "python",
+      "source": "def f49(\n    return 49\n",
+      "source_sha256": "896a00d87b61b6ff6d4c120dcf9fb5ee2418ee286691d818b4d8d9d1e6269b7d",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_50",
+      "language": "python",
+      "source": "def f50(\n    return 50\n",
+      "source_sha256": "bfe158cb0bc27f479ad596f3279f77c25477cd1e4c8e15fc7e867630e87cc32d",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_51",
+      "language": "python",
+      "source": "def f51(\n    return 51\n",
+      "source_sha256": "ffa4f550b94154e9ca6aeb216de3b5f913e634716bd91fede39d58b49eb159a7",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_52",
+      "language": "python",
+      "source": "def f52(\n    return 52\n",
+      "source_sha256": "83030bb913aa50a17e211bd1ce5c4c6c4d6982e0491d5e78e448070dc64196a7",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_53",
+      "language": "python",
+      "source": "def f53(\n    return 53\n",
+      "source_sha256": "f251e7bdf1b536919bc9c7c4dd423c0110844e1d2685534e8361b15d35e433b7",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_54",
+      "language": "python",
+      "source": "def f54(\n    return 54\n",
+      "source_sha256": "54c9d07dc153b0a192e8f287ebafbea15f0e355f428e0212b888967c3a2d8e3e",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_55",
+      "language": "python",
+      "source": "def f55(\n    return 55\n",
+      "source_sha256": "6cdc286055a2039af4735482ea99d4feea8d2431b5d5b20d719475299836d9a1",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_56",
+      "language": "python",
+      "source": "def f56(\n    return 56\n",
+      "source_sha256": "01460fc135ac753738282f96dbcdd5990e08234e95afa1faa1ba23f2417908e6",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_57",
+      "language": "python",
+      "source": "def f57(\n    return 57\n",
+      "source_sha256": "89fa5dc56aa1055d4f351d31ef408e3e37d46c4e097a6e54d92c5cd002f17348",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_58",
+      "language": "python",
+      "source": "def f58(\n    return 58\n",
+      "source_sha256": "cb372ed8e1c14fdd74e43e1477db632105a0400426a4cec64939806447a01f4b",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_paren_59",
+      "language": "python",
+      "source": "def f59(\n    return 59\n",
+      "source_sha256": "191cd1d91f380e373034be23deee74c61faf1f8b9ecdc2c9e3737a55eda9be07",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_0",
+      "language": "python",
+      "source": "def f0()\n    return 0\n",
+      "source_sha256": "59910eb1ca83fd4f31152bd7c6fca5eb4b76781d75d3eff382cee04c6bfca73b",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_1",
+      "language": "python",
+      "source": "def f1()\n    return 1\n",
+      "source_sha256": "4972aeffbc98e5d1a2e4a9ec5d814e9dc3771c7ae0d36553b772d1a958ef4200",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_2",
+      "language": "python",
+      "source": "def f2()\n    return 2\n",
+      "source_sha256": "2fb421476fac37cf1c484c946acfaaa942aa15f3d6f9d2470904576850ae4264",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_3",
+      "language": "python",
+      "source": "def f3()\n    return 3\n",
+      "source_sha256": "5fb676daa58b936ebdd027296e45b59b03bc2401e199fe2c72526adcb0ba100f",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_4",
+      "language": "python",
+      "source": "def f4()\n    return 4\n",
+      "source_sha256": "ab3800c6e4d86352403caf88711d206909c9447fdeaefd8ffde337e504f1d519",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_5",
+      "language": "python",
+      "source": "def f5()\n    return 5\n",
+      "source_sha256": "dda0c937136b21a837d29b3de12167709c48b95f7f94b25dde1ea65981160bd7",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_6",
+      "language": "python",
+      "source": "def f6()\n    return 6\n",
+      "source_sha256": "8c7e8c9d759820bc46840b87a4e772aa933a3e0d3ee7a63422734cbd090dd656",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_7",
+      "language": "python",
+      "source": "def f7()\n    return 7\n",
+      "source_sha256": "13633c8c57f3444d5ed54a978fbd180d1a0c6347eaaa9390a2079b295299340e",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_8",
+      "language": "python",
+      "source": "def f8()\n    return 8\n",
+      "source_sha256": "54ffd7aea886d1d0f6bd40f013b5f504d084ffddedfa78bafd8107856b4ab53b",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_9",
+      "language": "python",
+      "source": "def f9()\n    return 9\n",
+      "source_sha256": "fa8343a1af7e8e5d0371acf113ba279fc64ee5c7efb6a161fbebe83388669348",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_10",
+      "language": "python",
+      "source": "def f10()\n    return 10\n",
+      "source_sha256": "a630294f75807a09e57cb91387e50fdbb4868c28480537be0d2f99f6517b1dc7",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_11",
+      "language": "python",
+      "source": "def f11()\n    return 11\n",
+      "source_sha256": "ff902b8b5aff75ea3296ddcbf18626d3bd3375d74479e734f77890b6d714668e",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_12",
+      "language": "python",
+      "source": "def f12()\n    return 12\n",
+      "source_sha256": "972c428f7e6166a9b3e30f7c0140c55467b99ba049c44944b49217ec0a56ccd3",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_13",
+      "language": "python",
+      "source": "def f13()\n    return 13\n",
+      "source_sha256": "02127e111163706370cd2adaa7cd5cabd307fa6360b21c743b9d83eff0cb19dd",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_14",
+      "language": "python",
+      "source": "def f14()\n    return 14\n",
+      "source_sha256": "7bedb22608f6fb1cb06e0c6dcf466b6d5377ea6e5ec04b9b9d7455ef3c65fb80",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_15",
+      "language": "python",
+      "source": "def f15()\n    return 15\n",
+      "source_sha256": "105ae46d59449c9ef1be0ed3c9006d1fd836a480940f4cc300b8f1e0b1f4c036",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_16",
+      "language": "python",
+      "source": "def f16()\n    return 16\n",
+      "source_sha256": "fb6cd86b11f4f80ec49778715461b2db7fa46dc36de27c8d7cc70f87169a39b0",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_17",
+      "language": "python",
+      "source": "def f17()\n    return 17\n",
+      "source_sha256": "77293b812216bab535719f2a11f60b5b0d622ddc1f7bf447ba02b3282940a431",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_18",
+      "language": "python",
+      "source": "def f18()\n    return 18\n",
+      "source_sha256": "8776ec138956ab45b9439bceec99187e518dabe6cba23f2aa17820795c42ce55",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_19",
+      "language": "python",
+      "source": "def f19()\n    return 19\n",
+      "source_sha256": "55059938a530b74d70efa8899a5282641d4cf4afcf14567219af5538a8efe532",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_20",
+      "language": "python",
+      "source": "def f20()\n    return 20\n",
+      "source_sha256": "833b6777ecb9380517c7fb37b2c68566b967018a44e8139424521b546167b88d",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_21",
+      "language": "python",
+      "source": "def f21()\n    return 21\n",
+      "source_sha256": "48ef4e4e4cde03feda6250fb9baf02feb0234406671ca0cd0546bf8522ef84d0",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_22",
+      "language": "python",
+      "source": "def f22()\n    return 22\n",
+      "source_sha256": "89b99991fe1fa899f911744e9f36ee501452a8c82f67e3ac88e96602e6d93260",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_23",
+      "language": "python",
+      "source": "def f23()\n    return 23\n",
+      "source_sha256": "984809ec98287d2b4899412354e91af6394d899a8b1ce89d88546a42e5747ed4",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_24",
+      "language": "python",
+      "source": "def f24()\n    return 24\n",
+      "source_sha256": "7dba5f66d620882c19d311edc6d5a16bc4f758ab016559a306b7e575f6e2764d",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_25",
+      "language": "python",
+      "source": "def f25()\n    return 25\n",
+      "source_sha256": "c98f14558e0f33f799a4ed4ea9c9ec0430961ebba70335a8b6485c8dfff3a728",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_26",
+      "language": "python",
+      "source": "def f26()\n    return 26\n",
+      "source_sha256": "fd44fcaecf4886dc774f10a5a066b76df7ed1e3f833971b8040d5dd241a887c8",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_27",
+      "language": "python",
+      "source": "def f27()\n    return 27\n",
+      "source_sha256": "7da27ba9e395dc2255abfb2abf3fbdba18eeb0eed649add61db20499669e81af",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_28",
+      "language": "python",
+      "source": "def f28()\n    return 28\n",
+      "source_sha256": "b3e86e489d0f1ce78828a15d2aa0be3023a83624d26c0bf4e671d949bd2aa76e",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_29",
+      "language": "python",
+      "source": "def f29()\n    return 29\n",
+      "source_sha256": "aabeaf6746cea54b7e6a4c400cbe7f0c5b4e73346768ca6554646f301ef88dcf",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_30",
+      "language": "python",
+      "source": "def f30()\n    return 30\n",
+      "source_sha256": "4cafecf31a76616145df670721a0a686d23ab2ae859a3b3b2ab313cd6a26da5f",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_31",
+      "language": "python",
+      "source": "def f31()\n    return 31\n",
+      "source_sha256": "13d5413eb60ef09810a685760e553d228a45ff2789c097fa098a44b00f99b3af",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_32",
+      "language": "python",
+      "source": "def f32()\n    return 32\n",
+      "source_sha256": "e816134f09f7ef088250c801c8582597a0104b485c6c42e87df918d8bde9dd94",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_33",
+      "language": "python",
+      "source": "def f33()\n    return 33\n",
+      "source_sha256": "dfa1532ea6eb590f60fcf5ab99941de1ecf2de5e799af4037a7687212347773e",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_34",
+      "language": "python",
+      "source": "def f34()\n    return 34\n",
+      "source_sha256": "ddc440196feb094001b1977ae6b5a6069ba301e5b28c75ef11804fd7dd3cbc1f",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_35",
+      "language": "python",
+      "source": "def f35()\n    return 35\n",
+      "source_sha256": "1b5dd69b8e1a313d08c5ed9813e731f2259c5e59e03bd2eb78f08e14a7dfe303",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_36",
+      "language": "python",
+      "source": "def f36()\n    return 36\n",
+      "source_sha256": "646a73550da9990a7db597360aae8552e0e3d50e214fa8401f0fff2e12244efd",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_37",
+      "language": "python",
+      "source": "def f37()\n    return 37\n",
+      "source_sha256": "2b89d85fedb4566544e8f8edf5b3f2e2f254808be4f4a3c51c3638ed6e6219e3",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_38",
+      "language": "python",
+      "source": "def f38()\n    return 38\n",
+      "source_sha256": "822fb29f6da59735d6a3a732fd00f2003290ba36b0146820a6d8fc30997af0a2",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_39",
+      "language": "python",
+      "source": "def f39()\n    return 39\n",
+      "source_sha256": "72ba2a66195812953370cf503fcfb1462cd335c3344845ccdcabef3af608f555",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_40",
+      "language": "python",
+      "source": "def f40()\n    return 40\n",
+      "source_sha256": "04c2a38c2bbdba709e3859ad2dd8558456903735a542b9e894bdc7f8e2c8de00",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_41",
+      "language": "python",
+      "source": "def f41()\n    return 41\n",
+      "source_sha256": "883471db1c8840d3ccfe7dd01bcfea9c820088d732c04da737e10e144a8468f9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_42",
+      "language": "python",
+      "source": "def f42()\n    return 42\n",
+      "source_sha256": "5cd8af1633900546e41cce13c94bae3b2cba17bf3057a084686bc6450f8f7c0b",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_43",
+      "language": "python",
+      "source": "def f43()\n    return 43\n",
+      "source_sha256": "539883f63b6e6444b406ff8b2a7141570f55153ad918b311cf0828d5fcbe44ec",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_44",
+      "language": "python",
+      "source": "def f44()\n    return 44\n",
+      "source_sha256": "277da594108afafb3fd184bd28ca33479f0d6eb1742866e9f2b5c00c3ffdbadd",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_45",
+      "language": "python",
+      "source": "def f45()\n    return 45\n",
+      "source_sha256": "160799e5f856b5b948f28ccf588b93c0d483e7b1bb1f09b8374225b562f8d68e",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_46",
+      "language": "python",
+      "source": "def f46()\n    return 46\n",
+      "source_sha256": "288d7f4533c385dc5a8dec32cd804644e301e20a0eb627d2567358afb413d91a",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_47",
+      "language": "python",
+      "source": "def f47()\n    return 47\n",
+      "source_sha256": "9d8aa794adcdf4932f07d5ceaf999f4c7945048c36b5caf7ca6d9b28462e17ea",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_48",
+      "language": "python",
+      "source": "def f48()\n    return 48\n",
+      "source_sha256": "b225778b8c6207927d85ac011c516fa27e3961c9fb3b42436a39dd8e25848d2b",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_49",
+      "language": "python",
+      "source": "def f49()\n    return 49\n",
+      "source_sha256": "eb109a554b074499223c0064a7a91237aec67efaf4e0c75ae875a111c1a1dd45",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_50",
+      "language": "python",
+      "source": "def f50()\n    return 50\n",
+      "source_sha256": "2a1a13cb6c320dd20e670d28ec67167c933a87ba5978df8ef72807dd71a5b8ef",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_51",
+      "language": "python",
+      "source": "def f51()\n    return 51\n",
+      "source_sha256": "4ed3625a430e9550868f6d462891ae682ee5d5c66fb7bea2d142789d5e1e2dd0",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_52",
+      "language": "python",
+      "source": "def f52()\n    return 52\n",
+      "source_sha256": "9e41e0ce443547a244d441542c5e9c0cf1a6a65a1c373155fac1b7e7be8ba51f",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_53",
+      "language": "python",
+      "source": "def f53()\n    return 53\n",
+      "source_sha256": "7b36a0d318108ae0e04016d4c172594e689e950e2cf318aba7327e600e2c97aa",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_54",
+      "language": "python",
+      "source": "def f54()\n    return 54\n",
+      "source_sha256": "01da5525d606c3d5ab7f28a5f04cfb36780a56fb56453c66076b3e92c9d77498",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_55",
+      "language": "python",
+      "source": "def f55()\n    return 55\n",
+      "source_sha256": "02d9a189ae411a94655f6fed6fa5ca8e9ae7aa2a4c9b665a29be212065f66dff",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_56",
+      "language": "python",
+      "source": "def f56()\n    return 56\n",
+      "source_sha256": "c255444b30e4e082b136ea939a91141c05a1098d4a3f149a026285514bdeb881",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_57",
+      "language": "python",
+      "source": "def f57()\n    return 57\n",
+      "source_sha256": "54335cd211bcf4ef2570761eb582ebdc8b6e05d054579afbade93afe54d0f3c3",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_58",
+      "language": "python",
+      "source": "def f58()\n    return 58\n",
+      "source_sha256": "17730309aff335e6ea9a00a34a76415936ea103b8055746178d601641e555a86",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_59",
+      "language": "python",
+      "source": "def f59()\n    return 59\n",
+      "source_sha256": "98f3e3a03fa08863da2f7a2c5b87248c3e7097b16ea934f23eec9ec1763a55b2",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_0",
+      "language": "python",
+      "source": "if True\n    x = 0\n",
+      "source_sha256": "fe654836d99fcff02edcc137c64159533bd6bde530fec43d184baecb25eba742",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_1",
+      "language": "python",
+      "source": "if True\n    x = 1\n",
+      "source_sha256": "798d1f65d6a1f751c3060176976c2ed547dde9def3dd78fb51ddbe513760f1d6",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_2",
+      "language": "python",
+      "source": "if True\n    x = 2\n",
+      "source_sha256": "2ac3537865ce52e2bfcde9a7c1a1a20cd7cc8beb3e335374c40b7eda932d9c32",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_3",
+      "language": "python",
+      "source": "if True\n    x = 3\n",
+      "source_sha256": "8f7f5730f5f69ac8c87781f9be7d06a342bccf6d1fb8ea513ecfe6f6d25fccdf",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_4",
+      "language": "python",
+      "source": "if True\n    x = 4\n",
+      "source_sha256": "f931756532f1c1d62d0c5fb4efd78d8831093fb312207048e61513f64b5c2958",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_5",
+      "language": "python",
+      "source": "if True\n    x = 5\n",
+      "source_sha256": "aced57ce7f29d2f5152d1aa592382f955a23a669d2a4d6839dcf361139f9d32a",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_6",
+      "language": "python",
+      "source": "if True\n    x = 6\n",
+      "source_sha256": "5cf7a04ea31f5b3e1a74c99b8022960e8e3af63aa81aacdfc62380d607e2f1b0",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_7",
+      "language": "python",
+      "source": "if True\n    x = 7\n",
+      "source_sha256": "832f22bfcd57286bfe8684143df9f5ed01aed617c236d849c84796aaad57e3cf",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_8",
+      "language": "python",
+      "source": "if True\n    x = 8\n",
+      "source_sha256": "27286ab7fae70162acadc1de4ce959d84ed9666bebc200e12800546ae126e226",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_9",
+      "language": "python",
+      "source": "if True\n    x = 9\n",
+      "source_sha256": "ad9685c49976938d4261a53c050cdefb8cafc172c1559bfae55ad4a333bf43b7",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_10",
+      "language": "python",
+      "source": "if True\n    x = 10\n",
+      "source_sha256": "0e18f0ce583a38450e54017558329716c981fd36b03de3c0e47e193b745c8d67",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_11",
+      "language": "python",
+      "source": "if True\n    x = 11\n",
+      "source_sha256": "0f2247e25c15491bb3bf97b378d0e75afaf63fb914261e279bc4fecf530f91f0",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_12",
+      "language": "python",
+      "source": "if True\n    x = 12\n",
+      "source_sha256": "1126cbeb548c3a38916b1bc8ef63d56261e4c275d852c04faa3d72b79c925f8e",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_13",
+      "language": "python",
+      "source": "if True\n    x = 13\n",
+      "source_sha256": "8052813f3ab394f502d63da99e6e0fffd6de4450c0c5df0ad69510743baebe75",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_14",
+      "language": "python",
+      "source": "if True\n    x = 14\n",
+      "source_sha256": "e6d574d8fe369b6de70f4313e2fb13e47dee748957fab8f8fd36d4165074be0c",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_15",
+      "language": "python",
+      "source": "if True\n    x = 15\n",
+      "source_sha256": "be4731f728be732f3f92c162b22fbcef281c251eace1088b32c4fb704045c81d",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_16",
+      "language": "python",
+      "source": "if True\n    x = 16\n",
+      "source_sha256": "67d9fc638698bfb9856409d928effa7d7e5f6ff007cd580c8befb1d019d7b716",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_17",
+      "language": "python",
+      "source": "if True\n    x = 17\n",
+      "source_sha256": "dd0c0b165aaf5fc7810a9861d962517e9d0420c1c5699430f52efed80f50134b",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_18",
+      "language": "python",
+      "source": "if True\n    x = 18\n",
+      "source_sha256": "0a9a31e308e7cc61f76b72c2b27e9e370c216f5f3edf866fe8bced31cd894918",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_19",
+      "language": "python",
+      "source": "if True\n    x = 19\n",
+      "source_sha256": "bbe744d282d50ec4d93b2787fa8365535bfa77fad8c5519e6ec176d3303d57e6",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_20",
+      "language": "python",
+      "source": "if True\n    x = 20\n",
+      "source_sha256": "02da4ec4c8d5cc9ff5b047627c448fc18225c1cd24a38edfc6b2c9936e10dbb7",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_21",
+      "language": "python",
+      "source": "if True\n    x = 21\n",
+      "source_sha256": "c2eed3dc37a9828453b5c852282ccfa75e617b1d59cd8902c209ba9b06c7f839",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_22",
+      "language": "python",
+      "source": "if True\n    x = 22\n",
+      "source_sha256": "3c6c153297b41c182629485cabb738c4e6a49552fb5160462776a322ea29c736",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_23",
+      "language": "python",
+      "source": "if True\n    x = 23\n",
+      "source_sha256": "1fea4f9a9bd02cfe66ee66c6c714c50d88a6c791b562bf7a1e81df84085292f0",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_24",
+      "language": "python",
+      "source": "if True\n    x = 24\n",
+      "source_sha256": "9b641b700a3cec077d485802c71358a23f352e53d6907346c321702e41f0c023",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_25",
+      "language": "python",
+      "source": "if True\n    x = 25\n",
+      "source_sha256": "a8c3a7ff6b928b414c716f70bd7942fc92a89e3b76df90e9652e381cd8988d74",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_26",
+      "language": "python",
+      "source": "if True\n    x = 26\n",
+      "source_sha256": "a40cf5e0c502c090bb4a81f97dd7a6839cfeeeaac5f0ed6d43409f4cf13f1199",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_27",
+      "language": "python",
+      "source": "if True\n    x = 27\n",
+      "source_sha256": "e5ae50c29834ad9b0cfd4643ebfa394622b0c58ac577c5baad176ea09cdde94d",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_28",
+      "language": "python",
+      "source": "if True\n    x = 28\n",
+      "source_sha256": "18cc034f69e38a669eed52c3fbfadd396314f494b22ec6095d820cf793e65142",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_29",
+      "language": "python",
+      "source": "if True\n    x = 29\n",
+      "source_sha256": "bb8f94e7924232c6bb340875f5896db927c975b6a39c39090d829e3156c3d05a",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_30",
+      "language": "python",
+      "source": "if True\n    x = 30\n",
+      "source_sha256": "bfe25501eb4907b2f64fec21ab2e1c0931c163f1c09cdade9a2678d0e1aa88d4",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_31",
+      "language": "python",
+      "source": "if True\n    x = 31\n",
+      "source_sha256": "831296b1d19d271738f7961135e469c0a2c0e8dcf9256985eb947b009a2724c6",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_32",
+      "language": "python",
+      "source": "if True\n    x = 32\n",
+      "source_sha256": "03fa23112943df9f1c774a289b97598169147c62b0b3277ebfe0a03d83af3d7e",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_33",
+      "language": "python",
+      "source": "if True\n    x = 33\n",
+      "source_sha256": "d30f76a17e6f2ec799d7015fc3fa078c8fd14857dea3575a7d248a1a62d53f61",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_34",
+      "language": "python",
+      "source": "if True\n    x = 34\n",
+      "source_sha256": "592b5073e69ca6dc8b98f85d54e81f5b8a5ca8e4e0bc2608cd08a7d01e952e30",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_35",
+      "language": "python",
+      "source": "if True\n    x = 35\n",
+      "source_sha256": "0d9b23f13a8152d10247427d4fd62202c146af495d0a1902826c06e340b12863",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_36",
+      "language": "python",
+      "source": "if True\n    x = 36\n",
+      "source_sha256": "40277be3cb66120e678a79c38be782e13b857065b8a8710a46dfa9ec9f493b45",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_37",
+      "language": "python",
+      "source": "if True\n    x = 37\n",
+      "source_sha256": "00d87c7ef2b9a4bb6692798eac37d16e1bd73c6eb6e0310cbc2976d069db216e",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_38",
+      "language": "python",
+      "source": "if True\n    x = 38\n",
+      "source_sha256": "1a525e3c42e33fad3d1a12da30b8742996f932c2cc998e8eddf37d28b98d19ce",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_39",
+      "language": "python",
+      "source": "if True\n    x = 39\n",
+      "source_sha256": "2ce3d02288811c8b05e6042b8da53873001a55a75fc31d37c29aad2839cde74f",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_40",
+      "language": "python",
+      "source": "if True\n    x = 40\n",
+      "source_sha256": "77bca73c853beba3ed43bec53f6fdf4128954260245e2be632914e3e93f01a19",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_41",
+      "language": "python",
+      "source": "if True\n    x = 41\n",
+      "source_sha256": "333b2e1c992ea72ec2cc257594f10748367b9b7bcbbf45b4d2dbe940e46bb88b",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_42",
+      "language": "python",
+      "source": "if True\n    x = 42\n",
+      "source_sha256": "22bd5bf30b8edd350fb7fdfb36e675d62494fcf0167e40b8d4d592aeff21e1bc",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_43",
+      "language": "python",
+      "source": "if True\n    x = 43\n",
+      "source_sha256": "2aa6a1a37662d467781b1af823af6cde551a2ab6f37908b5a139954dedb638d7",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_44",
+      "language": "python",
+      "source": "if True\n    x = 44\n",
+      "source_sha256": "4f47de1618ead44c4b492825a0755eee1be61b0423efe71c1dc190d1a540b883",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_45",
+      "language": "python",
+      "source": "if True\n    x = 45\n",
+      "source_sha256": "964cec7178fd9d7d43c4ae33bf43dd582cb7baad41311a5827ae9faefeaf0279",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_46",
+      "language": "python",
+      "source": "if True\n    x = 46\n",
+      "source_sha256": "327c60c66165f6aba46c93b0fed9b95201743bb191f36bed9e41a76c44365dc7",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_47",
+      "language": "python",
+      "source": "if True\n    x = 47\n",
+      "source_sha256": "608d6548bfe85844cb19f0d5c5b8401a41c029729385f4dc0945f0cedab08d1d",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_48",
+      "language": "python",
+      "source": "if True\n    x = 48\n",
+      "source_sha256": "c4870c32c058b57569a0d1a1c0d4c4cee23c9d4e91a082ff5d08abe8f7910279",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_49",
+      "language": "python",
+      "source": "if True\n    x = 49\n",
+      "source_sha256": "cb6587e97fe7262ef7070b68568771c19d93e536b4b1b03826aac5cc5cd85e1f",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_50",
+      "language": "python",
+      "source": "if True\n    x = 50\n",
+      "source_sha256": "ae7e906e3ddb9431c8bcc3169c63d22ca5d07a31f959baefcc35833592247073",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_51",
+      "language": "python",
+      "source": "if True\n    x = 51\n",
+      "source_sha256": "38d3047f5138caf22d4d4d73f3f1f9c18e0d7c9ec4f7e4c09c8381cf5eee8689",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_52",
+      "language": "python",
+      "source": "if True\n    x = 52\n",
+      "source_sha256": "3f9189af2a2be46911ddeff1958c7e845b7ac17dd6604643adba4c0c59392c73",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_53",
+      "language": "python",
+      "source": "if True\n    x = 53\n",
+      "source_sha256": "927b537bdb5ae6d9eddd89b5dad6eb2941ecab8f95f65e49c2a77d3bd1fe6f4d",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_54",
+      "language": "python",
+      "source": "if True\n    x = 54\n",
+      "source_sha256": "4c7ce5d06dd572e4c14d40965fd9b1142e7080edb2333a18e001ad30bbf22b28",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_55",
+      "language": "python",
+      "source": "if True\n    x = 55\n",
+      "source_sha256": "a3017f259c31761c3af1fef8a3423bde373df4b6f5510a6350f15dbc705bd957",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_56",
+      "language": "python",
+      "source": "if True\n    x = 56\n",
+      "source_sha256": "9d01fcb11f396033778a360cfe7390371dae352ec137b4919be97a3af6c14bd8",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_57",
+      "language": "python",
+      "source": "if True\n    x = 57\n",
+      "source_sha256": "a87e94c91375c43c93521ad3b61732b9d0fb353c9b54f73eb241f0b52b3077d4",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_58",
+      "language": "python",
+      "source": "if True\n    x = 58\n",
+      "source_sha256": "5c3f0c8b3c19b0c278f964aa0f009bc4426ffea1401a430883777667a8be90be",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_colon_if_59",
+      "language": "python",
+      "source": "if True\n    x = 59\n",
+      "source_sha256": "ee6dea7e17a7fc57d201a99cc676b79c9367c2b128da1a60df2d5b9490640942",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_0",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_1",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_2",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_3",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_4",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_5",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_6",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_7",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_8",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_9",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_10",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_11",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_12",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_13",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_14",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_15",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_16",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_17",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_18",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_19",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_20",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_21",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_22",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_23",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_24",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_25",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_26",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_27",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_28",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_29",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_30",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_31",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_32",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_33",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_34",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_35",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_36",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_37",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_38",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_39",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_40",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_41",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_42",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_43",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_44",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_45",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_46",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_47",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_48",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_49",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_50",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_51",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_52",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_53",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_54",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_55",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_56",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_57",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_58",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    },
+    {
+      "id": "py_invalid_quote_59",
+      "language": "python",
+      "source": "x = \"unclosed\n",
+      "source_sha256": "74bb53402c9bf9d269cc7468b76199daa352863f114f4eb1731222074bda96d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/generate_multi_lang_corpus.py"
+    }
+  ]
+}

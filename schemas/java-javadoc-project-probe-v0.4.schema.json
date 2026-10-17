@@ -1,0 +1,157 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "checker_id",
+    "project_checker_attribution",
+    "language",
+    "category",
+    "source_file_count",
+    "observed_file_count",
+    "local_probe_complete",
+    "coverage_proven",
+    "authority",
+    "delivery_decision",
+    "files",
+    "maven_multifile_probes",
+    "probe_mode"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.4.0"
+    },
+    "report_type": {
+      "const": "java_javadoc_project_probe"
+    },
+    "checker_id": {
+      "const": "java.jdk.javadoc"
+    },
+    "project_checker_attribution": {
+      "const": "unverified"
+    },
+    "language": {
+      "const": "java"
+    },
+    "category": {
+      "const": "comments"
+    },
+    "source_file_count": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "observed_file_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "local_probe_complete": {
+      "type": "boolean"
+    },
+    "coverage_proven": {
+      "const": false
+    },
+    "authority": {
+      "const": "local_unverified"
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    },
+    "maven_multifile_probes": {
+      "type": "array",
+      "maxItems": 0
+    },
+    "files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "build_root",
+          "configuration",
+          "configuration_ref",
+          "configuration_sha256",
+          "reason",
+          "observation"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "build_root": {
+            "type": "string",
+            "minLength": 1
+          },
+          "configuration": {
+            "enum": [
+              "configured",
+              "missing",
+              "unknown",
+              "invalid"
+            ]
+          },
+          "configuration_ref": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "configuration_sha256": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "reason": {
+            "enum": [
+              "request_cancelled",
+              "request_deadline_exceeded",
+              "javadoc_configuration_not_confirmed",
+              "javadoc_configuration_changed_before_scan",
+              "javadoc_configuration_changed_during_scan",
+              "javadoc_source_scope_unverified",
+              "native_probe_returned",
+              "maven_multifile_probe_selected"
+            ]
+          },
+          "observation": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "java-javadoc-local-feedback-v0.2.schema.json"
+              }
+            ]
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "reason": {
+                  "const": "maven_multifile_probe_selected"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "observation": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "probe_mode": {
+      "const": "jdk_single_file"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:java-javadoc-project-probe:0.4.0"
+}

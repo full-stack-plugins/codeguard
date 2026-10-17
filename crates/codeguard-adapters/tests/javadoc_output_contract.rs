@@ -1,4 +1,4 @@
-use codeguard_adapters::{JavadocParseState, parse_javadoc_output};
+use codeguard_adapters::{JavadocParseState, parse_detailed_javadoc_output, parse_javadoc_output};
 
 #[test]
 fn jdk21_missing_comment_param_and_return_are_structured() {
@@ -36,4 +36,35 @@ fn diagnostic_source_excerpt_must_match_the_scanned_bytes() {
     let parsed = parse_javadoc_output(output, "/private/Bad.java", b"public class Good {}\n");
     assert_eq!(parsed.state, JavadocParseState::Incomplete);
     assert_eq!(parsed.reason, Some("javadoc_source_line_mismatch"));
+}
+
+#[test]
+fn detailed_descriptions_have_distinct_source_bound_rules() {
+    let source = b"public class Bad {}\n";
+    for (message, rule) in [
+        ("empty comment", "JavadocEmptyComment"),
+        ("no main description", "JavadocMissingMainDescription"),
+        ("no description for @param", "JavadocEmptyParamDescription"),
+        (
+            "no description for @return",
+            "JavadocEmptyReturnDescription",
+        ),
+        (
+            "no description for @throws",
+            "JavadocEmptyThrowsDescription",
+        ),
+    ] {
+        let output = format!(
+            "/private/Bad.java:1: warning: {message}\npublic class Bad {{}}\n       ^\n1 warning\n"
+        );
+        let legacy = parse_javadoc_output(output.as_bytes(), "/private/Bad.java", source);
+        assert_eq!(legacy.state, JavadocParseState::Incomplete);
+        let parsed = parse_detailed_javadoc_output(output.as_bytes(), "/private/Bad.java", source);
+        assert_eq!(
+            parsed.state,
+            JavadocParseState::ValidDiagnostics,
+            "{message}"
+        );
+        assert_eq!(parsed.diagnostics[0].rule_id, rule);
+    }
 }

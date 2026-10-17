@@ -1,0 +1,247 @@
+[
+  {
+    "case": "missing",
+    "report": {
+      "authority": "local_unverified",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "findings": [
+        {
+          "column": 8,
+          "line": 1,
+          "path": "src/main/java/Sample.java",
+          "rule_id": "JavadocMissingComment"
+        },
+        {
+          "column": 12,
+          "line": 2,
+          "path": "src/main/java/Sample.java",
+          "rule_id": "JavadocMissingComment"
+        },
+        {
+          "column": 16,
+          "line": 3,
+          "path": "src/main/java/Sample.java",
+          "rule_id": "JavadocMissingComment"
+        }
+      ],
+      "gradle_bundle_sha256": "915f28e8fd4f7133e51321c688bf59dbc4c18da8748a297913010d245ddd3651",
+      "init_scripts_sha256": "f759fb2fde664dbf316a17f752630f5f78b4b98dac5131f2ac43133e763ba309",
+      "java_entry_sha256": "e820b09ad7e80bf14ec6803d9ade8abc02dfbfe9d0540f9b0e8c6d334706bc5e",
+      "jdk_release_sha256": "9e5f483cd7a0b0bd3524139fb7e08dae750bd9b60336004fa70cd2d00bcc0583",
+      "model_report_sha256": "4b6e4673bc26d43ebf422edc7e6dba28f4ad91a20a8166dba6f0a4029580a664",
+      "native_status": "findings_observed_unverified",
+      "native_stderr_sha256": "7915344e7e17ad67e59a65208f70d70699401c59a37475219308d6ddd23b2e84",
+      "native_stdout_sha256": "345ad3994d7c90d240429a29e59cb1259cfe81aee908c46c2404f510c7c9d830",
+      "reason": "selected_sources_and_complete_documentation_rules_unverified",
+      "report_type": "gradle_javadoc_probe",
+      "rule_configuration_complete": false,
+      "schema_version": "0.1.0",
+      "selected_java_file_count": 1,
+      "source_snapshot_sha256": "7eca284f3a6816722d9b05bb10a21083f2e2ee0e41b112e2b0325ae1a4c47966",
+      "task_paths": [
+        ":javadoc"
+      ]
+    }
+  },
+  {
+    "case": "missing_tags",
+    "report": {
+      "authority": "local_unverified",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "findings": [
+        {
+          "column": 16,
+          "line": 6,
+          "path": "src/main/java/Sample.java",
+          "rule_id": "JavadocMissingParam"
+        },
+        {
+          "column": 16,
+          "line": 6,
+          "path": "src/main/java/Sample.java",
+          "rule_id": "JavadocMissingReturn"
+        }
+      ],
+      "gradle_bundle_sha256": "915f28e8fd4f7133e51321c688bf59dbc4c18da8748a297913010d245ddd3651",
+      "init_scripts_sha256": "f759fb2fde664dbf316a17f752630f5f78b4b98dac5131f2ac43133e763ba309",
+      "java_entry_sha256": "e820b09ad7e80bf14ec6803d9ade8abc02dfbfe9d0540f9b0e8c6d334706bc5e",
+      "jdk_release_sha256": "9e5f483cd7a0b0bd3524139fb7e08dae750bd9b60336004fa70cd2d00bcc0583",
+      "model_report_sha256": "4b6e4673bc26d43ebf422edc7e6dba28f4ad91a20a8166dba6f0a4029580a664",
+      "native_status": "findings_observed_unverified",
+      "native_stderr_sha256": "253b28da9bf76c121f56a065d5da1c1b8bda26c20a9b2743fbdbc6505eb51aae",
+      "native_stdout_sha256": "345ad3994d7c90d240429a29e59cb1259cfe81aee908c46c2404f510c7c9d830",
+      "reason": "selected_sources_and_complete_documentation_rules_unverified",
+      "report_type": "gradle_javadoc_probe",
+      "rule_configuration_complete": false,
+      "schema_version": "0.1.0",
+      "selected_java_file_count": 1,
+      "source_snapshot_sha256": "c1662cb7ffc6c628a7e0628a6b6dc048691117168dfcd6716950e93b4a33f9fa",
+      "task_paths": [
+        ":javadoc"
+      ]
+    }
+  },
+  {
+    "case": "empty_tags",
+    "report": {
+      "authority": "local_unverified",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "findings": [
+        {
+          "column": 8,
+          "line": 6,
+          "path": "src/main/java/Sample.java",
+          "rule_id": "JavadocEmptyParamDescription"
+        },
+        {
+          "column": 8,
+          "line": 7,
+          "path": "src/main/java/Sample.java",
+          "rule_id": "JavadocEmptyReturnDescription"
+        }
+      ],
+      "gradle_bundle_sha256": "915f28e8fd4f7133e51321c688bf59dbc4c18da8748a297913010d245ddd3651",
+      "init_scripts_sha256": "f759fb2fde664dbf316a17f752630f5f78b4b98dac5131f2ac43133e763ba309",
+      "java_entry_sha256": "e820b09ad7e80bf14ec6803d9ade8abc02dfbfe9d0540f9b0e8c6d334706bc5e",
+      "jdk_release_sha256": "9e5f483cd7a0b0bd3524139fb7e08dae750bd9b60336004fa70cd2d00bcc0583",
+      "model_report_sha256": "4b6e4673bc26d43ebf422edc7e6dba28f4ad91a20a8166dba6f0a4029580a664",
+      "native_status": "findings_observed_unverified",
+      "native_stderr_sha256": "28d353fb482bfb1bd2330708e26c0c58d891a84a0e23abf9310fb0f4f2373c84",
+      "native_stdout_sha256": "345ad3994d7c90d240429a29e59cb1259cfe81aee908c46c2404f510c7c9d830",
+      "reason": "selected_sources_and_complete_documentation_rules_unverified",
+      "report_type": "gradle_javadoc_probe",
+      "rule_configuration_complete": false,
+      "schema_version": "0.1.0",
+      "selected_java_file_count": 1,
+      "source_snapshot_sha256": "4cedb0f1b6cf25930cdcc0a0923b83fc7c5c7f81093d521875392271949da838",
+      "task_paths": [
+        ":javadoc"
+      ]
+    }
+  },
+  {
+    "case": "documented",
+    "report": {
+      "authority": "local_unverified",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "findings": [],
+      "gradle_bundle_sha256": "915f28e8fd4f7133e51321c688bf59dbc4c18da8748a297913010d245ddd3651",
+      "init_scripts_sha256": "f759fb2fde664dbf316a17f752630f5f78b4b98dac5131f2ac43133e763ba309",
+      "java_entry_sha256": "e820b09ad7e80bf14ec6803d9ade8abc02dfbfe9d0540f9b0e8c6d334706bc5e",
+      "jdk_release_sha256": "9e5f483cd7a0b0bd3524139fb7e08dae750bd9b60336004fa70cd2d00bcc0583",
+      "model_report_sha256": "4b6e4673bc26d43ebf422edc7e6dba28f4ad91a20a8166dba6f0a4029580a664",
+      "native_status": "empty_output_unverified",
+      "native_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "native_stdout_sha256": "37c356f163c81be1038fa8b3ed141416502fd8388b2f88a31d16aef347c56323",
+      "reason": "selected_sources_and_complete_documentation_rules_unverified",
+      "report_type": "gradle_javadoc_probe",
+      "rule_configuration_complete": false,
+      "schema_version": "0.1.0",
+      "selected_java_file_count": 1,
+      "source_snapshot_sha256": "4ce58e452efa3077f1d1326f8c227f44d216a4ce24f3b97f12ff4e72886018eb",
+      "task_paths": [
+        ":javadoc"
+      ]
+    }
+  },
+  {
+    "case": "missing_native",
+    "report": {
+      "authority": "local_unverified",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "findings": [],
+      "gradle_bundle_sha256": null,
+      "init_scripts_sha256": "f759fb2fde664dbf316a17f752630f5f78b4b98dac5131f2ac43133e763ba309",
+      "java_entry_sha256": null,
+      "jdk_release_sha256": null,
+      "model_report_sha256": null,
+      "native_status": "incomplete",
+      "native_stderr_sha256": null,
+      "native_stdout_sha256": null,
+      "reason": "native_prerequisite_unavailable",
+      "report_type": "gradle_javadoc_probe",
+      "rule_configuration_complete": false,
+      "schema_version": "0.1.0",
+      "selected_java_file_count": 0,
+      "source_snapshot_sha256": "c6cabe95d0e6a72d9dc2ffef9094881bd637677bb974432a20dc0f3f5a7cbd12",
+      "task_paths": []
+    }
+  },
+  {
+    "case": "cancelled",
+    "report": {
+      "authority": "local_unverified",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "findings": [],
+      "gradle_bundle_sha256": null,
+      "init_scripts_sha256": "f759fb2fde664dbf316a17f752630f5f78b4b98dac5131f2ac43133e763ba309",
+      "java_entry_sha256": null,
+      "jdk_release_sha256": null,
+      "model_report_sha256": null,
+      "native_status": "incomplete",
+      "native_stderr_sha256": null,
+      "native_stdout_sha256": null,
+      "reason": "request_cancelled",
+      "report_type": "gradle_javadoc_probe",
+      "rule_configuration_complete": false,
+      "schema_version": "0.1.0",
+      "selected_java_file_count": 0,
+      "source_snapshot_sha256": null,
+      "task_paths": []
+    }
+  },
+  {
+    "case": "expired",
+    "report": {
+      "authority": "local_unverified",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "findings": [],
+      "gradle_bundle_sha256": null,
+      "init_scripts_sha256": "f759fb2fde664dbf316a17f752630f5f78b4b98dac5131f2ac43133e763ba309",
+      "java_entry_sha256": null,
+      "jdk_release_sha256": null,
+      "model_report_sha256": null,
+      "native_status": "incomplete",
+      "native_stderr_sha256": null,
+      "native_stdout_sha256": null,
+      "reason": "request_deadline_exceeded",
+      "report_type": "gradle_javadoc_probe",
+      "rule_configuration_complete": false,
+      "schema_version": "0.1.0",
+      "selected_java_file_count": 0,
+      "source_snapshot_sha256": null,
+      "task_paths": []
+    }
+  },
+  {
+    "case": "missing_root",
+    "report": {
+      "authority": "local_unverified",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "findings": [],
+      "gradle_bundle_sha256": null,
+      "init_scripts_sha256": "f759fb2fde664dbf316a17f752630f5f78b4b98dac5131f2ac43133e763ba309",
+      "java_entry_sha256": null,
+      "jdk_release_sha256": null,
+      "model_report_sha256": null,
+      "native_status": "incomplete",
+      "native_stderr_sha256": null,
+      "native_stdout_sha256": null,
+      "reason": "root_build_inputs_missing",
+      "report_type": "gradle_javadoc_probe",
+      "rule_configuration_complete": false,
+      "schema_version": "0.1.0",
+      "selected_java_file_count": 0,
+      "source_snapshot_sha256": null,
+      "task_paths": []
+    }
+  }
+]

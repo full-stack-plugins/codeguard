@@ -1,0 +1,87 @@
+{
+  "delivery_decision": "not_evaluated",
+  "grammar_qualified": false,
+  "independent_holdout": false,
+  "native_tool_sha256": "f9b046eb45d522f6e41d0b7eef03d4a1d0f898e0b54f1eac0a1b254be81d0e36",
+  "native_version": "javac 21.0.12.1\n",
+  "schema_version": "0.1.0",
+  "scope": "java21_new_local_cases",
+  "observations": [
+    {
+      "case": "pattern_switch",
+      "source_sha256": "7cff38df8d68315bc79af1147df3a612703cd8379a065c9c5f3f1e1c848fbad0",
+      "native_valid": true,
+      "candidate_valid": true,
+      "candidate_report_sha256": "da60a866f6a3eca50c79e58bd32c04bef20e44dbf1e653bbef11c004dace0f3b"
+    },
+    {
+      "case": "guarded_switch",
+      "source_sha256": "a9aa35d2e450397b94864ca9f84fa9cb08b63d05d396fe9bdc9f75e0cc91cf03",
+      "native_valid": true,
+      "candidate_valid": true,
+      "candidate_report_sha256": "5783d9c3539830f2f8a025e3ddef31ffb403dbdc04d26e4caf2bb1694667ae90"
+    },
+    {
+      "case": "record_pattern",
+      "source_sha256": "daa326a9f452f3ffa0f0fbfa0effefde9d41b2af0a736c4a11e59c5509a7f3f3",
+      "native_valid": true,
+      "candidate_valid": true,
+      "candidate_report_sha256": "32678be9e5e901dd2769903b1e70707916e6f085e414869c6b78e58fbd5165d8"
+    },
+    {
+      "case": "sealed_record",
+      "source_sha256": "914ba8be2750d45b3c1eaea1720b23d7fdbdb0f1252d10ef3e50838c758de27b",
+      "native_valid": true,
+      "candidate_valid": true,
+      "candidate_report_sha256": "a2df8d26bfa8d1239ed1c5954893a5f9ec04a23b10a84fb41558f62cc8d1c615"
+    },
+    {
+      "case": "text_block",
+      "source_sha256": "1d48239dbc78baafcc7554ff7c16758feed86ba75fae4f0e05c1723c92604145",
+      "native_valid": true,
+      "candidate_valid": true,
+      "candidate_report_sha256": "db81166cbdc1d41b3fef852bd3e174c6997bb0105d4286744acf3815dd039f69"
+    },
+    {
+      "case": "missing_guard",
+      "source_sha256": "61eb96df16c9d6b42aec9e07ce656a127b7c2658ad451aae3307a21709a170c1",
+      "native_valid": false,
+      "candidate_valid": false,
+      "candidate_report_sha256": "4b8c219a5e578d042fa48dd7733f5c87c3c69b95b83d2f336020afde69fd34af"
+    },
+    {
+      "case": "missing_record_parameter_type",
+      "source_sha256": "97ebf921f8c089fe01a329e275af683fa78eac2903dbc22eb1a312cf49574de7",
+      "native_valid": false,
+      "candidate_valid": false,
+      "candidate_report_sha256": "3de80c9512c7c694be24147466a1eb51ad3698024e20d844c372733ca9d44045"
+    },
+    {
+      "case": "missing_switch_arrow",
+      "source_sha256": "6b92578733f6c9150f13fd2dbabc641bbb59bf626c8ff54d0858c07b2cf9427a",
+      "native_valid": false,
+      "candidate_valid": false,
+      "candidate_report_sha256": "c778312e404252f9ad08bfc09c0630b3ff28369a7908081ebc3fc111bb94aab1"
+    }
+  ],
+  "source_sha256": "02f223ed7f786163ffd7034c0e88247b92cedf80b1e2ff3ac5e6f6ea1d774c11",
+  "raw_report_sha256": "9d3a53ae5cdb591bda2a95713a854e627551e1a08492f0c4886ff9866f4c96f8",
+  "logs_sha256": {
+    "cg-java-native-recovery-classification.log": "be447ba7f5ebb2268587daebc5a38c9c48479874fa8298d4cd72c29ca76c3683",
+    "cg-java21-native-new-cases.log": "eec0c7208969f34613c88bab650f8f1b3135b457fb5d8070849733b7b8fc1eb4",
+    "cg-java-native-current-final.log": "3c38d39fec3e34d0ea42ce631788167dfc470289a90a92de210b2bdb22b75c9c",
+    "cg-java-native-clippy.log": "7816be6d8b455bec1730c6a157aa750cb2310e6195ee15d56f30cd41355f6147"
+  },
+  "tests": {
+    "passed": 4,
+    "failed": 0,
+    "ignored": 0
+  },
+  "java21_counts": {
+    "tp": 3,
+    "tn": 5,
+    "fp": 0,
+    "fn": 0,
+    "unknown": 0
+  }
+}

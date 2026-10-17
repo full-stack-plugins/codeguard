@@ -61,7 +61,7 @@ fn ruby_native_project_scan_preempts_wasm_without_fabricating_columns() {
     let tool = p.tool("2.6.10p210");
     let report = p.check("all", Some(&tool));
     let scan = &report["native_results"]["ruby_lint"];
-    assert_eq!(report["schema_version"], "0.51.0");
+    assert_eq!(report["schema_version"], "0.73.0");
     assert_eq!(scan["files"][0]["native"]["status"], "diagnostics_observed");
     assert_eq!(scan["files"][0]["native"]["diagnostics"][0]["line"], 1);
     assert!(

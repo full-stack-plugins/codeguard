@@ -17,3 +17,16 @@ Rust runtime 在私有 POM 与数据库副本中调用原生 `org.owasp:dependen
 重复 CVE blocker 扫描现在只在首次发现写 tracked `observed` 事件，后续每轮报告摘要与受影响路径写入默认忽略的 `state/observations/`；复检事件之后再次出现才补一条 tracked 事件，继续重复扫描不增加 Git 噪声。`check_java_cve_native` 中连续扫描与复检后的再现矩阵验证这一点。
 
 本切片尚未把未经核验的 advisory 写成 `finding`，也未实现 CVE 任务的正式关闭/重开或可信漏洞库验收；故此任务始终不能用于交付通过。模拟原生与缺数据库的持久化正反例见 `check_java_cve_native` 测试。
+
+## 2026-10-07 真实插件执行发现与修复（requiresOnline 与 `-o` 冲突）
+
+首次用本机真实 Maven 3.9.16 + Microsoft OpenJDK 21.0.12.1 + `org.owasp:dependency-check-maven:10.0.4`（本地缓存）执行探针原生命令时发现：该插件 `check` goal 在插件描述符中声明 `<requiresOnline>true</requiresOnline>`，Maven 在 `-o` 模式下于 goal 启动前直接失败（"Goal requires online mode for execution but Maven is currently offline"）。此前该探针只有模拟工具验收，`-o` 参数使**任何真实 dependency-check 版本都无法执行**。修复：探针不再向 Maven 传 `-o`，改用探针私有的隔离 settings——镜像 id 保持 `nexus-aliyun`（与离线仓库 `_remote.repositories` 来源一致）但 URL 指向不可路由的 `http://127.0.0.1:9/`。闭包完整时零联网；任何缺件都会确定性连接失败并如实返回 `native_execution_incomplete`，绝不静默下载。`check_java_cve_native::owasp_probe_invokes_real_plugin_online_semantics_with_unroutable_mirror` 以受控 Maven 脚本断言：无 `-o`/`--offline`、保留 `-DautoUpdate=false`、settings 不可路由且不含真实远端。
+
+同批新增修复反例 `fixed_version_recheck_with_original_tool_never_becomes_clean_acceptance`：同一原工具先报漏洞、依赖升到修复版本后复检，第二次观察固定 `empty_report_unverified`、零 advisory、`database_freshness=unverified`，`task verify` 保持 `still_blocked` 且事实 `open`——修复后复检不得产出清洁结论。
+
+真实执行证据（均零联网，磁盘 fixture）：约 493 MiB 受控离线仓库（本机缓存整拷后裁掉与闭包无关的大块，并将 fixture 内 `_remote.repositories` 统一改写为 `nexus-aliyun=`；仅测试专用，不改用户缓存）+ 本机真实 NVD 数据库副本（2026-08-28 由 12.1.1 生成，34 MiB）。结果：
+
+- 真实 10.0.4 插件 + 12.1.1 格式数据库 → 引擎侧 `DatabaseException: Incompatible or corrupt database found`、BUILD FAILURE；探针如实 `incomplete`/`native_execution_incomplete`、零 advisory、退出 3、交付 `not_evaluated`。条件用例 `real_owasp_engine_database_mismatch_stays_incomplete_never_clean`（需 `CODEGUARD_MAVEN_BIN`、`CODEGUARD_JAVA_HOME`、`CODEGUARD_OWASP_MAVEN_REPO`、`CODEGUARD_OWASP_DATA_DIR`、可选 `CODEGUARD_OWASP_PLUGIN_VERSION`）在本机通过。
+- 真实插件 + 空数据目录（无 `odc.mv.db`）+ `autoUpdate=false` → `NoDataException: Autoupdate is disabled and the database does not exist`、BUILD FAILURE；真实工具自身拒绝在无库时产出清洁报告，与探针反伪造契约一致。
+
+仍缺：**真实正反例（真实漏洞 advisory 被观察 / 匹配库下真实零漏洞）**。本机唯一真实 NVD 库为 12.1.1 格式，与本地缓存插件 10.0.4 不兼容；闭环需要授权将 `org.owasp:dependency-check-maven:12.1.1` 及其闭包下载进隔离目录（不动 `~/.m2`，记录逐件 SHA-256，恢复即删目录），或提供 10.0.4 兼容库。在真实成功扫描跑通前，`validate_log` 的零 `[WARNING]` 约束对真实成功日志的适配性未验证。6.4/6.8/15.5 继续不勾选。

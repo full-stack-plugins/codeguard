@@ -902,3 +902,140 @@ fn new_scan_and_deleted_projection_recover_in_one_sync_without_report_failure() 
     assert_eq!(r["imported_reports"], 1);
     assert_eq!(r["new_findings"], 0);
 }
+
+#[test]
+fn sync_does_not_append_observations_to_an_ambiguous_existing_finding() {
+    let project = Project::new();
+    let workspace_id = project.workspace_id();
+    project.write_report("run-one", &project.report("run-one", &workspace_id));
+    assert_eq!(project.sync().1["new_findings"], 1);
+    let id = format!("CG-{}", "a".repeat(32));
+    let fact = project
+        .0
+        .join(format!(".codeguard/findings/{id}/finding.json"));
+    let original = fs::read_to_string(&fact).unwrap();
+    let ambiguous = format!(
+        "{{\"state\":\"resolved\",{}",
+        original.trim_start().strip_prefix('{').unwrap()
+    );
+    fs::write(&fact, &ambiguous).unwrap();
+    project.write_report("run-two", &project.report("run-two", &workspace_id));
+    let (_, result) = project.sync();
+    assert_eq!(result["failed_reports"], 1, "{result}");
+    assert_eq!(result["imported_reports"], 0, "{result}");
+    assert!(
+        !project
+            .0
+            .join(format!(".codeguard/state/observations/{id}/run-two.json"))
+            .exists()
+    );
+    assert!(
+        !project
+            .0
+            .join(".codeguard/state/consumed/run-two.json")
+            .exists()
+    );
+    assert_eq!(fs::read_to_string(&fact).unwrap(), ambiguous);
+    fs::write(&fact, original).unwrap();
+    project.write_report("run-three", &project.report("run-three", &workspace_id));
+    let (_, restored) = project.sync();
+    assert_eq!(restored["new_findings"], 0, "{restored}");
+    assert!(
+        project
+            .0
+            .join(format!(".codeguard/state/observations/{id}/run-three.json"))
+            .exists()
+    );
+    assert_eq!(
+        fs::read_dir(project.0.join(".codeguard/tasks"))
+            .unwrap()
+            .count(),
+        1
+    );
+}
+
+#[test]
+fn ambiguous_blocker_does_not_accept_a_repeat_scan_observation() {
+    let project = Project::new();
+    fs::write(project.0.join("ruff.toml"), "[lint]\nselect = ['F']\n").unwrap();
+    let scan = || {
+        let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+            .args([
+                "lint",
+                "python",
+                project.0.to_str().unwrap(),
+                "--ruff-tool",
+                "/nonexistent/codeguard-ruff",
+                "--format=json",
+            ])
+            .output()
+            .unwrap();
+        assert_eq!(output.status.code(), Some(3));
+        serde_json::from_slice::<Value>(&output.stdout).unwrap()
+    };
+    let first = scan();
+    assert_eq!(first["backlog_sync"]["new_blockers"], 1);
+    let task = fs::read_dir(project.0.join(".codeguard/tasks"))
+        .unwrap()
+        .next()
+        .unwrap()
+        .unwrap()
+        .path();
+    let id = task.file_stem().unwrap().to_str().unwrap();
+    let fact = project
+        .0
+        .join(format!(".codeguard/findings/{id}/finding.json"));
+    let original = fs::read_to_string(&fact).unwrap();
+    let ambiguous = format!(
+        "{{\"state\":\"resolved\",{}",
+        original.trim_start().strip_prefix('{').unwrap()
+    );
+    fs::write(&fact, &ambiguous).unwrap();
+    let second = scan();
+    assert_eq!(second["backlog_sync"]["failed_reports"], 1, "{second}");
+    let run_id = second["run_id"].as_str().unwrap();
+    assert!(
+        !project
+            .0
+            .join(format!(".codeguard/state/observations/{id}/{run_id}.json"))
+            .exists()
+    );
+    assert!(
+        !project
+            .0
+            .join(format!(".codeguard/state/consumed/{run_id}.json"))
+            .exists()
+    );
+    assert_eq!(fs::read_to_string(&fact).unwrap(), ambiguous);
+    fs::write(&fact, original).unwrap();
+    let third = scan();
+    assert_eq!(third["backlog_sync"]["new_blockers"], 0, "{third}");
+    let run_id = third["run_id"].as_str().unwrap();
+    assert!(
+        project
+            .0
+            .join(format!(".codeguard/state/observations/{id}/{run_id}.json"))
+            .exists()
+    );
+    assert_eq!(
+        fs::read_dir(project.0.join(".codeguard/tasks"))
+            .unwrap()
+            .filter(|entry| {
+                let file = entry.as_ref().unwrap().path();
+                let other_id = file.file_stem().unwrap().to_str().unwrap();
+                let value: Value = serde_json::from_slice(
+                    &fs::read(
+                        project
+                            .0
+                            .join(format!(".codeguard/findings/{other_id}/finding.json")),
+                    )
+                    .unwrap(),
+                )
+                .unwrap();
+                value["checker_id"] == "python.ruff"
+                    && value["reason_code"] == "ruff_tool_not_found"
+            })
+            .count(),
+        1
+    );
+}

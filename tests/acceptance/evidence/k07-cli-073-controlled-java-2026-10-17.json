@@ -1,0 +1,287 @@
+{
+  "authority": "local_unverified",
+  "category_candidates": [
+    {
+      "capability_status": "gap",
+      "category": "lint",
+      "checker_id": null,
+      "language": "java",
+      "legacy_status": "stable",
+      "next_action": null,
+      "reason": "native_scan_incomplete",
+      "status": "native_incomplete"
+    },
+    {
+      "capability_status": "gap",
+      "category": "comments",
+      "checker_id": null,
+      "language": "java",
+      "legacy_status": "stable",
+      "next_action": null,
+      "reason": "javadoc_checker_not_configured",
+      "status": "not_configured"
+    },
+    {
+      "capability_status": "gap",
+      "category": "dependencies",
+      "checker_id": "java.maven.dependency",
+      "language": "java",
+      "legacy_status": "stable",
+      "next_action": "确认批准策略是否要求该检查器；需要时配置后重新探测",
+      "reason": "recognized_checker_not_configured",
+      "status": "not_configured"
+    },
+    {
+      "capability_status": "gap",
+      "category": "cve",
+      "checker_id": "java.maven.dependency_check",
+      "language": "java",
+      "legacy_status": "stable",
+      "next_action": "确认批准策略是否要求该检查器；需要时配置后重新探测",
+      "reason": "recognized_checker_not_configured",
+      "status": "not_configured"
+    },
+    {
+      "capability_status": "gap",
+      "category": "security",
+      "checker_id": "java.maven.findsecbugs",
+      "language": "java",
+      "legacy_status": "stable",
+      "next_action": "确认批准策略是否要求该检查器；需要时配置后重新探测",
+      "reason": "recognized_checker_not_configured",
+      "status": "not_configured"
+    },
+    {
+      "capability_status": "gap",
+      "category": "build",
+      "checker_id": null,
+      "language": "java",
+      "legacy_status": "stable",
+      "next_action": null,
+      "reason": "native_adapter_not_integrated",
+      "status": "not_integrated"
+    }
+  ],
+  "command_status": "incomplete",
+  "delivery_decision": "not_evaluated",
+  "discovery": {
+    "blocked_paths": [],
+    "build_roots": [
+      {
+        "manifests": [
+          "pom.xml"
+        ],
+        "path": "."
+      }
+    ],
+    "checker_configurations": [
+      {
+        "build_root": ".",
+        "category": "lint",
+        "checker_id": "java.maven.pmd",
+        "configuration": "missing",
+        "configuration_ref": "pom.xml",
+        "next_action": "在项目中配置对应原生检查器或明确采用其他检查命令",
+        "reason": "plugin_not_declared"
+      },
+      {
+        "build_root": ".",
+        "category": "lint",
+        "checker_id": "java.maven.p3c",
+        "configuration": "missing",
+        "configuration_ref": "pom.xml",
+        "next_action": "检查是否需要在 Maven PMD 中声明 P3C 制品和规则集",
+        "reason": "p3c_plugin_not_declared"
+      },
+      {
+        "build_root": ".",
+        "category": "lint",
+        "checker_id": "java.maven.checkstyle",
+        "configuration": "missing",
+        "configuration_ref": "pom.xml",
+        "next_action": "在项目中配置对应原生检查器或明确采用其他检查命令",
+        "reason": "plugin_not_declared"
+      },
+      {
+        "build_root": ".",
+        "category": "comments",
+        "checker_id": "java.maven.javadoc",
+        "configuration": "missing",
+        "configuration_ref": "pom.xml",
+        "next_action": "在项目中配置对应原生检查器或明确采用其他检查命令",
+        "reason": "plugin_not_declared"
+      },
+      {
+        "build_root": ".",
+        "category": "dependencies",
+        "checker_id": "java.maven.dependency",
+        "configuration": "missing",
+        "configuration_ref": "pom.xml",
+        "next_action": "在项目中配置对应原生检查器或明确采用其他检查命令",
+        "reason": "plugin_not_declared"
+      },
+      {
+        "build_root": ".",
+        "category": "cve",
+        "checker_id": "java.maven.dependency_check",
+        "configuration": "missing",
+        "configuration_ref": "pom.xml",
+        "next_action": "在项目中配置对应原生检查器或明确采用其他检查命令",
+        "reason": "plugin_not_declared"
+      },
+      {
+        "build_root": ".",
+        "category": "security",
+        "checker_id": "java.maven.findsecbugs",
+        "configuration": "missing",
+        "configuration_ref": "pom.xml",
+        "next_action": "在项目中配置对应原生检查器或明确采用其他检查命令",
+        "reason": "plugin_not_declared"
+      }
+    ],
+    "declared_versions": {
+      "pom.xml": "1"
+    },
+    "languages": [
+      {
+        "id": "java",
+        "manifests": [
+          "pom.xml"
+        ],
+        "source_files": [
+          "src/main/java/Example.java"
+        ]
+      }
+    ],
+    "lockfiles": [],
+    "manifest_sha256": {
+      "pom.xml": "bc802eeed8f4bee032bcf5d049759ecbe1d5bcaee19f28edad7f8a7c66c2486d"
+    },
+    "native_tool_candidates": [],
+    "observation_complete": true,
+    "observed_entries": 5,
+    "report_type": "discovery",
+    "root": "/tmp/codeguard-engineering-smoke-4549",
+    "schema_version": "0.4.0",
+    "scope_summary": {
+      "configuration_exception_files_observed": 0,
+      "dependency_roots_excluded": 0,
+      "dot_prefix_roots_excluded": 0,
+      "git_safety_status": "not_evaluated",
+      "ordinary_scan_policy": "project_sources_default_v2"
+    },
+    "source_set_candidates": [
+      {
+        "basis": "directory_convention",
+        "language": "java",
+        "path": "src/main/java",
+        "role": "main"
+      }
+    ],
+    "unknown_conditions": [
+      "build_model_not_evaluated",
+      "source_sets_not_fully_classified",
+      "dialects_not_classified"
+    ]
+  },
+  "execution_budget": {
+    "enforcement": "native_execution_only",
+    "jobs_limit": 1,
+    "jobs_source": "cli",
+    "native_task_count": 1,
+    "source": "cli",
+    "started_native_task_count": 1,
+    "timeout_ms": 2000
+  },
+  "execution_tasks": [
+    {
+      "id": "java.p3c",
+      "status": "native_incomplete"
+    }
+  ],
+  "exit_code": 3,
+  "export": {
+    "reason_code": null,
+    "status": "not_requested"
+  },
+  "gradle_javadoc_tasks": null,
+  "native_results": {
+    "java_p3c": {
+      "authority": "local_unverified",
+      "backlog_status": "not_initialized",
+      "backlog_sync": null,
+      "category": "lint",
+      "checker_id": "java.maven.p3c",
+      "command_status": "incomplete",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "exit_code": 3,
+      "files": [
+        {
+          "build_root": ".",
+          "configuration": "missing",
+          "configuration_next_action": "检查是否需要在 Maven PMD 中声明 P3C 制品和规则集",
+          "configuration_reason": "p3c_plugin_not_declared",
+          "configuration_ref": "pom.xml",
+          "configuration_sha256": "bc802eeed8f4bee032bcf5d049759ecbe1d5bcaee19f28edad7f8a7c66c2486d",
+          "observation": null,
+          "path": "src/main/java/Example.java",
+          "reason": "p3c_configuration_not_confirmed"
+        }
+      ],
+      "finding_count": 0,
+      "findings": [],
+      "language": "java",
+      "local_observation_complete": false,
+      "next": null,
+      "observed_file_count": 0,
+      "operation": "lint",
+      "report_type": "java_p3c_project_observation",
+      "rulepack_approval": "unverified",
+      "run_id": "java-p3c-4551-1792187718586322411-0",
+      "schema_version": "0.2.0",
+      "source_file_count": 1,
+      "tool_approval": "unverified",
+      "workspace_binding": "uninitialized",
+      "workspace_id": null
+    },
+    "npm_cve": [],
+    "python_cve": []
+  },
+  "next": null,
+  "obligation_status": "unresolved",
+  "operation": "check",
+  "reason": "java_selection_obligations_and_trusted_policy_unavailable",
+  "report_type": "check_feedback",
+  "required_obligations": null,
+  "schema_version": "0.73.0",
+  "selection": "java",
+  "syntax_candidates": {
+    "authority": "candidate_unqualified",
+    "delivery_decision": "incomplete",
+    "execution_phase": "after_native",
+    "native_preferred_count": 0,
+    "next_action": "使用包含固定语法资产的发行包运行候选初检，并完成适用原生检查",
+    "observations": [],
+    "reason": "binary_without_wasm_precheck",
+    "skipped_count": 0,
+    "source_file_count": 1,
+    "status": "not_run",
+    "unrouted_count": 0
+  },
+  "syntax_tasks": {
+    "failures": [],
+    "new_blockers": 0,
+    "status": "synced_partial",
+    "tasks": []
+  },
+  "unresolved_conditions": [
+    "build_model_not_evaluated",
+    "dialects_not_classified",
+    "java_p3c_task_incomplete",
+    "required_obligations_unresolved",
+    "source_sets_not_fully_classified",
+    "tool_lock_unverified",
+    "trusted_policy_unavailable"
+  ]
+}

@@ -1,0 +1,448 @@
+[
+  {
+    "evidence": {
+      "adapter_sha256": "cbe4e284495f64ad95c4272d6791bd5b8fe4b42bac8bdc4e459642776d771e6d",
+      "current_native": {
+        "diagnostics": [
+          {
+            "line": 1,
+            "rule_id": "rust.syntax"
+          }
+        ],
+        "edition": "2021",
+        "edition_context": {
+          "edition": "2021",
+          "manifest_ref": "Cargo.toml",
+          "manifest_sha256": "918f4235220587c824be3e64352af40c838fc86e059a6d6eb36338c01a3c5146",
+          "workspace_manifest_ref": null,
+          "workspace_manifest_sha256": null
+        },
+        "observation_kind": "formatter_parser",
+        "reason": "rustfmt_native_parse_diagnostics",
+        "status": "diagnostics_observed",
+        "tool_sha256": "98e8da71078a8b5710f1818c98da25d92de162a122bd9a6db222ca929e545468",
+        "version": "rustfmt 1.9.0-stable"
+      },
+      "current_source_sha256": "c4f7e70d40f8cc9a2a7d960468502b18e912b8b3d34776ac35a8d3ae64114c97",
+      "edition_context": {
+        "edition": "2021",
+        "manifest_ref": "Cargo.toml",
+        "manifest_sha256": "918f4235220587c824be3e64352af40c838fc86e059a6d6eb36338c01a3c5146",
+        "workspace_manifest_ref": null,
+        "workspace_manifest_sha256": null
+      },
+      "grammar_sha256": "206031e0f67fb41ecae505868ca3bb917df7375031aebafd2f97314a849713fe",
+      "identity": {
+        "checker_id": "syntax.native_confirmation",
+        "scope": "app.rs",
+        "task_id": "CG-B-ae3cf319eb537b83650a6110750f32a8",
+        "workspace_id": "ws-8284d19a9b2c3216864d7d206be19051"
+      },
+      "original_native": {
+        "diagnostics": [
+          {
+            "line": 1,
+            "rule_id": "rust.syntax"
+          }
+        ],
+        "edition": "2021",
+        "edition_context": {
+          "edition": "2021",
+          "manifest_ref": "Cargo.toml",
+          "manifest_sha256": "918f4235220587c824be3e64352af40c838fc86e059a6d6eb36338c01a3c5146",
+          "workspace_manifest_ref": null,
+          "workspace_manifest_sha256": null
+        },
+        "observation_kind": "formatter_parser",
+        "reason": "rustfmt_native_parse_diagnostics",
+        "status": "diagnostics_observed",
+        "tool_sha256": "98e8da71078a8b5710f1818c98da25d92de162a122bd9a6db222ca929e545468",
+        "version": "rustfmt 1.9.0-stable"
+      },
+      "original_report_sha256": "795820befd35f6b241ce7ba6a9d3d927dce385f85e0fe314f0bdec414efe666f",
+      "original_source_sha256": "c4f7e70d40f8cc9a2a7d960468502b18e912b8b3d34776ac35a8d3ae64114c97",
+      "outcome": "still_present",
+      "policy_revision": "p1",
+      "policy_sha256": "133a4a5e6ed3269c4f3948953996ed5ff786b76ea67c1dc560dee6ca1880eb65",
+      "report_type": "task_resolution_evidence",
+      "schema_version": "0.9.0",
+      "tool_sha256": "98e8da71078a8b5710f1818c98da25d92de162a122bd9a6db222ca929e545468"
+    },
+    "policy": {
+      "adapter_sha256": "cbe4e284495f64ad95c4272d6791bd5b8fe4b42bac8bdc4e459642776d771e6d",
+      "edition_context": {
+        "edition": "2021",
+        "manifest_ref": "Cargo.toml",
+        "manifest_sha256": "918f4235220587c824be3e64352af40c838fc86e059a6d6eb36338c01a3c5146",
+        "workspace_manifest_ref": null,
+        "workspace_manifest_sha256": null
+      },
+      "grammar_sha256": "206031e0f67fb41ecae505868ca3bb917df7375031aebafd2f97314a849713fe",
+      "identity": {
+        "checker_id": "syntax.native_confirmation",
+        "scope": "app.rs",
+        "task_id": "CG-B-ae3cf319eb537b83650a6110750f32a8",
+        "workspace_id": "ws-8284d19a9b2c3216864d7d206be19051"
+      },
+      "native_rule_id": "rust.syntax",
+      "native_version": "rustfmt 1.9.0-stable",
+      "original_report_sha256": "795820befd35f6b241ce7ba6a9d3d927dce385f85e0fe314f0bdec414efe666f",
+      "original_source_sha256": "c4f7e70d40f8cc9a2a7d960468502b18e912b8b3d34776ac35a8d3ae64114c97",
+      "policy_revision": "p1",
+      "report_type": "task_resolution_policy",
+      "schema_version": "1.8.0",
+      "tool_sha256": "98e8da71078a8b5710f1818c98da25d92de162a122bd9a6db222ca929e545468"
+    },
+    "receipt": {
+      "authority": "host_context_verified",
+      "delivery_decision": "not_evaluated",
+      "event_ref": ".codeguard/findings/CG-B-ae3cf319eb537b83650a6110750f32a8/events/lifecycle-event-7e5802ae4e78df1581fead7b5f282d12d99d377f5da16b686972f1803541a918.json",
+      "evidence_ref": ".codeguard/state/resolution_evidence/b90e94a9776af952962d04dd34060b18d6a1807fb1a578c9f9653fee9c02de81.json",
+      "evidence_sha256": "b90e94a9776af952962d04dd34060b18d6a1807fb1a578c9f9653fee9c02de81",
+      "identity": {
+        "checker_id": "syntax.native_confirmation",
+        "scope": "app.rs",
+        "task_id": "CG-B-ae3cf319eb537b83650a6110750f32a8",
+        "workspace_id": "ws-8284d19a9b2c3216864d7d206be19051"
+      },
+      "outcome": "still_present",
+      "policy_revision": "p1",
+      "policy_sha256": "133a4a5e6ed3269c4f3948953996ed5ff786b76ea67c1dc560dee6ca1880eb65",
+      "report_type": "task_resolution_receipt",
+      "schema_version": "0.1.0",
+      "state": "open"
+    }
+  },
+  {
+    "evidence": {
+      "adapter_sha256": "cbe4e284495f64ad95c4272d6791bd5b8fe4b42bac8bdc4e459642776d771e6d",
+      "current_native": {
+        "diagnostics": [],
+        "edition": "2021",
+        "edition_context": {
+          "edition": "2021",
+          "manifest_ref": "Cargo.toml",
+          "manifest_sha256": "918f4235220587c824be3e64352af40c838fc86e059a6d6eb36338c01a3c5146",
+          "workspace_manifest_ref": null,
+          "workspace_manifest_sha256": null
+        },
+        "observation_kind": "formatter_parser",
+        "reason": "rustfmt_native_parse_no_diagnostics",
+        "status": "completed",
+        "tool_sha256": "98e8da71078a8b5710f1818c98da25d92de162a122bd9a6db222ca929e545468",
+        "version": "rustfmt 1.9.0-stable"
+      },
+      "current_source_sha256": "16c2fca9e371936458d01576b4ca311c22d166a45539ccbc9104823d0b10db47",
+      "edition_context": {
+        "edition": "2021",
+        "manifest_ref": "Cargo.toml",
+        "manifest_sha256": "918f4235220587c824be3e64352af40c838fc86e059a6d6eb36338c01a3c5146",
+        "workspace_manifest_ref": null,
+        "workspace_manifest_sha256": null
+      },
+      "grammar_sha256": "206031e0f67fb41ecae505868ca3bb917df7375031aebafd2f97314a849713fe",
+      "identity": {
+        "checker_id": "syntax.native_confirmation",
+        "scope": "app.rs",
+        "task_id": "CG-B-ae3cf319eb537b83650a6110750f32a8",
+        "workspace_id": "ws-8284d19a9b2c3216864d7d206be19051"
+      },
+      "original_native": {
+        "diagnostics": [
+          {
+            "line": 1,
+            "rule_id": "rust.syntax"
+          }
+        ],
+        "edition": "2021",
+        "edition_context": {
+          "edition": "2021",
+          "manifest_ref": "Cargo.toml",
+          "manifest_sha256": "918f4235220587c824be3e64352af40c838fc86e059a6d6eb36338c01a3c5146",
+          "workspace_manifest_ref": null,
+          "workspace_manifest_sha256": null
+        },
+        "observation_kind": "formatter_parser",
+        "reason": "rustfmt_native_parse_diagnostics",
+        "status": "diagnostics_observed",
+        "tool_sha256": "98e8da71078a8b5710f1818c98da25d92de162a122bd9a6db222ca929e545468",
+        "version": "rustfmt 1.9.0-stable"
+      },
+      "original_report_sha256": "795820befd35f6b241ce7ba6a9d3d927dce385f85e0fe314f0bdec414efe666f",
+      "original_source_sha256": "c4f7e70d40f8cc9a2a7d960468502b18e912b8b3d34776ac35a8d3ae64114c97",
+      "outcome": "code_fixed",
+      "policy_revision": "p1",
+      "policy_sha256": "133a4a5e6ed3269c4f3948953996ed5ff786b76ea67c1dc560dee6ca1880eb65",
+      "report_type": "task_resolution_evidence",
+      "schema_version": "0.9.0",
+      "tool_sha256": "98e8da71078a8b5710f1818c98da25d92de162a122bd9a6db222ca929e545468"
+    },
+    "policy": {
+      "adapter_sha256": "cbe4e284495f64ad95c4272d6791bd5b8fe4b42bac8bdc4e459642776d771e6d",
+      "edition_context": {
+        "edition": "2021",
+        "manifest_ref": "Cargo.toml",
+        "manifest_sha256": "918f4235220587c824be3e64352af40c838fc86e059a6d6eb36338c01a3c5146",
+        "workspace_manifest_ref": null,
+        "workspace_manifest_sha256": null
+      },
+      "grammar_sha256": "206031e0f67fb41ecae505868ca3bb917df7375031aebafd2f97314a849713fe",
+      "identity": {
+        "checker_id": "syntax.native_confirmation",
+        "scope": "app.rs",
+        "task_id": "CG-B-ae3cf319eb537b83650a6110750f32a8",
+        "workspace_id": "ws-8284d19a9b2c3216864d7d206be19051"
+      },
+      "native_rule_id": "rust.syntax",
+      "native_version": "rustfmt 1.9.0-stable",
+      "original_report_sha256": "795820befd35f6b241ce7ba6a9d3d927dce385f85e0fe314f0bdec414efe666f",
+      "original_source_sha256": "c4f7e70d40f8cc9a2a7d960468502b18e912b8b3d34776ac35a8d3ae64114c97",
+      "policy_revision": "p1",
+      "report_type": "task_resolution_policy",
+      "schema_version": "1.8.0",
+      "tool_sha256": "98e8da71078a8b5710f1818c98da25d92de162a122bd9a6db222ca929e545468"
+    },
+    "receipt": {
+      "authority": "host_context_verified",
+      "delivery_decision": "not_evaluated",
+      "event_ref": ".codeguard/findings/CG-B-ae3cf319eb537b83650a6110750f32a8/events/lifecycle-event-cdfb933bbb78069569e54e0232e28de2e841b06694ad457d4300bda6487eb152.json",
+      "evidence_ref": ".codeguard/state/resolution_evidence/be31b56739db4b6ad42a16bda01afd82ee49bdb94b5ee8ee8403eea2d1e06c67.json",
+      "evidence_sha256": "be31b56739db4b6ad42a16bda01afd82ee49bdb94b5ee8ee8403eea2d1e06c67",
+      "identity": {
+        "checker_id": "syntax.native_confirmation",
+        "scope": "app.rs",
+        "task_id": "CG-B-ae3cf319eb537b83650a6110750f32a8",
+        "workspace_id": "ws-8284d19a9b2c3216864d7d206be19051"
+      },
+      "outcome": "code_fixed",
+      "policy_revision": "p1",
+      "policy_sha256": "133a4a5e6ed3269c4f3948953996ed5ff786b76ea67c1dc560dee6ca1880eb65",
+      "report_type": "task_resolution_receipt",
+      "schema_version": "0.1.0",
+      "state": "resolved"
+    }
+  },
+  {
+    "evidence": {
+      "adapter_sha256": "cbe4e284495f64ad95c4272d6791bd5b8fe4b42bac8bdc4e459642776d771e6d",
+      "current_native": {
+        "diagnostics": [],
+        "edition": "2021",
+        "edition_context": {
+          "edition": "2021",
+          "manifest_ref": "Cargo.toml",
+          "manifest_sha256": "918f4235220587c824be3e64352af40c838fc86e059a6d6eb36338c01a3c5146",
+          "workspace_manifest_ref": null,
+          "workspace_manifest_sha256": null
+        },
+        "observation_kind": "formatter_parser",
+        "reason": "rustfmt_native_parse_no_diagnostics",
+        "status": "completed",
+        "tool_sha256": "98e8da71078a8b5710f1818c98da25d92de162a122bd9a6db222ca929e545468",
+        "version": "rustfmt 1.9.0-stable"
+      },
+      "current_source_sha256": "16c2fca9e371936458d01576b4ca311c22d166a45539ccbc9104823d0b10db47",
+      "edition_context": {
+        "edition": "2021",
+        "manifest_ref": "Cargo.toml",
+        "manifest_sha256": "918f4235220587c824be3e64352af40c838fc86e059a6d6eb36338c01a3c5146",
+        "workspace_manifest_ref": null,
+        "workspace_manifest_sha256": null
+      },
+      "grammar_sha256": "206031e0f67fb41ecae505868ca3bb917df7375031aebafd2f97314a849713fe",
+      "identity": {
+        "checker_id": "syntax.native_confirmation",
+        "scope": "app.rs",
+        "task_id": "CG-B-ae3cf319eb537b83650a6110750f32a8",
+        "workspace_id": "ws-8284d19a9b2c3216864d7d206be19051"
+      },
+      "original_native": {
+        "diagnostics": [
+          {
+            "line": 1,
+            "rule_id": "rust.syntax"
+          }
+        ],
+        "edition": "2021",
+        "edition_context": {
+          "edition": "2021",
+          "manifest_ref": "Cargo.toml",
+          "manifest_sha256": "918f4235220587c824be3e64352af40c838fc86e059a6d6eb36338c01a3c5146",
+          "workspace_manifest_ref": null,
+          "workspace_manifest_sha256": null
+        },
+        "observation_kind": "formatter_parser",
+        "reason": "rustfmt_native_parse_diagnostics",
+        "status": "diagnostics_observed",
+        "tool_sha256": "98e8da71078a8b5710f1818c98da25d92de162a122bd9a6db222ca929e545468",
+        "version": "rustfmt 1.9.0-stable"
+      },
+      "original_report_sha256": "795820befd35f6b241ce7ba6a9d3d927dce385f85e0fe314f0bdec414efe666f",
+      "original_source_sha256": "c4f7e70d40f8cc9a2a7d960468502b18e912b8b3d34776ac35a8d3ae64114c97",
+      "outcome": "code_fixed",
+      "policy_revision": "p1",
+      "policy_sha256": "133a4a5e6ed3269c4f3948953996ed5ff786b76ea67c1dc560dee6ca1880eb65",
+      "report_type": "task_resolution_evidence",
+      "schema_version": "0.9.0",
+      "tool_sha256": "98e8da71078a8b5710f1818c98da25d92de162a122bd9a6db222ca929e545468"
+    },
+    "policy": {
+      "adapter_sha256": "cbe4e284495f64ad95c4272d6791bd5b8fe4b42bac8bdc4e459642776d771e6d",
+      "edition_context": {
+        "edition": "2021",
+        "manifest_ref": "Cargo.toml",
+        "manifest_sha256": "918f4235220587c824be3e64352af40c838fc86e059a6d6eb36338c01a3c5146",
+        "workspace_manifest_ref": null,
+        "workspace_manifest_sha256": null
+      },
+      "grammar_sha256": "206031e0f67fb41ecae505868ca3bb917df7375031aebafd2f97314a849713fe",
+      "identity": {
+        "checker_id": "syntax.native_confirmation",
+        "scope": "app.rs",
+        "task_id": "CG-B-ae3cf319eb537b83650a6110750f32a8",
+        "workspace_id": "ws-8284d19a9b2c3216864d7d206be19051"
+      },
+      "native_rule_id": "rust.syntax",
+      "native_version": "rustfmt 1.9.0-stable",
+      "original_report_sha256": "795820befd35f6b241ce7ba6a9d3d927dce385f85e0fe314f0bdec414efe666f",
+      "original_source_sha256": "c4f7e70d40f8cc9a2a7d960468502b18e912b8b3d34776ac35a8d3ae64114c97",
+      "policy_revision": "p1",
+      "report_type": "task_resolution_policy",
+      "schema_version": "1.8.0",
+      "tool_sha256": "98e8da71078a8b5710f1818c98da25d92de162a122bd9a6db222ca929e545468"
+    },
+    "receipt": {
+      "authority": "host_context_verified",
+      "delivery_decision": "not_evaluated",
+      "event_ref": ".codeguard/findings/CG-B-ae3cf319eb537b83650a6110750f32a8/events/lifecycle-event-cdfb933bbb78069569e54e0232e28de2e841b06694ad457d4300bda6487eb152.json",
+      "evidence_ref": ".codeguard/state/resolution_evidence/be31b56739db4b6ad42a16bda01afd82ee49bdb94b5ee8ee8403eea2d1e06c67.json",
+      "evidence_sha256": "be31b56739db4b6ad42a16bda01afd82ee49bdb94b5ee8ee8403eea2d1e06c67",
+      "identity": {
+        "checker_id": "syntax.native_confirmation",
+        "scope": "app.rs",
+        "task_id": "CG-B-ae3cf319eb537b83650a6110750f32a8",
+        "workspace_id": "ws-8284d19a9b2c3216864d7d206be19051"
+      },
+      "outcome": "code_fixed",
+      "policy_revision": "p1",
+      "policy_sha256": "133a4a5e6ed3269c4f3948953996ed5ff786b76ea67c1dc560dee6ca1880eb65",
+      "report_type": "task_resolution_receipt",
+      "schema_version": "0.1.0",
+      "state": "resolved"
+    }
+  },
+  {
+    "evidence": {
+      "adapter_sha256": "cbe4e284495f64ad95c4272d6791bd5b8fe4b42bac8bdc4e459642776d771e6d",
+      "current_native": {
+        "diagnostics": [
+          {
+            "line": 1,
+            "rule_id": "rust.syntax"
+          }
+        ],
+        "edition": "2021",
+        "edition_context": {
+          "edition": "2021",
+          "manifest_ref": "Cargo.toml",
+          "manifest_sha256": "918f4235220587c824be3e64352af40c838fc86e059a6d6eb36338c01a3c5146",
+          "workspace_manifest_ref": null,
+          "workspace_manifest_sha256": null
+        },
+        "observation_kind": "formatter_parser",
+        "reason": "rustfmt_native_parse_diagnostics",
+        "status": "diagnostics_observed",
+        "tool_sha256": "98e8da71078a8b5710f1818c98da25d92de162a122bd9a6db222ca929e545468",
+        "version": "rustfmt 1.9.0-stable"
+      },
+      "current_source_sha256": "c4f7e70d40f8cc9a2a7d960468502b18e912b8b3d34776ac35a8d3ae64114c97",
+      "edition_context": {
+        "edition": "2021",
+        "manifest_ref": "Cargo.toml",
+        "manifest_sha256": "918f4235220587c824be3e64352af40c838fc86e059a6d6eb36338c01a3c5146",
+        "workspace_manifest_ref": null,
+        "workspace_manifest_sha256": null
+      },
+      "grammar_sha256": "206031e0f67fb41ecae505868ca3bb917df7375031aebafd2f97314a849713fe",
+      "identity": {
+        "checker_id": "syntax.native_confirmation",
+        "scope": "app.rs",
+        "task_id": "CG-B-ae3cf319eb537b83650a6110750f32a8",
+        "workspace_id": "ws-8284d19a9b2c3216864d7d206be19051"
+      },
+      "original_native": {
+        "diagnostics": [
+          {
+            "line": 1,
+            "rule_id": "rust.syntax"
+          }
+        ],
+        "edition": "2021",
+        "edition_context": {
+          "edition": "2021",
+          "manifest_ref": "Cargo.toml",
+          "manifest_sha256": "918f4235220587c824be3e64352af40c838fc86e059a6d6eb36338c01a3c5146",
+          "workspace_manifest_ref": null,
+          "workspace_manifest_sha256": null
+        },
+        "observation_kind": "formatter_parser",
+        "reason": "rustfmt_native_parse_diagnostics",
+        "status": "diagnostics_observed",
+        "tool_sha256": "98e8da71078a8b5710f1818c98da25d92de162a122bd9a6db222ca929e545468",
+        "version": "rustfmt 1.9.0-stable"
+      },
+      "original_report_sha256": "795820befd35f6b241ce7ba6a9d3d927dce385f85e0fe314f0bdec414efe666f",
+      "original_source_sha256": "c4f7e70d40f8cc9a2a7d960468502b18e912b8b3d34776ac35a8d3ae64114c97",
+      "outcome": "still_present",
+      "policy_revision": "p1",
+      "policy_sha256": "133a4a5e6ed3269c4f3948953996ed5ff786b76ea67c1dc560dee6ca1880eb65",
+      "report_type": "task_resolution_evidence",
+      "schema_version": "0.9.0",
+      "tool_sha256": "98e8da71078a8b5710f1818c98da25d92de162a122bd9a6db222ca929e545468"
+    },
+    "policy": {
+      "adapter_sha256": "cbe4e284495f64ad95c4272d6791bd5b8fe4b42bac8bdc4e459642776d771e6d",
+      "edition_context": {
+        "edition": "2021",
+        "manifest_ref": "Cargo.toml",
+        "manifest_sha256": "918f4235220587c824be3e64352af40c838fc86e059a6d6eb36338c01a3c5146",
+        "workspace_manifest_ref": null,
+        "workspace_manifest_sha256": null
+      },
+      "grammar_sha256": "206031e0f67fb41ecae505868ca3bb917df7375031aebafd2f97314a849713fe",
+      "identity": {
+        "checker_id": "syntax.native_confirmation",
+        "scope": "app.rs",
+        "task_id": "CG-B-ae3cf319eb537b83650a6110750f32a8",
+        "workspace_id": "ws-8284d19a9b2c3216864d7d206be19051"
+      },
+      "native_rule_id": "rust.syntax",
+      "native_version": "rustfmt 1.9.0-stable",
+      "original_report_sha256": "795820befd35f6b241ce7ba6a9d3d927dce385f85e0fe314f0bdec414efe666f",
+      "original_source_sha256": "c4f7e70d40f8cc9a2a7d960468502b18e912b8b3d34776ac35a8d3ae64114c97",
+      "policy_revision": "p1",
+      "report_type": "task_resolution_policy",
+      "schema_version": "1.8.0",
+      "tool_sha256": "98e8da71078a8b5710f1818c98da25d92de162a122bd9a6db222ca929e545468"
+    },
+    "receipt": {
+      "authority": "host_context_verified",
+      "delivery_decision": "not_evaluated",
+      "event_ref": ".codeguard/findings/CG-B-ae3cf319eb537b83650a6110750f32a8/events/lifecycle-event-bfc844e0730960f92cabde311833089994b295221c641ea37990b9c3bbeee06c.json",
+      "evidence_ref": ".codeguard/state/resolution_evidence/b90e94a9776af952962d04dd34060b18d6a1807fb1a578c9f9653fee9c02de81.json",
+      "evidence_sha256": "b90e94a9776af952962d04dd34060b18d6a1807fb1a578c9f9653fee9c02de81",
+      "identity": {
+        "checker_id": "syntax.native_confirmation",
+        "scope": "app.rs",
+        "task_id": "CG-B-ae3cf319eb537b83650a6110750f32a8",
+        "workspace_id": "ws-8284d19a9b2c3216864d7d206be19051"
+      },
+      "outcome": "still_present",
+      "policy_revision": "p1",
+      "policy_sha256": "133a4a5e6ed3269c4f3948953996ed5ff786b76ea67c1dc560dee6ca1880eb65",
+      "report_type": "task_resolution_receipt",
+      "schema_version": "0.1.0",
+      "state": "open"
+    }
+  }
+]

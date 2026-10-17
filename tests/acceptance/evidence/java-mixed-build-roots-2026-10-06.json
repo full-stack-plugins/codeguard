@@ -1,0 +1,89 @@
+{
+  "date": "2026-10-06",
+  "source_base": "d69076c537c6e3403925665042edb9fac30107e1",
+  "scope": "maven_gradle_static_scope_and_maven_local_evidence_retention",
+  "red": {
+    "passed": 0,
+    "failed": 3
+  },
+  "default": {
+    "passed": 50,
+    "failed": 0,
+    "ignored": 0
+  },
+  "feature_related": {
+    "passed": 7,
+    "failed": 0,
+    "ignored": 0
+  },
+  "entry_regression": {
+    "passed": 18,
+    "failed": 0,
+    "ignored": 1
+  },
+  "overlap_not_combined": true,
+  "actual_reports_validated": 21,
+  "schema_definitions": 409,
+  "schema_forgeries_rejected": 4,
+  "maven_native_replies": "controlled_fixture_not_real_engine",
+  "gradle_plugin_scan_executed": false,
+  "gradle_runtime_observation": "gradle-existing-runtime-2026-10-06.json",
+  "report_bundle": {
+    "path": "tests/acceptance/evidence/java-mixed-build-roots-reports-2026-10-06.json",
+    "sha256": "6c7417ce8c846b620fef054ce43391d437f5c62d92c58b8cf34aa62f6704be36"
+  },
+  "four_core_production_qualified": false,
+  "grammar_qualification": 0,
+  "logs": [
+    {
+      "path": "/private/tmp/cg-java-mixed-build-red.log",
+      "sha256": "d21a0c4134207f0fbabdb8b1b2180dbde891ed1de9e899208d15e87406b0e7ac"
+    },
+    {
+      "path": "/private/tmp/cg-java-mixed-build-current-default.log",
+      "sha256": "2a815398326eb4b9db1311d50b26fac2345c65581be4d4b0d34a14ec582097bf"
+    },
+    {
+      "path": "/private/tmp/cg-java-mixed-build-v61-wasm.log",
+      "sha256": "c16258a13479afb0c539ab0f63a012154a40a92dc119f252522d039be1a01cb9"
+    },
+    {
+      "path": "/private/tmp/cg-java-mixed-build-native-evidence.log",
+      "sha256": "dfe7c7b11a01fbae9e0a5e744fa13b83173dc623536c2c6f95df5c46c77f80d6"
+    },
+    {
+      "path": "/private/tmp/cg-java-mixed-build-lint-contract.log",
+      "sha256": "110514c7f56469bb4d1036b06d6cefe3ca815a06f4f4dcb753c751bd512bf149"
+    },
+    {
+      "path": "/private/tmp/cg-java-mixed-build-final-default-clippy.log",
+      "sha256": "d1f66b44304bf8181f6582c9ad8c1b7c99f8daa6d8f90e247f5978c64edf9ebb"
+    },
+    {
+      "path": "/private/tmp/cg-java-mixed-build-final-feature-clippy.log",
+      "sha256": "9639c145cdfe9bf13cb3e5073f59130310cfde26e97d0e81e8b5f7cabadb403b"
+    }
+  ],
+  "source_files": [
+    {
+      "path": "crates/codeguard-cli/src/check_command.rs",
+      "sha256": "dc1481ae29d8aaa7a4cf5409e75ee1685b112eb975479a018c058b13c5d03668"
+    },
+    {
+      "path": "crates/codeguard-cli/src/discovery.rs",
+      "sha256": "8c64f17b195efd9ccc9cdc5a24a27c062d5338e65816b5b18548127082f4d482"
+    },
+    {
+      "path": "crates/codeguard-cli/tests/java_mixed_build_roots.rs",
+      "sha256": "b39f125045cdc5adfbfe808a34178b3e9145d1e0ea22883758687cb4ad994af9"
+    },
+    {
+      "path": "crates/codeguard-cli/tests/check_java_cve_attribution.rs",
+      "sha256": "4f6ae47cc7612e9e5d91dcb3e587bcc223fc70463b46075ef7c31a5a60717c8a"
+    }
+  ],
+  "strict_default_clippy": "passed",
+  "strict_wasm_clippy": "passed",
+  "layering": "passed",
+  "openspec_strict": "passed"
+}

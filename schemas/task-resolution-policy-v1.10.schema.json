@@ -1,0 +1,136 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:task-resolution-policy:1.10.0",
+  "title": "ShellCheck原规则的限定宿主关闭策略",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.10.0"
+    },
+    "report_type": {
+      "const": "task_resolution_policy"
+    },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "workspace_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.:-]{1,128}$"
+        },
+        "task_id": {
+          "type": "string",
+          "pattern": "^CG-[0-9a-f]{32}$"
+        },
+        "checker_id": {
+          "const": "shell.shellcheck"
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096,
+          "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))[^\\\\:\\x00-\\x1f\\x7f]+$"
+        }
+      },
+      "required": [
+        "workspace_id",
+        "task_id",
+        "checker_id",
+        "scope"
+      ]
+    },
+    "policy_revision": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_.:-]{1,128}$"
+    },
+    "original_report_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "original_source_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "grammar_sha256": {
+      "type": "null"
+    },
+    "tool_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "adapter_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "native_rule_id": {
+      "type": "string",
+      "pattern": "^SC[1-9][0-9]{3}$"
+    },
+    "native_version": {
+      "const": "0.11.0"
+    },
+    "dialect": {
+      "enum": [
+        "sh",
+        "bash",
+        "dash",
+        "ksh",
+        "busybox"
+      ]
+    },
+    "project_configuration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "global_configuration",
+        "reason",
+        "sha256",
+        "source_path",
+        "status"
+      ],
+      "properties": {
+        "global_configuration": {
+          "const": "not_loaded"
+        },
+        "reason": {
+          "type": "null"
+        },
+        "sha256": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "source_path": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "status": {
+          "enum": [
+            "configured",
+            "missing"
+          ]
+        }
+      }
+    }
+  },
+  "required": [
+    "schema_version",
+    "report_type",
+    "identity",
+    "policy_revision",
+    "original_report_sha256",
+    "original_source_sha256",
+    "grammar_sha256",
+    "tool_sha256",
+    "adapter_sha256",
+    "native_rule_id",
+    "native_version",
+    "dialect",
+    "project_configuration"
+  ]
+}

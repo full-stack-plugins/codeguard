@@ -169,3 +169,52 @@ Go候选任务复检现接受 `--go-tool /absolute/sdk/bin/go`，对冻结整文
 ### Go统一lint的原生优先与缺工具初检
 
 源码版 `codeguard lint go . --format json` 优先显式 `--go-tool`，否则查找调用方绝对PATH中的Go。工具已选择但版本/执行失败时保留原生故障；真正缺工具时，内置WASM做有界整文件初检，保留恢复和独立结构候选。候选或初检未完成要求准备项目适用原生工具；完整有界范围的零候选只推荐准备，原生义务仍未完成，退出码继续3。默认不含WASM的构建明确报告能力缺失。重复lint与check复用确认任务，补声明不自动关闭。公开npm0.1.4未更新。见[局部验收](../tests/acceptance/go-lint-fallback.md)。
+
+## 2026-10-06 Java21原生增量对照
+
+Java差分验收先核对truncated_files，隐藏恢复保留unknown，避免空recoveries误计为干净。原13例仍用javac21按release17对照；新增8例单独按release21执行，含模式switch/guard/record pattern/sealed/text block及三个语法错误，实际3TP/5TN/0FP/0FN/0unknown。新增组是本轮作者样本，independent_holdout=false，不提升grammar资格或混入固定358例。原生工具和源码摘要随证据绑定。见 [验收](../tests/acceptance/java21-native-differential.md)。
+
+## JavaScript 原生差分对齐项目结构候选
+
+开发差分现在复用项目检查的重复直接绑定 worker，报告0.9分别保留原始恢复与组合结构指标。真实 Node24.18.0 的18个额外 module 样例：原始5TP/11TN/0FP/2FN，组合6TP/11TN/0FP/1FN；重复绑定得到结构规则证据，顶层 module return 仍漏检。规则摘要和语言范围受 schema 约束；旧协议保持不变，旧0.4消费者拒绝新版本。此修正不新增发行资格、不改变固定358例指标，也不能对 CommonJS/未知模式无条件报顶层 return。独立holdout及正式资格仍未完成。见[局部验收](../tests/acceptance/javascript-native-project-binding.md)。
+
+## 模块 return 候选的 AST 事实基础
+
+runtime新增有界函数外return扫描：覆盖顶层控制流、跳过函数/生成器/箭头/方法子树、保留UTF-8字节位置和预算截断。真实Node24.18.0对11份源码在module/CommonJS下共22次对照，证明规则必须带模块模式条件。当前仅有事实层，公开worker/probe/项目模式/差分尚未接线，因此module_return仍漏检、资格0/32。见[局部验收](../tests/acceptance/javascript-module-return-ast.md)。
+
+## 显式module候选与原生组合差分接线
+
+`grammar probe javascript FILE --module --format=json`现在通过worker1.7/probe0.8观察函数外return；缺失模式的原入口不启用这条规则，零候选/读取失败也保留显式模式。开发Node差分固定module上下文，报告0.10复用同一worker：实际18例raw5TP/11TN/0FP/2FN，combined7TP/11TN/0FP/0FN。原始漏检不被抹除，固定358指标和正式资格0/32不变；这不是独立holdout。项目模式自动观察、任务和宿主接线仍开放。见[局部验收](../tests/acceptance/javascript-module-worker-probe.md)。
+
+## 项目 JavaScript 声明模式证据接口
+
+源码模式观察接口已实现，返回`javascript_mode_observation`0.1：普通源码和物理工作区绑定后，`.mjs`/`.cjs`分别明确module/CommonJS，`.js`只读取工作区内最近包的唯一显式`type`。缺type、坏/重复JSON、链接、越界、超预算、loader模式未知时不猜测或继承外包。源码上限1MiB、清单256KiB、搜索64目录；源码/包摘要和已搜索目录保留，便于扫描前后发现近包变化。它不执行原生工具，也不证明生效ESLint配置。
+
+该接口基线批次尚未接入自动scanner/任务/Hook；当前接线及独立验收见下方新增章节。真实Node按文件路径的5例对照和21份协议观察见[局部验收](../tests/acceptance/javascript-project-mode.md)。
+
+## 四类核心生产验收与声明模块接线
+
+生产目标要求57个canonical语言条目逐项验收语法、详细文档注释、开发规范和漏洞检查；历史planned仍是未完成目标。Java必须分别验收Maven/Gradle漏洞路径、详细Javadoc和原生P3C。配置存在、WASM可运行或模拟测试通过都不能证明生产就绪。独立标注评测、声明支持的版本/构建器/平台、原工具修复复检关闭与复发重开均为必需验收；当前WASM正式资格仍为0/32。详见OpenSpec任务15.1–15.7。
+
+当前源码把JavaScript声明模式证据接入项目检查、独立 `lint typescript`、`lint all` 与文件编辑反馈，适用原生ESLint仍优先。未覆盖的整文件 `.mjs` 和明确声明module的 `.js` 使用模块候选worker；CommonJS/未知模式继续原有有界初检，不启用函数外return模块规则。worker之后复核源码和模式证据；持久确认0.15、项目检查0.60、ESLint反馈0.7、Hook0.29/局部0.17与模块修复简报0.21使用独立版本契约。包声明改变时原任务复检报告上下文失效，不能沿用旧模块证据。重复检查复用稳定任务，清洁候选不能关闭任务。本批不声称新的npm/宿主发行或生产资格。见[接线验收](../tests/acceptance/javascript-module-workbench.md)。
+
+```mermaid
+flowchart LR
+    A[项目lint或编辑请求] --> B{适用原生ESLint}
+    B -->|可用| C[原配置原生检查]
+    B -->|缺失或未覆盖| D[观察源码与声明模式]
+    D -->|Module| E[模块WASM候选worker]
+    D -->|CommonJS或未知| F[原有有界初检]
+    E --> G[复核源码与模式]
+    F --> H[未完成初检反馈]
+    G -->|变化| H
+    G -->|稳定| I[绑定证据的稳定确认任务]
+    I --> J[智能体反馈与原工具复检]
+    J --> K[关闭仍需通过原生修复验收]
+```
+
+
+C11/C++17开发期统一回放现复用固定Clang原生服务与共享取消令牌。警告不算语法错误；仅已审计缺表达式解析规则可分类，语义/混合/预处理上下文保持unknown。新0.11协议记录标准与策略，32库存及零资格保持；见[局部验收](../tests/acceptance/c-family-native-replay.md)。
+
+
+0.12逐条审计七个Clang标点解析ID；非已审计warning/语义混合保留unknown，C11扩展与C++17错误分开，历史0.11保持。见[增量验收](../tests/acceptance/c-family-native-punctuation.md)与[CI来源待决动作](../tests/acceptance/ci-source-reachability.md)。

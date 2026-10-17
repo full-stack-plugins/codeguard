@@ -87,6 +87,27 @@ fn invalid_scope_or_one_bad_position_discards_all_task_inputs() {
     assert!(project_eslint_findings("app.js", "/fixture/app.js", b"debugger;", &[bad]).is_none());
 }
 #[test]
+fn duplicate_diagnostics_cannot_hide_invalid_ownership_or_message() {
+    let mut wrong_path = finding(1, 1);
+    wrong_path.path = "/fixture/other.js".into();
+    wrong_path.message = "z duplicate from another file".into();
+    let mut oversized_message = finding(1, 1);
+    oversized_message.message = "z".repeat(4097);
+    for bad in [wrong_path, oversized_message] {
+        for diagnostics in [
+            vec![finding(1, 1), bad.clone()],
+            vec![bad.clone(), finding(1, 1)],
+        ] {
+            assert!(
+                project_eslint_findings("app.js", "/fixture/app.js", b"debugger;", &diagnostics)
+                    .is_none(),
+                "invalid duplicate must reject the complete task projection"
+            );
+        }
+    }
+}
+
+#[test]
 fn unicode_columns_use_utf16_and_native_line_terminators() {
     let source = "'😀';\r\ndebugger;\u{2028}debugger;";
     let records = project_eslint_findings(

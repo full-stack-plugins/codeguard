@@ -1,0 +1,33 @@
+{
+  "runtime": "web-tree-sitter",
+  "version": "0.25.10",
+  "rows": [
+    {
+      "language": "kotlin",
+      "source": "fun f(x: ) = x\n",
+      "grammar_sha256": "c80c88867a589a1a0959bcea89de84b7e9684b3693b2cdb2944812458e62ff48",
+      "has_error": true,
+      "sexp": "(source_file (function_declaration (simple_identifier) (function_value_parameters (parameter (simple_identifier) (user_type (type_identifier (MISSING _alpha_identifier))))) (function_body (simple_identifier))))",
+      "recoveries": []
+    },
+    {
+      "language": "kotlin",
+      "source": "object C { val value = 1 }\n",
+      "grammar_sha256": "c80c88867a589a1a0959bcea89de84b7e9684b3693b2cdb2944812458e62ff48",
+      "has_error": true,
+      "sexp": "(source_file (object_declaration (type_identifier) (class_body (property_declaration (binding_pattern_kind) (variable_declaration (simple_identifier)) (integer_literal)) (MISSING _automatic_semicolon))))",
+      "recoveries": []
+    },
+    {
+      "language": "swift",
+      "source": "func f(_ x: ) {}\n",
+      "grammar_sha256": "cc77a63b8487956270e2f385e29a03ba0773ba532a3c8a8844a26b4c98793843",
+      "has_error": true,
+      "sexp": "(source_file (function_declaration name: (simple_identifier) (parameter external_name: (simple_identifier) name: (simple_identifier) name: (user_type (type_identifier (MISSING \"simple_identifier_token1\")))) body: (function_body)))",
+      "recoveries": []
+    }
+  ],
+  "runtime_js_sha256": "d4fc466df6358055253bc4cdaab23cdf84fe00741fa5a4ff56506c06c533da42",
+  "runtime_wasm_sha256": "f38dcc4b43b818f9a0785bc1c6d5611a75ac4cdd428ff3f02757c34ca4e46d7f",
+  "scope": "existing installed reference; neither source validity nor grammar qualification"
+}

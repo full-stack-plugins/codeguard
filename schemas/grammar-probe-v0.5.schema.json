@@ -1,0 +1,252 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:grammar-probe:0.5.0",
+  "title": "Unlocated parser error requires original-source native confirmation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "status",
+    "language",
+    "path",
+    "native",
+    "delivery_decision",
+    "source_sha256",
+    "grammar_sha256",
+    "grammar_qualified",
+    "precheck",
+    "recoveries",
+    "next_action",
+    "parser_error_location_unavailable"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.5.0"
+    },
+    "report_type": {
+      "const": "grammar_candidate_probe"
+    },
+    "status": {
+      "const": "incomplete"
+    },
+    "language": {
+      "enum": [
+        "arkts",
+        "c",
+        "cfml",
+        "cfquery",
+        "cfscript",
+        "cobol",
+        "cpp",
+        "csharp",
+        "dart",
+        "erlang",
+        "go",
+        "java",
+        "javascript",
+        "kotlin",
+        "lua",
+        "luau",
+        "nix",
+        "objc",
+        "pascal",
+        "php",
+        "python",
+        "r",
+        "ruby",
+        "rust",
+        "scala",
+        "solidity",
+        "swift",
+        "terraform",
+        "tsx",
+        "typescript",
+        "vbnet",
+        "zig"
+      ]
+    },
+    "path": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_sha256": {
+      "$ref": "#/$defs/digest"
+    },
+    "grammar_sha256": {
+      "$ref": "#/$defs/digest"
+    },
+    "grammar_qualified": {
+      "const": false
+    },
+    "precheck": {
+      "$ref": "#/$defs/precheck"
+    },
+    "recoveries": {
+      "type": "array",
+      "maxItems": 128,
+      "items": {
+        "$ref": "#/$defs/recovery"
+      }
+    },
+    "native": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "reason"
+      ],
+      "properties": {
+        "status": {
+          "const": "not_run"
+        },
+        "reason": {
+          "const": "explicit_candidate_probe"
+        }
+      }
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    },
+    "next_action": {
+      "const": "compare_original_source_with_native_tool_then_review_grammar"
+    },
+    "parser_error_location_unavailable": {
+      "const": true
+    },
+    "structural_observations": {
+      "anyOf": [
+        {
+          "$ref": "grammar-probe-v0.2.schema.json#/properties/structural_observations"
+        },
+        {
+          "$ref": "grammar-probe-v0.3.schema.json#/properties/structural_observations"
+        },
+        {
+          "$ref": "grammar-probe-v0.4.schema.json#/properties/structural_observations"
+        }
+      ]
+    },
+    "precheck_scope": {
+      "const": "raw_parser_recoveries_and_observation_budgets"
+    },
+    "source_scope": {
+      "enum": [
+        "whole_file",
+        "static_cfquery_sql_candidate"
+      ]
+    }
+  },
+  "$defs": {
+    "digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "precheck": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "scope_complete",
+        "cancelled",
+        "selected_files",
+        "checked_files",
+        "incomplete_files",
+        "unsupported_files",
+        "unqualified_files",
+        "truncated_files",
+        "suspected_recoveries"
+      ],
+      "properties": {
+        "status": {
+          "const": "incomplete"
+        },
+        "scope_complete": {
+          "type": "boolean"
+        },
+        "cancelled": {
+          "const": false
+        },
+        "selected_files": {
+          "const": 1
+        },
+        "checked_files": {
+          "const": 1
+        },
+        "incomplete_files": {
+          "const": 0
+        },
+        "unsupported_files": {
+          "const": 0
+        },
+        "unqualified_files": {
+          "const": 1
+        },
+        "truncated_files": {
+          "const": 1
+        },
+        "suspected_recoveries": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 128
+        }
+      }
+    },
+    "recovery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "group_id",
+        "syntax_kind",
+        "start_byte",
+        "end_byte",
+        "start_row",
+        "start_column_byte",
+        "end_row",
+        "end_column_byte"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "ERROR",
+            "MISSING"
+          ]
+        },
+        "group_id": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "syntax_kind": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "start_byte": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "end_byte": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "start_row": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "start_column_byte": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "end_row": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "end_column_byte": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}

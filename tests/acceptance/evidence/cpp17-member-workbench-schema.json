@@ -1,0 +1,7 @@
+{
+  "qualification": "not_granted",
+  "scope": "cpp_member_workbench_schema_only",
+  "reports_valid": 8,
+  "negative_cases_rejected": 16,
+  "schemas_valid": 509
+}

@@ -314,3 +314,49 @@ npm公开CVE入口 MUST 按CLI、登记环境变量、项目runtime.json、内�
 #### Scenario: Unknown command or duplicated format is requested
 - **WHEN** 帮助查询有未知入口、重复format或不支持的sarif格式
 - **THEN** 执行前返回2且stdout不输出伪成功JSON
+
+#### Scenario: Registered standalone lint has no native adapter
+- **WHEN** 使用注册表规范语言请求独立单文件 lint，而该语言尚无专用原生适配器
+- **THEN** 返回版本化未完成报告，明确原生适配缺口及配置 unknown；不得宣称原生工具未安装或执行注册表中未经适配的历史命令。启用WASM时只对匹配的固定路由提供有界候选，未知ID、错参、无关工具参数在观察及持久化前拒绝
+- **AND** 疑似候选可复用项目确认任务及下一步；后续零候选不关闭历史任务，损坏历史保留恢复原因。无WASM构建明确能力不可用，不伪造lint通过。源码选择与grammar不匹配、歧义头文件或普通SQL不强选grammar
+
+### Requirement: Java comments entry SHALL preserve native scope and configuration boundaries
+
+`comments java [path]` MUST 提供独立注释检查入口，复用已有 JDK 单文件和 Maven 项目 Javadoc 原生能力。项目入口 MUST 先观察当前配置，只选择 Java 注释检查，不运行其他语言或检测类别。显式 Maven 上下文 MUST 不退回单文件探针。文件入口是显式局部诊断，不证明项目配置。共享预算、不可用工具与取消 MUST 明示；不隐式安装、不修改源码。尚未接通持久修复适配时 MUST 明示 `workbench_status=not_integrated`，不得伪造任务或关闭资格。
+
+#### Scenario: Java comments project lacks configuration
+- **WHEN** 项目有 Java 主源码，但没有确认的 Javadoc 配置
+- **THEN** 保留配置缺口，不启动 Javadoc，不生成源码违规，不声称检查通过
+
+#### Scenario: Java comments file produces native diagnostics
+- **WHEN** 显式 JDK 对单文件返回可解析的 Javadoc 诊断
+- **THEN** 独立 comments 报告保留原诊断、局部范围和复检指引，交付不作判定
+
+#### Scenario: Duplicate Java comments arguments
+- **WHEN** 同一选项重复、未知选项或预算无效
+- **THEN** 启动原生工具前以参数错误拒绝，不输出成功报告
+
+### Requirement: Aggregate feedback SHALL describe selected native preparation briefs exactly
+聚合报告 SHALL 使用能容纳选中准备简报的显式协议版本，保持历史schema；P3C未确认配置的简报 SHALL 保留blocker、原检查器及review-project-policy动作，不转述为源码违规或交付通过。完整实际聚合及内嵌简报须共同符合协议。
+
+#### Scenario: A Maven module has unconfirmed P3C configuration
+- **WHEN** check java选择java.maven.p3c的p3c_configuration_not_confirmed准备任务
+- **THEN** 返回0.58聚合协议，接受原Java选择原因码并明确配置策略复核；伪造finding、检查器、原因、修复动作或批准/allow不符合协议
+
+### Requirement: Public language aliases SHALL normalize only explicit language positions
+CLI检查类别/check/plan入口 SHALL 将已登记py/rs/ts/rb/kt/erl/golang/c++/c#分别归一为python/rust/typescript/ruby/kotlin/erlang/go/cpp/csharp，再执行既有参数校验和路由。路径、工具参数、任务身份及grammar探针方言不得重写。未知拼写保留并由原入口拒绝，不猜测JavaScript/TSX/bash等语言或方言映射；别名不增加检查能力或提升planned状态。
+
+#### Scenario: A short language name selects a read-only plan
+- **WHEN** plan lint py请求只读计划
+- **THEN** 返回规范python身份，与plan lint python相同，不运行工具、不写文件
+
+#### Scenario: A path or grammar dialect resembles an alias
+- **WHEN** 源码路径、工具路径或grammar探针的选择出现py/ts等字符串
+- **THEN** 路径和grammar方言保持原值，只有具名公开检查命令的语言位置归一
+
+### Requirement: lint all SHALL select lint tasks across discovered languages
+公开lint all SHALL复用多语言检查调度器的发现、输入快照、并发预算、原生适配及任务反馈，只选择lint类别。不启动独立build/comments/dependencies/cve任务，不把Python扫描当作全语言检查。报告 SHALL 明确requested_categories=[lint]，保留各语言能力缺口及未完成状态，不签发完整项目通过。
+
+#### Scenario: A mixed Python and Rust project requests lint all
+- **WHEN** 项目包含Python与Rust源码，执行lint all
+- **THEN** 调度python.lint及rust.lint，缺工具保留未完成；不调度Rust构建、注释或漏洞检查，不生成这些类别的失败记录

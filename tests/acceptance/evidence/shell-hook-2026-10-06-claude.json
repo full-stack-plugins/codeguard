@@ -1,0 +1,7 @@
+{
+  "hookSpecificOutput": {
+    "additionalContext": "CodeGuard：app.sh 局部检查反馈：原生诊断 1 项；规则 SC2086；WASM 候选 0 项、疑似恢复节点 0 项、独立结构观察 0 项、恢复扫描未完成 0 项；不可检查文件 0 项、原生快检未接线 0 项。按当前 SC 规则及 Unicode 标量位置修复；继续原 ShellCheck 任务复检和完整项目检查。Shell 第 2 行，第 6 列（Unicode 标量）；Shell 原生任务 CG-9e3be727dbf76c8e55a5ca543cc21506：codeguard task show CG-9e3be727dbf76c8e55a5ca543cc21506 . --format=json；修复后 codeguard task verify CG-9e3be727dbf76c8e55a5ca543cc21506 . --shellcheck-tool <已核验绝对路径> --format=json。缺工具时安装适用ShellCheck；未知或不支持方言先核对实际方言与检查器，不反复重装。当前没有Shell内置WASM，检查不完整；不凭零诊断关闭任务。候选语法能力尚未完整验收，完整项目与交付未评估。",
+    "hookEventName": "PostToolUse"
+  },
+  "systemMessage": "CodeGuard 局部检查反馈"
+}

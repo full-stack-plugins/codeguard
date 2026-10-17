@@ -422,3 +422,81 @@ fn unsupported_tool_and_wrong_event_are_visible_but_do_not_scan() {
             .contains("范围未确定")
     );
 }
+
+#[test]
+fn c_edit_context_gap_is_visible_in_agent_conversation() {
+    let project = Project::new();
+    let file = project.0.join("changed.c");
+    fs::write(&file, "int f(int x) { return x; }\n").unwrap();
+    let (exit, output) = run(&project, &payload(&project, file.to_str().unwrap()), &[]);
+    assert_eq!(exit, 0);
+    let context = output["hookSpecificOutput"]["additionalContext"]
+        .as_str()
+        .unwrap();
+    assert!(context.contains("C 文档上下文未就绪"), "{context}");
+    assert!(context.contains("交付未评估"));
+    assert!(!context.contains("SECRET_HOST_SOURCE_MUST_NOT_BE_ECHOED"));
+}
+
+#[test]
+#[ignore = "requires existing native Clang via CODEGUARD_CLANG_BIN"]
+fn native_c_documentation_is_injected_without_source_or_comment_text() {
+    let project = Project::new();
+    let tool = std::env::var("CODEGUARD_CLANG_BIN").unwrap();
+    for (extension, option, standard) in [
+        ("c", "--c-standard", "c11"),
+        ("cpp", "--cpp-standard", "c++17"),
+    ] {
+        let file = project.0.join(format!("changed.{extension}"));
+        fs::write(
+            &file,
+            "/** SECRET_COMMENT_DO_NOT_ECHO\n * @param x\n */\nint f(int x) { return x; }\n",
+        )
+        .unwrap();
+        let initialized = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+            .arg("init")
+            .arg(&project.0)
+            .args(["--apply", "--format=json"])
+            .output()
+            .unwrap();
+        assert_eq!(initialized.status.code(), Some(3), "{initialized:?}");
+        assert!(project.0.join(".codeguard/workspace.json").is_file());
+        let (exit, output) = run(
+            &project,
+            &payload(&project, file.to_str().unwrap()),
+            &["--clang-tool", &tool, option, standard],
+        );
+        assert_eq!(exit, 0);
+        let context = output["hookSpecificOutput"]["additionalContext"]
+            .as_str()
+            .unwrap();
+        assert!(context.contains("原生文档规则 clang."), "{context}");
+        assert!(
+            context.contains("codeguard.documentation.function_structure_required"),
+            "{context}"
+        );
+        assert!(context.contains("复检"));
+        assert!(context.contains("文档任务 CG-"), "{context}");
+        assert!(context.contains("交付未评估"));
+        assert!(!context.contains("SECRET"));
+        assert!(context.chars().count() <= 1200);
+        if let Ok(directory) = std::env::var("CODEGUARD_C_DOC_HOST_EVIDENCE_DIR") {
+            use sha2::{Digest, Sha256};
+            let directory = std::path::Path::new(&directory);
+            assert!(directory.is_absolute());
+            let evidence = json!({"qualification":"not_granted","evidence_kind":"development_claude_c_documentation_context","test_source_sha256":format!("{:x}",Sha256::digest(include_bytes!("claude_hook_cli.rs"))),"output":output});
+            fs::write(
+                directory.join(format!(
+                    "c-family-host-{}-{extension}.json",
+                    if cfg!(feature = "wasm-precheck") {
+                        "wasm"
+                    } else {
+                        "default"
+                    }
+                )),
+                serde_json::to_vec_pretty(&evidence).unwrap(),
+            )
+            .unwrap();
+        }
+    }
+}

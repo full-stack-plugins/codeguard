@@ -1,0 +1,1812 @@
+{
+  "schema_version": "0.1.0",
+  "document_type": "format_profiles",
+  "authority": "repository_profile_only",
+  "qualification": "not_granted",
+  "category": "format",
+  "separation_note": "format 类别独立于 lint/comments/conventions/vulnerabilities；格式化不能冒充注释或规范检查",
+  "policy": "format_check_reports_style_only_never_claims_semantic_compliance",
+  "languages": [
+    {
+      "language": "java",
+      "status": "integrated",
+      "formatter": "google-java-format",
+      "tool_key": "google-java-format",
+      "check_argv": [
+        "--dry-run",
+        "--set-exit-if-changed",
+        "{file}"
+      ],
+      "apply_argv": [
+        "--replace",
+        "{file}"
+      ],
+      "config_markers": [
+        ".editorconfig",
+        "pom.xml",
+        "build.gradle",
+        "build.gradle.kts"
+      ],
+      "extensions": [
+        ".java"
+      ],
+      "dialects": {
+        "style": "google"
+      },
+      "notes": "Java 选 google-java-format（GJF）而非 spotless / palantir-java-format，理由是逐文件调用契约：codeguard format 以 {file} 逐文件驱动格式化器，需要可直接对单文件判定合规性的独立 CLI。① spotless 是 Maven/Gradle 插件形态，只能通过 mvn spotless:check / gradle spotlessCheck 驱动整个项目生命周期，无法对单个 .java 文件给出独立退出码，且项目未配置插件时命令直接失败（退出 1 会与「不合规」混淆）；② palantir-java-format 是 GJF 的 fork，check/apply 语义与 GJF 完全一致（--dry-run --set-exit-if-changed / --replace），选 GJF 是因为它是 upstream 且发行形态最稳定；项目若偏好 palantir 风格，可用 --tool google-java-format=<palantir 绝对路径> 替换绑定，无需改档案；③ GJF 对 .groovy 输出 Skipping non-Java file 且恒退 0，故 groovy 不复用本条目，改走 npm-groovy-lint 包装器。实测（本机 google-java-format 1.27.0 + JDK 21）：不合规退出 1 且 stdout 列出文件、已格式化退出 0、--replace 就地重写后复检退出 0。限制：GJF 无自身配置文件（仅 --aosp 风格变体），缩进/换行由内置风格决定；只重排版面，不做 import 顺序治理、不检查注释完整性、不做静态分析，不能替代 Checkstyle/P3C（那是 conventions 核心能力的职责）。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
+    },
+    {
+      "formatter": "rustfmt",
+      "tool_key": "rustfmt",
+      "check_argv": [
+        "--check",
+        "--edition",
+        "{edition}",
+        "{file}"
+      ],
+      "apply_argv": [
+        "--edition",
+        "{edition}",
+        "{file}"
+      ],
+      "config_markers": [
+        "rustfmt.toml",
+        ".rustfmt.toml"
+      ],
+      "extensions": [
+        ".rs"
+      ],
+      "dialects": {
+        "edition": "2021"
+      },
+      "notes": "rustfmt 是 Rust 官方格式化器；--check 只读检查不改源码",
+      "language": "rust",
+      "status": "integrated",
+      "unformatted_exit_codes": [
+        1
+      ],
+      "unparsable_detection": "none"
+    },
+    {
+      "formatter": "prettier",
+      "tool_key": "prettier",
+      "check_argv": [
+        "--list-different",
+        "{file}"
+      ],
+      "apply_argv": [
+        "--write",
+        "{file}"
+      ],
+      "config_markers": [
+        ".prettierrc",
+        ".prettierrc.json",
+        ".prettierrc.yaml",
+        "prettier.config.js"
+      ],
+      "extensions": [
+        ".ts",
+        ".tsx",
+        ".js",
+        ".jsx",
+        ".mjs",
+        ".cjs"
+      ],
+      "dialects": {},
+      "notes": "prettier 是 TypeScript/JavaScript 生态事实标准格式化器，同时覆盖 .ts/.tsx（TypeScript）与 .js/.jsx/.mjs/.cjs（JavaScript，注册表中 JS 生态归于本条目，无独立 node 语言 ID）。check_argv 用 --list-different 而非 --check：实测 prettier 3.9.9 的 --check 在全部合规时仍向 stdout 打印「All matched files use Prettier code style!」，与 A 类「退出 0 且 stdout 为空=合规」冲突会导致全量误报；--list-different 合规时退出 0 且 stdout 为空，不合规时退出 1 并逐行列出路径，文件不存在退出 2 落入工具故障语义。限制：只重排版面，不做类型检查或 lint 规则检查，不能替代 tsc 或 eslint；prettier 读项目 prettier 配置与 .editorconfig。",
+      "language": "typescript",
+      "status": "integrated",
+      "unformatted_exit_codes": [
+        1
+      ],
+      "unparsable_detection": "none"
+    },
+    {
+      "formatter": "ruff",
+      "tool_key": "ruff",
+      "check_argv": [
+        "format",
+        "--check",
+        "--quiet",
+        "{file}"
+      ],
+      "apply_argv": [
+        "format",
+        "--quiet",
+        "{file}"
+      ],
+      "config_markers": [
+        "pyproject.toml",
+        "ruff.toml",
+        ".ruff.toml"
+      ],
+      "extensions": [
+        ".py",
+        ".pyi"
+      ],
+      "dialects": {},
+      "notes": "ruff format 是 Black 兼容格式化器；只判格式，不冒充 lint 规则",
+      "language": "python",
+      "status": "integrated",
+      "unformatted_exit_codes": [
+        1
+      ],
+      "unparsable_detection": "none"
+    },
+    {
+      "formatter": "gofmt",
+      "tool_key": "gofmt",
+      "check_argv": [
+        "-l",
+        "{file}"
+      ],
+      "apply_argv": [
+        "-w",
+        "{file}"
+      ],
+      "config_markers": [],
+      "extensions": [
+        ".go"
+      ],
+      "dialects": {},
+      "notes": "gofmt 是 Go 官方格式化器；-l 列出不合规文件（stdout 非空即不合规），-w 就地写入",
+      "language": "go",
+      "status": "integrated",
+      "unformatted_exit_codes": [
+        1
+      ],
+      "unparsable_detection": "none"
+    },
+    {
+      "language": "csharp",
+      "status": "integrated",
+      "formatter": "csharpier",
+      "tool_key": "csharpier",
+      "check_argv": [
+        "check",
+        "--log-level",
+        "Warning",
+        "{file}"
+      ],
+      "apply_argv": [
+        "format",
+        "{file}"
+      ],
+      "config_markers": [
+        ".csharpierrc",
+        ".csharpierrc.json",
+        ".csharpierrc.yaml",
+        ".editorconfig"
+      ],
+      "extensions": [
+        ".cs"
+      ],
+      "dialects": {},
+      "notes": "官方 dotnet format 已实测（.NET 10 SDK 10.0.401）其 --verify-no-changes 在检测到需格式化时退出码为 2（官方文档明示行为），不满足本契约 A/B 退出码语义（退出 ≥2 视为工具故障，永不判不合规），故改选社区事实标准 CSharpier（dotnet tool install -g csharpier，类似 prettier 的 C# 官方外主流格式化器）。已在本机实跑验证（CSharpier 1.3.0）：csharpier check {file} --log-level Warning 退出 0=合规、1=不合规（--log-level Warning 用于抑制默认打在 stdout 的 Checked 摘要，避免合规文件被误判为不合规），csharpier format {file} 就地格式化退出 0；无 csproj 的裸目录同样可用（已实测）。配置读 .csharpierrc/.csharpierrc.json/.csharpierrc.yaml 或 .editorconfig；需要 .NET 运行时；语法错误文件 check 退出 1（与不合规同码，随后 apply 阶段会失败兜底）；clang-format 方案因默认按 C++ 规则处理 .cs（需项目内 Language: CSharp 配置才正确）而弃用。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
+    },
+    {
+      "language": "kotlin",
+      "status": "integrated",
+      "formatter": "ktlint",
+      "tool_key": "ktlint",
+      "check_argv": [
+        "{file}"
+      ],
+      "apply_argv": [
+        "--format",
+        "{file}"
+      ],
+      "config_markers": [
+        ".editorconfig"
+      ],
+      "extensions": [
+        ".kt",
+        ".kts"
+      ],
+      "dialects": {},
+      "notes": "Kotlin 生态主流格式化/风格检查器（实测 ktlint 1.8.0）。check_argv 属 B 类：默认 lint 模式对违规文件退出 1 并在 stdout 输出违规明细（file:line:col 规则），合规时退出 0 且无输出；apply_argv 为 --format（旧别名 -F 已弃用），就地改写并退出 0，.kt 与 .kts 两个方向均在本机实跑验证。通过 .editorconfig 配置（ktlint_code_style 等），无 .editorconfig 时使用内置默认风格。只检查风格/格式规则，不做类型或语义检查；对语法错误的文件也退出 1（按不合规处理而非故障）；路径未匹配到任何文件时仅输出警告并退出 0（会被视为合规）。本机经 GitHub release 自包含 jar + Java 21 实跑验证。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
+    },
+    {
+      "language": "swift",
+      "status": "integrated",
+      "formatter": "swift-format",
+      "tool_key": "swift-format",
+      "check_argv": [
+        "lint",
+        "--strict",
+        "{file}"
+      ],
+      "apply_argv": [
+        "format",
+        "--in-place",
+        "{file}"
+      ],
+      "config_markers": [
+        ".swift-format"
+      ],
+      "extensions": [
+        ".swift"
+      ],
+      "dialects": {},
+      "notes": "Apple 官方 Swift 格式化器（swiftlang/swift-format），随 Xcode/CommandLineTools 工具链自带，也可 `brew install swift-format` 独立安装。B 类检查：`lint --strict` 退出 0=合规、退出 1=有风格违规；参数与退出码已在本机实跑验证（CommandLineTools 捆绑版，Swift 6.4 工具链）。限制：只做源码排版/风格检查与重排，不做编译检查、不修复语义问题、不检查注释内容；对不存在的文件路径静默退出 0 不报错；对语法解析失败的文件 lint/format 均退出 1，无法在退出码上区分「不合规」与「源码损坏」；配置从当前目录或祖先目录的 .swift-format（JSON，含 lineLength 等字段）自动发现，实测确认生效。",
+      "unparsable_detection": "clang_format_xml",
+      "unformatted_exit_codes": [
+        1
+      ]
+    },
+    {
+      "language": "php",
+      "status": "integrated",
+      "formatter": "sh",
+      "tool_key": "sh",
+      "check_argv": [
+        "-c",
+        "#!/bin/sh\n# php-cs-fixer 只读检查\n#\n# 前置条件：项目必须提供 .php-cs-fixer.dist.php 或 .php-cs-fixer.php。\n# 本机 3.95.27 实测：无配置时它创建 .gitignore 并退 0 却不格式化（静默无效），\n# 不拦截会把未检查当合规，故无配置返回 2。\nf=\"$1\"\n[ -f \"$f\" ] || exit 2\ncommand -v php-cs-fixer >/dev/null 2>&1 || exit 2\n[ -f .php-cs-fixer.dist.php ] || [ -f .php-cs-fixer.php ] || exit 2\nphp-cs-fixer fix --dry-run --using-cache=no \"$f\" >/dev/null 2>&1\nexit $?\n",
+        "codeguard",
+        "{file}"
+      ],
+      "apply_argv": [
+        "-c",
+        "#!/bin/sh\nf=\"$1\"\n[ -f \"$f\" ] || exit 2\ncommand -v php-cs-fixer >/dev/null 2>&1 || exit 2\n[ -f .php-cs-fixer.dist.php ] || [ -f .php-cs-fixer.php ] || exit 2\nphp-cs-fixer fix --using-cache=no \"$f\" >/dev/null 2>&1\nexit $?\n",
+        "codeguard",
+        "{file}"
+      ],
+      "config_markers": [
+        ".php-cs-fixer.php",
+        ".php-cs-fixer.dist.php"
+      ],
+      "extensions": [
+        ".php"
+      ],
+      "dialects": {},
+      "notes": "php-cs-fixer 是 PHP 生态事实标准。**退出码实测（本机 3.95.27）**：需修复时 `fix --dry-run` 返回位掩码 8（非 1），已并入码集 [1, 8]；语法错误与无配置均不入码集。**项目须提供 .php-cs-fixer.dist.php（或 .php-cs-fixer.php）**：本机实测无配置时它会创建 .gitignore 并退出 0 却**不做任何格式化**——属静默无效，wrapper 在无配置时返回 2（工具故障）而非 0，避免把未检查当合规。同时丢弃 stdout 以避免 A 类误判（php-cs-fixer 判定通过时仍打印进度摘要）。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1,
+        8
+      ]
+    },
+    {
+      "language": "ruby",
+      "status": "integrated",
+      "formatter": "sh",
+      "tool_key": "sh",
+      "check_argv": [
+        "-c",
+        "#!/bin/sh\n# rubocop 只读检查：丢弃 stdout，判定纯粹由退出码承担。\n#\n# 本机 1.91.0 实测：rubocop 判定通过时仍打印「Inspecting 1 file…」等进度摘要，\n# 而运行时把「退出 0 且 stdout 非空」判为 A 类语义（gofmt -l 那种），\n# 会把每一个合规的 Ruby 文件误判为需重排。\nf=\"$1\"\n[ -f \"$f\" ] || exit 2\ncommand -v rubocop >/dev/null 2>&1 || exit 2\nrubocop --only Layout -f quiet \"$f\" >/dev/null 2>&1\nexit $?\n",
+        "codeguard",
+        "{file}"
+      ],
+      "apply_argv": [
+        "-c",
+        "#!/bin/sh\nf=\"$1\"\n[ -f \"$f\" ] || exit 2\ncommand -v rubocop >/dev/null 2>&1 || exit 2\nrubocop --only Layout --autocorrect -f quiet \"$f\" >/dev/null 2>&1\nexit $?\n",
+        "codeguard",
+        "{file}"
+      ],
+      "config_markers": [
+        ".rubocop.yml",
+        ".rubocop.yaml"
+      ],
+      "extensions": [
+        ".rb"
+      ],
+      "dialects": {},
+      "notes": "rubocop 是 Ruby 生态事实标准（布局由 Layout cops 集合覆盖）。检查与修复均限定 --only Layout（仅排版类规则），刻意不用 -A——unsafe 修正可能改变代码行为。**必须经 wrapper 丢弃 stdout**：本机 1.91.0 实测 rubocop 判定通过时仍打印「Inspecting 1 file…」等进度摘要，而运行时把「退出 0 且 stdout 非空」判为 A 类语义（gofmt -l 那种），直接调用会把每一个合规的 Ruby 文件误判为需重排。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
+    },
+    {
+      "language": "scala",
+      "status": "integrated",
+      "formatter": "scalafmt",
+      "tool_key": "scalafmt",
+      "check_argv": [
+        "--test",
+        "{file}"
+      ],
+      "apply_argv": [
+        "{file}"
+      ],
+      "config_markers": [
+        ".scalafmt.conf"
+      ],
+      "extensions": [
+        ".scala",
+        ".sc"
+      ],
+      "dialects": {
+        "runner.dialect": "scala213"
+      },
+      "notes": "Scala 事实标准格式化器（实测 scalafmt 3.9.6）。check_argv 属 B 类：--test 对未格式化文件打印 diff 并退出 1，全部合规时退出 0；退出码 ≥2 为工具故障（实测：文件不存在=8，缺少 .scalafmt.conf=16）。apply_argv 直接跟 {file}（无额外标志）即就地格式化并退出 0。.scalafmt.conf 为强制项，缺失时拒绝运行（表现为故障码而非误判合规），方言由 runner.dialect 指定（实测 scala213 通过），.scala 与 .sc 均实测支持。只排版不检查语义，无法修复编译错误；不能在未提供 .scalafmt.conf 的项目中运行。本机经 Maven Central 的 scalafmt-cli_2.13 jar + Java 21 实跑验证；独立可执行文件可 coursier install scalafmt 获取。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
+    },
+    {
+      "language": "shell",
+      "status": "integrated",
+      "formatter": "shfmt",
+      "tool_key": "shfmt",
+      "check_argv": [
+        "-d",
+        "{file}"
+      ],
+      "apply_argv": [
+        "-w",
+        "{file}"
+      ],
+      "config_markers": [
+        ".editorconfig"
+      ],
+      "extensions": [
+        ".sh",
+        ".bash",
+        ".zsh"
+      ],
+      "dialects": {
+        "default": "由 shebang 自动识别",
+        "supported": [
+          "bash",
+          "posix",
+          "sh",
+          "mksh",
+          "bats"
+        ],
+        "override_flag": "-ln"
+      },
+      "notes": "shfmt 是 shell 事实标准格式化器。-d 为只读 diff 模式，实测合规时退出 0 且 stdout 为空、有差异时退出 1 并把 unified diff 输出到 stdout（标准 B 类，不改源码）；-w 就地写入退出 0。方言由 shebang 自动识别，可用 -ln 显式指定 bash/posix/sh/mksh/bats（实测 -ln posix 对 bash 数组语法报解析错）；zsh 不是支持方言，.zsh 文件仅当语法兼容 bash/POSIX 时能通过，zsh 特有语法解析失败同样退出 1 被列为不合规（不静默通过）。限制：只做排版，不查 shell bug 与用法错误（那是 shellcheck 的职责）；缩进等风格读 .editorconfig（实测 switch_case_indent/indent_style 生效）。本机已实跑（shfmt 3.14.1，brew 安装）。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
+    },
+    {
+      "language": "dockerfile",
+      "status": "integrated",
+      "formatter": "dprint",
+      "tool_key": "dprint",
+      "check_argv": [
+        "check",
+        "{file}"
+      ],
+      "apply_argv": [
+        "fmt",
+        "{file}"
+      ],
+      "config_markers": [
+        "dprint.json",
+        "dprint.jsonc",
+        ".dprint.json",
+        ".dprint.jsonc"
+      ],
+      "extensions": [
+        ".dockerfile"
+      ],
+      "dialects": {
+        "dprint": "0.61.1",
+        "dprint-plugin-dockerfile": "0.3.2"
+      },
+      "notes": "退出码实测（本机 2026-10-08 直测）：dprint check 合规退 0、需重排退 20、未认领退 14。 【本机复验 2026-10-08】直测 dprint check（插件取自 dprint-plugin-dockerfile releases 实际发布的 0.7.0，文件名 plugin.wasm；此前 notes 记述的 0.3.2 版本号有误）：合规退 0、排版不合规退 20、未认领退 14。⚠️ 已知限制：dprint 对**无法解析的 Dockerfile 一律退 0**（实测 `FROM alpine\\nRUN ((` 退 0 且 fmt 不改动），与 clang-format 同类——Dockerfile 的语法损坏须由 syntax 核心能力（docker build / hadolint）拦截，format 门禁不覆盖该类。 退出码约定：需格式化时 dprint check 退出 20（非 1），已显式声明为不合规码；文件未被插件认领退出 14、语法损坏退出 0（见上方已知限制），二者均不入码集。",
+      "unformatted_exit_codes": [
+        20
+      ],
+      "unparsable_detection": "none"
+    },
+    {
+      "language": "yaml",
+      "status": "integrated",
+      "formatter": "prettier",
+      "tool_key": "prettier",
+      "check_argv": [
+        "--list-different",
+        "{file}"
+      ],
+      "apply_argv": [
+        "--write",
+        "{file}"
+      ],
+      "config_markers": [
+        ".prettierrc",
+        ".prettierrc.json",
+        ".prettierrc.yaml",
+        ".prettierrc.yml",
+        ".prettierrc.toml",
+        "prettier.config.js"
+      ],
+      "extensions": [
+        ".yml",
+        ".yaml"
+      ],
+      "dialects": {},
+      "notes": "prettier 是 YAML 事实标准格式化器（与主档案 typescript 同一工具，各语言档案独立声明不冲突）。刻意选 --list-different 而非 --check：实测 --check 在全部合规时也会向 stdout 输出 'All matched files use Prettier code style!'，会被本运行时的「退出 0 且 stdout 非空=不合规」规则误判；--list-different 实测合规时 stdout 为 0 字节、不合规时退出 1 且文件名列在 stdout，A/B 两类判定都安全。限制：只做 YAML 排版（缩进/引号/折行），不校验 schema 与语义；含 Jinja2 模板或非法 YAML 的文件解析失败退出 2，按未完成处理不误判合规；读项目 prettier 配置。本机已实跑（prettier 3.9.9，npx）。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
+    },
+    {
+      "language": "elixir",
+      "status": "integrated",
+      "formatter": "mix",
+      "tool_key": "mix",
+      "check_argv": [
+        "format",
+        "--check-formatted",
+        "{file}"
+      ],
+      "apply_argv": [
+        "format",
+        "{file}"
+      ],
+      "config_markers": [
+        "mix.exs",
+        ".formatter.exs"
+      ],
+      "extensions": [
+        ".ex",
+        ".exs"
+      ],
+      "dialects": {},
+      "notes": "mix format 是 Elixir 官方发行、生态事实标准的格式化 Mix 任务（本机实测 Mix 1.19.5 / Erlang OTP 28）。属 B 类，已真实验证：干净项目 mix format --check-formatted 退出 0；存在未格式化文件时退出 1 并在输出中列出文件路径与 diff；mix format {file} 就地格式化退出 0，格式化后复查退出 0。限制：它是项目级任务，风格选项（line_length、import_deps 等）来自项目根及子目录的 .formatter.exs，须在含 mix.exs 的项目根运行才能读到项目风格；显式传单个 .ex/.exs 文件在项目内外均可执行（本机实测），但项目外读不到 .formatter.exs，可能与项目实际风格不一致；语法错误的文件同样退出 1，无法与未格式化区分（会报为不合规，方向保守）；只判格式，不检查注释完整性。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
+    },
+    {
+      "language": "css",
+      "status": "integrated",
+      "formatter": "prettier",
+      "tool_key": "prettier",
+      "check_argv": [
+        "--list-different",
+        "{file}"
+      ],
+      "apply_argv": [
+        "--write",
+        "{file}"
+      ],
+      "config_markers": [
+        ".prettierrc",
+        ".prettierrc.json",
+        ".prettierrc.yaml",
+        ".prettierrc.yml",
+        ".prettierrc.mjs",
+        ".prettierrc.cjs",
+        ".prettierrc.toml",
+        "prettier.config.js",
+        "prettier.config.mjs",
+        "prettier.config.cjs",
+        "prettier.config.toml"
+      ],
+      "extensions": [
+        ".css",
+        ".scss",
+        ".less"
+      ],
+      "dialects": {
+        "prettier": "3.9.9"
+      },
+      "notes": "选 prettier 而非 clang-format：实测 Apple clang-format 21（CommandLineTools 自带）把 body{color:red;margin:0} 格式化成 C++ 成员初始化风格（color:/red; 各占一行再缩进），破坏 CSS 惯用格式，不能用作 CSS 格式化器；prettier 输出惯用 CSS 且是 Web 生态事实标准，与本分片其余 5 种语言统一同一工具，--tool 绑定一次 prettier 即可覆盖全部。实测 prettier 3.9.9 闭环：.css/.scss/.less 不合规退出 1 列出文件，--write 退出 0，复查退出 0 且 stdout 为空（B 类）。限制：.sass 缩进语法 prettier 无 parser（实测退出 2 No parser could be inferred），故 extensions 排除 .sass；只调整格式，不检查样式正确性、浏览器兼容性；SCSS/LESS 变量与嵌套按对应语法排版但不做编译校验。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
+    },
+    {
+      "formatter": "clang-format",
+      "tool_key": "clang-format",
+      "check_argv": [
+        "--dry-run",
+        "--Werror",
+        "--style=file",
+        "{file}"
+      ],
+      "apply_argv": [
+        "-i",
+        "--style=file",
+        "{file}"
+      ],
+      "config_markers": [
+        ".clang-format",
+        "_clang-format"
+      ],
+      "extensions": [
+        ".c",
+        ".h"
+      ],
+      "dialects": {
+        "standard": "c11"
+      },
+      "notes": "clang-format 读 .clang-format；--dry-run --Werror 只读检查",
+      "language": "c",
+      "status": "integrated",
+      "unformatted_exit_codes": [
+        1
+      ],
+      "unparsable_detection": "clang_format_xml"
+    },
+    {
+      "formatter": "clang-format",
+      "tool_key": "clang-format",
+      "check_argv": [
+        "--dry-run",
+        "--Werror",
+        "--style=file",
+        "{file}"
+      ],
+      "apply_argv": [
+        "-i",
+        "--style=file",
+        "{file}"
+      ],
+      "config_markers": [
+        ".clang-format",
+        "_clang-format"
+      ],
+      "extensions": [
+        ".cpp",
+        ".cc",
+        ".cxx",
+        ".hpp",
+        ".hh",
+        ".hxx"
+      ],
+      "dialects": {
+        "standard": "c++17"
+      },
+      "notes": "clang-format 读 .clang-format；--dry-run --Werror 只读检查",
+      "language": "cpp",
+      "status": "integrated",
+      "unformatted_exit_codes": [
+        1
+      ],
+      "unparsable_detection": "clang_format_xml"
+    },
+    {
+      "formatter": "clang-format",
+      "tool_key": "clang-format",
+      "check_argv": [
+        "--dry-run",
+        "--Werror",
+        "--style=file",
+        "{file}"
+      ],
+      "apply_argv": [
+        "-i",
+        "--style=file",
+        "{file}"
+      ],
+      "config_markers": [
+        ".clang-format"
+      ],
+      "extensions": [
+        ".m",
+        ".mm"
+      ],
+      "dialects": {},
+      "notes": "clang-format 读 .clang-format",
+      "language": "objc",
+      "status": "integrated",
+      "unformatted_exit_codes": [
+        1
+      ],
+      "unparsable_detection": "clang_format_xml"
+    },
+    {
+      "language": "dart",
+      "status": "integrated",
+      "formatter": "dart",
+      "tool_key": "dart",
+      "check_argv": [
+        "format",
+        "--output=none",
+        "--set-exit-if-changed",
+        "{file}"
+      ],
+      "apply_argv": [
+        "format",
+        "{file}"
+      ],
+      "config_markers": [
+        "analysis_options.yaml"
+      ],
+      "extensions": [
+        ".dart"
+      ],
+      "dialects": {},
+      "notes": "Dart SDK 内置格式化器 `dart format`（Flutter 项目同样适用），接受目录或文件路径，目录会递归处理。B 类检查：`format --output=none --set-exit-if-changed` 退出 0=无需改动（合规）、退出 1=有需格式化的变化（不合规）；--output=none 与 --set-exit-if-changed 必须同时使用，前者保证只读不改写、后者以退出码报告结果。apply_argv 默认即原地覆写，退出 0=成功。默认行宽 80，可在 analysis_options.yaml 顶层 formatter 段（如 page_width）项目级配置（需语言版本 >=3.7），也可在文件顶部用 `// dart format width=NNN` 注释逐文件覆盖。限制：只统一排版，不做 lint 分析、不检查空安全或其他语义问题；格式风格（tall/short）由包语言版本自动决定，无法用命令行参数切换。本机未安装 Dart SDK（brew 无 dart formula，也无 dart-sdk cask），参数与退出码语义依据官方文档 dart.dev/tools/dart-format，未实跑验证。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
+    },
+    {
+      "language": "vue",
+      "status": "integrated",
+      "formatter": "prettier",
+      "tool_key": "prettier",
+      "check_argv": [
+        "--list-different",
+        "{file}"
+      ],
+      "apply_argv": [
+        "--write",
+        "{file}"
+      ],
+      "config_markers": [
+        ".prettierrc",
+        ".prettierrc.json",
+        ".prettierrc.yaml",
+        ".prettierrc.yml",
+        ".prettierrc.mjs",
+        ".prettierrc.cjs",
+        ".prettierrc.toml",
+        "prettier.config.js",
+        "prettier.config.mjs",
+        "prettier.config.cjs",
+        "prettier.config.toml"
+      ],
+      "extensions": [
+        ".vue"
+      ],
+      "dialects": {
+        "prettier": "3.9.9"
+      },
+      "notes": "prettier 内置 vue parser，可把 .vue SFC 的 template/script/style 作为整体格式化。实测（prettier 3.9.9）：不合规 --list-different 退出 1 且 stdout 列出文件，--write 退出 0，格式化后复查退出 0 且 stdout 为空，符合 B 类语义。限制：只调整格式，不校验模板语义、组件属性与事件合法性；不逐块处理 SFC，模板内嵌表达式按文本级排版；自定义块（custom block）不格式化；无法替代 vue-tsc 类类型检查。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
+    },
+    {
+      "language": "svelte",
+      "status": "integrated",
+      "formatter": "prettier",
+      "tool_key": "prettier",
+      "check_argv": [
+        "--plugin=prettier-plugin-svelte",
+        "--list-different",
+        "{file}"
+      ],
+      "apply_argv": [
+        "--plugin=prettier-plugin-svelte",
+        "--write",
+        "{file}"
+      ],
+      "config_markers": [
+        ".prettierrc",
+        ".prettierrc.json",
+        ".prettierrc.yaml",
+        ".prettierrc.yml",
+        ".prettierrc.mjs",
+        ".prettierrc.cjs",
+        ".prettierrc.toml",
+        "prettier.config.js",
+        "prettier.config.mjs",
+        "prettier.config.cjs",
+        "prettier.config.toml"
+      ],
+      "extensions": [
+        ".svelte"
+      ],
+      "dialects": {
+        "prettier": "3.9.9",
+        "prettier-plugin-svelte": "3.5.2"
+      },
+      "notes": "prettier 必须搭配 prettier-plugin-svelte 才能解析 .svelte：实测不传 --plugin 时退出 2 并报 [error] No parser could be inferred（按 B 类『退出≥2 工具故障』处理，不会误判合规）；传 --plugin=prettier-plugin-svelte 后实测闭环通过：不合规退出 1 列出文件，--write 退出 0，复查退出 0 且 stdout 空。验证版本：prettier 3.9.9 + prettier-plugin-svelte 3.5.2（插件 3.x 要求 prettier 3）。也可在 .prettierrc 的 plugins 字段声明插件以省略 CLI flag，此时 check_argv 无需 --plugin。限制：只调整格式，不校验组件逻辑与 store 用法；不提供 svelte-check 的类型/可访问性诊断；运行时编译错误不在格式化阶段暴露。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
+    },
+    {
+      "language": "astro",
+      "status": "integrated",
+      "formatter": "prettier",
+      "tool_key": "prettier",
+      "check_argv": [
+        "--plugin=prettier-plugin-astro",
+        "--list-different",
+        "{file}"
+      ],
+      "apply_argv": [
+        "--plugin=prettier-plugin-astro",
+        "--write",
+        "{file}"
+      ],
+      "config_markers": [
+        ".prettierrc",
+        ".prettierrc.json",
+        ".prettierrc.yaml",
+        ".prettierrc.yml",
+        ".prettierrc.mjs",
+        ".prettierrc.cjs",
+        ".prettierrc.toml",
+        "prettier.config.js",
+        "prettier.config.mjs",
+        "prettier.config.cjs",
+        "prettier.config.toml"
+      ],
+      "extensions": [
+        ".astro"
+      ],
+      "dialects": {
+        "prettier": "3.9.9",
+        "prettier-plugin-astro": "0.13.0"
+      },
+      "notes": "prettier 必须搭配 prettier-plugin-astro 才能解析 .astro：实测不传 --plugin 时退出 2 报 No parser could be inferred；传 --plugin=prettier-plugin-astro 后实测闭环通过：不合规退出 1 列出文件，--write 退出 0，复查退出 0 且 stdout 空；前置 frontmatter（TS）与模板一并格式化。验证版本：prettier 3.9.9 + prettier-plugin-astro 0.13.0。限制：只调整格式，不校验 frontmatter 类型；内嵌框架组件（React/Vue/Svelte）不会递归调用对应插件格式化，需项目自行配置额外插件；不提供 astro check 的诊断能力。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
+    },
+    {
+      "language": "solidity",
+      "status": "integrated",
+      "formatter": "forge",
+      "tool_key": "forge",
+      "check_argv": [
+        "fmt",
+        "--check",
+        "{file}"
+      ],
+      "apply_argv": [
+        "fmt",
+        "{file}"
+      ],
+      "config_markers": [
+        "foundry.toml"
+      ],
+      "extensions": [
+        ".sol"
+      ],
+      "dialects": {},
+      "notes": "forge fmt 是 Foundry 工具链官方格式化器。已在本机实跑验证（forge 1.8.5）：forge fmt --check {file} 退出 0=合规、1=不合规（diff 打到 stdout，不影响 B 类退出码判定），forge fmt {file} 就地格式化退出 0。风格经项目 foundry.toml 的 [fmt] 段配置；会做风格归一化（如 uint 归一为 uint256、补空行），属风格改动不改语义；只判格式不检查语义与 lint（lint 由 solhint 等负责）；文件不存在时也退出 1（与不合规同码，运行时会预先过滤不存在文件）；需要安装 Foundry 工具链，不在 PATH 时需用 --tool 绑定绝对路径。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
+    },
+    {
+      "language": "terraform",
+      "status": "integrated",
+      "formatter": "terraform",
+      "tool_key": "terraform",
+      "check_argv": [
+        "fmt",
+        "-check",
+        "-diff",
+        "{file}"
+      ],
+      "apply_argv": [
+        "fmt",
+        "{file}"
+      ],
+      "config_markers": [],
+      "extensions": [
+        ".tf",
+        ".tfvars",
+        ".tofu"
+      ],
+      "dialects": {
+        "hcl": "HCL2",
+        "opentofu": "1.x"
+      },
+      "notes": "退出码实测（本机 2026-10-08 直测）：terraform fmt -check -diff 合规退 0、排版不合规退 3、语法错误退 2。 【本机复验 2026-10-08】直测 terraform fmt -check -diff：合规退 0、排版不合规退 3、语法错误退 2。码集据此由 [1] 修正为 [1, 3]；语法错误的 2 不在码集内，正确降级为工具故障而非「需重排」。",
+      "unformatted_exit_codes": [
+        1,
+        3
+      ],
+      "unparsable_detection": "none"
+    },
+    {
+      "language": "nix",
+      "status": "integrated",
+      "formatter": "nixpkgs-fmt",
+      "tool_key": "nixpkgs-fmt",
+      "check_argv": [
+        "--check",
+        "{file}"
+      ],
+      "apply_argv": [
+        "{file}"
+      ],
+      "config_markers": [],
+      "extensions": [
+        ".nix"
+      ],
+      "dialects": {},
+      "notes": "nixpkgs-fmt 是 Nix 生态事实标准格式化器（registry format 通道同款）。--check 实测退出 0 且 stdout 为空=合规，退出 1 并把文件名列在 stdout=不合规，是标准 B 类；不带 --check 直接就地格式化、退出 0。限制：只做排版不做求值，语法错误的 .nix 在 --check 下也返回 0（语法坏文件不会被 format 拦截，需 lint 通道兜底）；上游 nix-community 仓库已停止维护，替代品 alejandra 4.0 的 --check 在有差异时退出码为 2（实测，工具帮助亦注明 2=requires formatting），不符合运行时 B 类契约故未选用；.nixpkgs-fmt.json 配置本机实测未观察到生效，config_markers 留空。本机已实跑（nixpkgs-fmt 1.3.0，cargo install）。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
+    },
+    {
+      "language": "html",
+      "status": "integrated",
+      "formatter": "prettier",
+      "tool_key": "prettier",
+      "check_argv": [
+        "--list-different",
+        "{file}"
+      ],
+      "apply_argv": [
+        "--write",
+        "{file}"
+      ],
+      "config_markers": [
+        ".prettierrc",
+        ".prettierrc.json",
+        ".prettierrc.yaml",
+        ".prettierrc.yml",
+        ".prettierrc.mjs",
+        ".prettierrc.cjs",
+        ".prettierrc.toml",
+        "prettier.config.js",
+        "prettier.config.mjs",
+        "prettier.config.cjs",
+        "prettier.config.toml"
+      ],
+      "extensions": [
+        ".html",
+        ".htm"
+      ],
+      "dialects": {
+        "prettier": "3.9.9"
+      },
+      "notes": "prettier 内置 html parser，.html/.htm 均支持。实测（prettier 3.9.9）：不合规 --list-different 退出 1 且 stdout 列出文件，--write 退出 0，复查退出 0 且 stdout 为空，符合 B 类语义。限制：只调整标签排版与缩进，不校验 HTML 合法性与可访问性，不检查链接/资源存在；模板引擎语法（Jinja/ERB/Liquid 等内嵌占位符）可能被当普通文本排版；默认行宽 80 自动换行。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
+    },
+    {
+      "language": "sql",
+      "status": "integrated",
+      "formatter": "sqlfluff",
+      "tool_key": "sqlfluff",
+      "check_argv": [
+        "lint",
+        "-q",
+        "--dialect",
+        "postgres",
+        "{file}"
+      ],
+      "apply_argv": [
+        "fix",
+        "-q",
+        "--dialect",
+        "postgres",
+        "{file}"
+      ],
+      "config_markers": [
+        ".sqlfluff",
+        ".sqlfluffignore",
+        "pyproject.toml",
+        "setup.cfg",
+        "tox.ini"
+      ],
+      "extensions": [
+        ".sql"
+      ],
+      "dialects": {
+        "default": "postgres",
+        "supported": [
+          "ansi",
+          "athena",
+          "bigquery",
+          "clickhouse",
+          "databricks",
+          "db2",
+          "doris",
+          "duckdb",
+          "exasol",
+          "flink",
+          "greenplum",
+          "hive",
+          "impala",
+          "mariadb",
+          "materialize",
+          "mysql",
+          "oracle",
+          "postgres",
+          "redshift",
+          "snowflake",
+          "soql",
+          "sparksql",
+          "sqlite",
+          "starrocks",
+          "teradata",
+          "trino",
+          "tsql",
+          "vertica"
+        ]
+      },
+      "notes": "sqlfluff 是 SQL 生态最主流的开源格式化器（在 4.4.0 实测）。只读检查用 lint -q：退出 0 且 stdout 为空=合规，退出 1=存在风格违规，退出 ≥2=工具故障（如未指定 dialect），属 B 类；-q 必不可少，否则合规文件也会向 stdout 输出 All Finished! 而被误判为不合规。就地为格式化用 fix：退出 0=成功；含语法/模板错误（默认 jinja 模板器）的文件不会被修改并以退出 1 如实标记为失败，不静默放行。限制：只判排版与可自动修复的风格项，不校验 SQL 逻辑正确性；check_argv/apply_argv 硬编码 --dialect postgres，命令行优先级高于 .sqlfluff 项目配置，非 postgres 项目暂无法经本入口切换方言（sqlfluff 另支持 ansi/bigquery/mysql/oracle/snowflake/tsql 等 28 种方言，见 dialects.supported）；项目自定义规则经 .sqlfluff 配置仍对 check 与 apply 同时生效。注意：sqlfluff 4.x 的 fix --check 并非只读模式（会询问确认并批量应用修复，非交互环境直接崩溃），只读检查必须用 lint。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
+    },
+    {
+      "language": "graphql",
+      "status": "integrated",
+      "formatter": "prettier",
+      "tool_key": "prettier",
+      "check_argv": [
+        "--list-different",
+        "{file}"
+      ],
+      "apply_argv": [
+        "--write",
+        "{file}"
+      ],
+      "config_markers": [
+        ".prettierrc",
+        ".prettierrc.json",
+        ".prettierrc.yaml",
+        ".prettierrc.yml",
+        ".prettierrc.toml",
+        ".prettierrc.js",
+        ".prettierrc.cjs",
+        ".prettierrc.mjs",
+        "prettier.config.js",
+        "prettier.config.cjs",
+        "prettier.config.mjs",
+        "prettier.config.toml",
+        ".prettierignore"
+      ],
+      "extensions": [
+        ".graphql",
+        ".gql"
+      ],
+      "dialects": {},
+      "notes": "prettier 内置 GraphQL 解析器，原生支持 .graphql/.gql，无需插件（在 3.6.2 实测）。check 用 --list-different：合规时退出 0 且 stdout 为空，不合规时退出 1 并在 stdout 列出文件路径，语法错误退出 2 归为工具故障；退出码与 stdout 双信号都落在不合规侧，无静默放行路径。不要改用 --check：它合规时也会向 stdout 输出 All matched files use Prettier code style! 汇总文案，会被检查运行时误判为不合规。apply 用 --write 就地格式化，退出 0=成功。限制：只做排版不校验 schema 语义（字段类型引用、循环依赖等需另行 graphql-eslint lint）；读项目 prettier 配置，无配置时用 prettier 默认风格。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
+    },
+    {
+      "language": "protobuf",
+      "status": "integrated",
+      "formatter": "clang-format",
+      "tool_key": "clang-format",
+      "check_argv": [
+        "--dry-run",
+        "--Werror",
+        "--style=file",
+        "{file}"
+      ],
+      "apply_argv": [
+        "-i",
+        "--style=file",
+        "{file}"
+      ],
+      "config_markers": [
+        ".clang-format",
+        "_clang-format"
+      ],
+      "extensions": [
+        ".proto"
+      ],
+      "dialects": {
+        "syntax": [
+          "proto2",
+          "proto3"
+        ]
+      },
+      "notes": "clang-format 原生把 .proto 识别为 Proto 语言，与主档案 c/cpp/objc 共用同一 tool_key，一条 --tool clang-format=ABS_PATH 绑定即可覆盖四种语言（在 Apple clang-format 21 与 LLVM clang-format 23 双版本实测行为一致）。check 用 --dry-run --Werror：退出 0=合规、1=排版不合规、≥2=工具故障，B 类，argv 与 c/cpp/objc 完全一致；--style=file 读项目 .clang-format（可写 Language: Proto 段），无配置文件时自动回退内置风格（实测不报错）。apply 用 -i 就地写入，退出 0=成功，apply 后复检退出 0 收敛。限制：只判空白与排版、不做完整语法解析，语法错误的 .proto 仍可能通过格式检查（编译正确性由 protoc 负责）；其 Proto 排版风格与 buf format 的官方风格存在差异（如单字段 message 可能被并为一行）。曾实测 buf 1.73.0 的 format -d/-w 对单文件免 workspace 配置可用，但其 -d 有差异时也退出 0、解析错误却退出 1，退出码分类不如 clang-format 干净，且需额外安装，故未采用。",
+      "unparsable_detection": "clang_format_xml",
+      "unformatted_exit_codes": [
+        1
+      ]
+    },
+    {
+      "language": "markdown",
+      "status": "integrated",
+      "formatter": "builtin:idea-markdown",
+      "tool_key": "builtin:idea-markdown",
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [
+        ".editorconfig"
+      ],
+      "extensions": [
+        ".md",
+        ".markdown"
+      ],
+      "dialects": {},
+      "notes": "IDEA 风格 Markdown 格式化，**内置 Rust 实现**（builtin:idea-markdown），codeguard 独立分发不依赖用户安装 IntelliJ IDEA。一致性由 golden 差分锁定：tests/fixtures/idea_markdown/ 下每个样本配对 IDEA 2026.2.3 format.sh 的真实输出（.expected.md），idea_markdown_differential 测试断言逐字节一致且幂等——CI 无需安装 IDE。从 golden 提炼的规则：标题标记后空格收敛为单空格而标题文本内部空格保留、无空格标题（###X）原样、正文/引用/列表内容行内多空格收敛单空格（code span 内容不动）、列表标记字符保留不归一（标记后单空格）、同标记连续项不插空行而标记变化视为新块（块间一空行，有序列表按分隔符同理）、表格列宽=max 显示宽（CJK 记 2）且数据行两侧单空格 padding、分隔行为 -×(列宽+2)、引用块前保留原空行数、围栏代码块内容原样、尾部是否换行跟随输入。与 prettier 输出存在可见差异（列表标记、标题空格策略、表格风格），两者是独立引擎。限制：与 IDEA 一样对语法损坏的 markdown 做容错排版（无法区分需重排与语法错误，同判不合规），语法有效性由 syntax 核心能力负责；IDEA 升级若改变风格，需在装有对应版本的机器上重新生成 golden 并提升 RULES_VERSION。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
+    },
+    {
+      "language": "toml",
+      "status": "integrated",
+      "formatter": "taplo",
+      "tool_key": "taplo",
+      "check_argv": [
+        "format",
+        "--check",
+        "{file}"
+      ],
+      "apply_argv": [
+        "format",
+        "{file}"
+      ],
+      "config_markers": [
+        "taplo.toml"
+      ],
+      "extensions": [
+        ".toml"
+      ],
+      "dialects": {
+        "spec": "1.0"
+      },
+      "notes": "taplo 是 Rust 编写的 TOML 格式化器，完整支持 TOML 1.0。format --check 实测合规时退出 0 且 stdout 为空（进度 INFO 日志走 stderr 不影响判定），不合规时退出 1（错误文本走 stderr），是标准 B 类；format 就地改写退出 0。限制：只做排版与键对齐，不做 schema/语义校验（那是 taplo lint 的职责，format 不冒充）；语法错误的 .toml 检查同样退出 1，会被列入不合规清单（不静默通过）；读项目 taplo.toml 配置。本机已实跑（taplo 0.10.0，本机既有）。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
+    },
+    {
+      "language": "haskell",
+      "status": "integrated",
+      "formatter": "fourmolu",
+      "tool_key": "fourmolu",
+      "check_argv": [
+        "--mode",
+        "check",
+        "{file}"
+      ],
+      "apply_argv": [
+        "--mode",
+        "inplace",
+        "{file}"
+      ],
+      "config_markers": [
+        "fourmolu.yaml"
+      ],
+      "extensions": [
+        ".hs",
+        ".lhs"
+      ],
+      "dialects": {},
+      "notes": "退出码实测（本机 2026-10-08 直测）：fourmolu --mode check 需重排退 100、解析错误退 102。 【本机复验 2026-10-08】直测 fourmolu --mode check：需重排退 100、解析错误退 102。码集 [100] 正确；只有 fourmolu 自己产出的文件才退 0，手写「看起来整齐」的文件仍判需重排——这是正确行为，格式化是确定性规范而非主观整洁度。",
+      "unformatted_exit_codes": [
+        100
+      ],
+      "unparsable_detection": "none"
+    },
+    {
+      "language": "ocaml",
+      "status": "integrated",
+      "formatter": "ocamlformat",
+      "tool_key": "ocamlformat",
+      "check_argv": [
+        "--check",
+        "{file}"
+      ],
+      "apply_argv": [
+        "-i",
+        "{file}"
+      ],
+      "config_markers": [
+        ".ocamlformat"
+      ],
+      "extensions": [
+        ".ml",
+        ".mli"
+      ],
+      "dialects": {},
+      "notes": "ocamlformat 是 OCaml 官方生态标准格式化器（ocaml-ppx 维护，经 opam 分发）。属 B 类，退出码经官方源码（bin/ocamlformat/ocamlformat.ml）与 man 文档确认：--check 全部已格式化退出 0，任一文件未格式化或解析/配置出错退出 1，不会出现 ≥2（解析错误会计为不合规，方向保守）。本机未实跑（brew 无 formula、release 仅源码包、本机未装 opam），安装方式 opam install ocamlformat。限制：默认只处理位于识别到的项目内（最近祖先目录含 .git/.hg/dune-project）的文件，项目外文件格式化器被禁用、check 会恒过（需 --enable-outside-detected-project 才处理）；.ocamlformat 按输入文件目录向上查找到项目根，找不到时可经 --profile / OCAMLFORMAT 环境变量 / 全局配置兜底；只判格式，不检查注释完整性（comment-check 默认开启）。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
+    },
+    {
+      "language": "fsharp",
+      "status": "integrated",
+      "formatter": "fantomas",
+      "tool_key": "fantomas",
+      "check_argv": [
+        "--check",
+        "{file}"
+      ],
+      "apply_argv": [
+        "{file}"
+      ],
+      "config_markers": [
+        ".editorconfig"
+      ],
+      "extensions": [
+        ".fs",
+        ".fsi",
+        ".fsx"
+      ],
+      "dialects": {},
+      "notes": "退出码实测：fantomas --check 需重排退 99、解析错误退 1。 fantomas 是 F# 唯一主流格式化器（本机实测 8.0.7，dotnet tool install -g fantomas）。官方契约与实测一致：--check 已格式化退出 0、需格式化退出 99、解析错误/一般错误退出 1，故 unformatted_exit_codes 声明 [1, 99]——退出 1 同时覆盖解析错误（无法与不合规区分，按 kotlin/ruby 等既有档位先例保守归入不合规，随后 apply 阶段以非 0 兜底，不静默通过）与文件不存在（运行时预先过滤）。实测 .fs 与 .fsx 支持，.fsi（签名文件）亦可检查；apply_argv 直接跟 {file} 就地格式化退出 0，实测幂等、复查退出 0。风格读项目 .editorconfig 的 fantomas 段（fantomas 6+ 的配置入口，--help 明示），另有 .fantomasignore 忽略清单。限制：是 .NET 全局工具 apphost，本机需 DOTNET_ROOT 指向 dotnet 运行时目录才能运行；只排版，不检查类型或语义。 退出码约定：fantomas --check 需格式化时退出 99（非 1），须显式声明为不合规码。",
+      "unformatted_exit_codes": [
+        1,
+        99
+      ],
+      "unparsable_detection": "none"
+    },
+    {
+      "language": "perl",
+      "status": "integrated",
+      "formatter": "sh",
+      "tool_key": "sh",
+      "check_argv": [
+        "-c",
+        "#!/bin/sh\n# perltidy 只读检查包装器\n#\n# perltidy 的 -ast（断言 tidy）模式在判定通过时**仍把规范化后的源码打印到 stdout**，\n# 而运行时把「退出 0 且 stdout 非空」判为 A 类语义（不合规，如 gofmt -l / prettier --list-different），\n# 于是每一个合规的 Perl 文件都会被误报为需重排。\n# 这里丢弃 stdout，让判定纯粹由退出码承担：0=合规，2=需重排（与语法错误同码，\n# perltidy 断言模式无法区分，见 notes）。\nf=\"$1\"\n[ -f \"$f\" ] || exit 2\nperltidy -ast -se -st \"$f\" >/dev/null 2>&1\nexit $?\n",
+        "codeguard",
+        "{file}"
+      ],
+      "apply_argv": [
+        "-c",
+        "#!/bin/sh\n# perltidy 就地格式化\n# -b -bext=/ 指定空后缀备份文件，成功后不留 .bak；-se 关闭错误stderr 输出。\nf=\"$1\"\n[ -f \"$f\" ] || exit 2\nperltidy -b -bext=/ -se \"$f\" >/dev/null 2>&1\nrc=$?\n# 成功时清理可能残留的备份文件\n[ \"$rc\" -eq 0 ] && rm -f \"$f\"~\nexit $rc\n",
+        "codeguard",
+        "{file}"
+      ],
+      "config_markers": [
+        ".perltidyrc"
+      ],
+      "extensions": [
+        ".pl",
+        ".pm",
+        ".t"
+      ],
+      "dialects": {},
+      "notes": "退出码实测（本机 2026-10-08 直测）：perltidy -ast 合规退 0、需重排退 2、语法错误亦退 2。 perltidy 是 Perl 生态事实标准格式化器。**必须经 wrapper 使用**：perltidy 的 -ast（断言 tidy）模式即使判定通过也会把规范化后的源码打印到 stdout，而运行时把「退出 0 且 stdout 非空」判为 A 类语义（不合规，如 gofmt -l / prettier --list-different），若直接调用会导致**每一个合规的 Perl 文件都被误报为需重排**——本条档案在 2026-10-08 的真机复验中正是因此暴露，此前档案直接用 perltidy -ast -se -st {file} 属静默缺陷。wrapper 丢弃 stdout 后判定纯粹由退出码承担。本机实测：合规退 0（经 wrapper）、排版不合规退 2、语法错误亦退 2；码集 [1, 2] 保证真实不合规不被误判为工具故障。限制：perltidy 断言模式**无法区分「需重排」与「语法错误」**（同为退出 2），因此语法错误的 Perl 会被报为需重排而非未完成——这是 perltidy 的能力边界，代价是判定精度下降，但远优于漏判（静默放行）。apply 幂等且不留备份文件。",
+      "unformatted_exit_codes": [
+        1,
+        2
+      ],
+      "unparsable_detection": "none"
+    },
+    {
+      "language": "groovy",
+      "status": "integrated",
+      "formatter": "node",
+      "tool_key": "node",
+      "check_argv": [
+        "-e",
+        "const fs=require(\"node:fs\"),path=require(\"node:path\"),m=require(\"node:module\"),u=require(\"node:url\");\n(async()=>{\ntry{\nconst file=path.resolve(process.argv[2]||process.argv[1]);\nif(!fs.existsSync(file)){console.error(\"file not found: \"+file);process.exit(2);}\nconst req=m.createRequire(path.join(path.dirname(file),\"a.js\"));\nlet entry;\ntry{entry=req.resolve(\"npm-groovy-lint\");}catch(e){console.error(\"npm-groovy-lint not resolvable from \"+file+\" (install it as project devDependency): \"+e.message);process.exit(2);}\nconst mod=await import(u.pathToFileURL(entry).href);\nconst NpmGroovyLint=mod.default;\nconst RULES=\"ElseBlockBraces,ForStatementBraces,IfStatementBraces,WhileStatementBraces,NoTabCharacter,BlankLineBeforePackage,BlockEndsWithBlankLine,BlockStartsWithBlankLine,BracesForClass,BracesForForLoop,BracesForIfElse,BracesForMethod,BracesForTryCatchFinally,ClassEndsWithBlankLine,ClassStartsWithBlankLine,ClosureStatementOnOpeningLineOfMultipleLineClosure,ConsecutiveBlankLines,FileEndsWithoutNewline,Indentation,MissingBlankLineAfterImports,MissingBlankLineAfterPackage,SpaceAfterCatch,SpaceAfterClosingBrace,SpaceAfterComma,SpaceAfterFor,SpaceAfterIf,SpaceAfterMethodCallName,SpaceAfterOpeningBrace,SpaceAfterSemicolon,SpaceAfterSwitch,SpaceAfterWhile,SpaceAroundClosureArrow,SpaceAroundMapEntryColon,SpaceAroundOperator,SpaceBeforeClosingBrace,SpaceBeforeOpeningBrace,SpaceInsideParentheses,TrailingWhitespace,UnnecessaryGString,UnnecessarySemicolon\";\nconst linter=new NpmGroovyLint([process.execPath,\"npm-groovy-lint\",file,\"--rulesets\",RULES,\"--failon\",\"none\",\"--output\",\"json\",\"--noserver\"],{origin:\"codeguard\",parseOptions:true});\nconst realWrite=process.stdout.write.bind(process.stdout);\nprocess.stdout.write=()=>true;\nlet err=null;\ntry{await linter.run();}catch(e){err=e;}\nprocess.stdout.write=realWrite;\nif(err){console.error(\"npm-groovy-lint threw: \"+err.message);process.exit(2);}\nif(linter.status===2){console.error(\"npm-groovy-lint unexpected failure (check java/CodeNarc availability)\");process.exit(2);}\nconst result=linter.lintResult||{};\nlet violations=0,parseErrors=0;\nconst files=(result&&result.files)||{};\nfor(const key of Object.keys(files)){\nfor(const issue of (files[key].errors||[])){\nconst rule=issue&&issue.rule;\nif(rule===\"NglParseError\"){parseErrors++;}else{violations++;}\n}}\nif(parseErrors>0){console.error(\"groovy parse error: cannot judge formatting\");process.exit(2);}\nif(linter.status!==0&&violations===0){console.error(\"npm-groovy-lint status \"+linter.status+\" with no violations\");process.exit(2);}\nprocess.exit(violations>0?1:0);\n}catch(e){console.error(\"wrapper error: \"+(e&&e.message));process.exit(2);}\n})();",
+        "{file}"
+      ],
+      "apply_argv": [
+        "-e",
+        "const fs=require(\"node:fs\"),path=require(\"node:path\"),m=require(\"node:module\"),u=require(\"node:url\");\n(async()=>{\ntry{\nconst file=path.resolve(process.argv[2]||process.argv[1]);\nif(!fs.existsSync(file)){console.error(\"file not found: \"+file);process.exit(2);}\nconst req=m.createRequire(path.join(path.dirname(file),\"a.js\"));\nlet entry;\ntry{entry=req.resolve(\"npm-groovy-lint\");}catch(e){console.error(\"npm-groovy-lint not resolvable from \"+file+\" (install it as project devDependency): \"+e.message);process.exit(2);}\nconst mod=await import(u.pathToFileURL(entry).href);\nconst NpmGroovyLint=mod.default;\nconst quietRun=async(argv)=>{\nconst linter=new NpmGroovyLint(argv,{origin:\"codeguard\",parseOptions:true});\nconst realWrite=process.stdout.write.bind(process.stdout);\nprocess.stdout.write=()=>true;\nlet err=null;\ntry{await linter.run();}catch(e){err=e;}\nprocess.stdout.write=realWrite;\nreturn {linter,err};\n};\nconst countParseErrors=(linter)=>{\nconst result=linter.lintResult||{};\nlet parseErrors=0;\nconst files=(result&&result.files)||{};\nfor(const key of Object.keys(files)){\nfor(const issue of (files[key].errors||[])){\nif(issue&&issue.rule===\"NglParseError\"){parseErrors++;}\n}}\nreturn parseErrors;\n};\nconst pre=[process.execPath,\"npm-groovy-lint\",file,\"--parse\",\"--failon\",\"none\",\"--output\",\"json\",\"--noserver\"];\nconst pre1=await quietRun(pre);\nif(pre1.err){console.error(\"npm-groovy-lint threw: \"+pre1.err.message);process.exit(2);}\nif(pre1.linter.status===2){console.error(\"npm-groovy-lint unexpected failure (check java/CodeNarc availability)\");process.exit(2);}\nif(countParseErrors(pre1.linter)>0){console.error(\"groovy parse error: formatting refused, file untouched\");process.exit(2);}\nconst main=[process.execPath,\"npm-groovy-lint\",file,\"--format\",\"--nolintafter\",\"--parse\",\"--failon\",\"none\",\"--output\",\"json\",\"--noserver\"];\nconst main1=await quietRun(main);\nif(main1.err){console.error(\"npm-groovy-lint threw: \"+main1.err.message);process.exit(2);}\nif(main1.linter.status===2){console.error(\"npm-groovy-lint unexpected failure during format\");process.exit(2);}\nif(countParseErrors(main1.linter)>0){console.error(\"groovy parse error during format\");process.exit(2);}\nprocess.exit(0);\n}catch(e){console.error(\"wrapper error: \"+(e&&e.message));process.exit(2);}\n})();",
+        "{file}"
+      ],
+      "config_markers": [
+        ".groovylintrc-format.json"
+      ],
+      "extensions": [
+        ".groovy"
+      ],
+      "dialects": {},
+      "notes": "Groovy 生态无独立格式化器可执行文件：google-java-format 已移除 Groovy 支持（实测对 .groovy 输出 Skipping non-Java file 且恒退 0），故采用事实标准 npm-groovy-lint（18.0.0，内嵌 CodeNarc 3.7.0，需本机 java）经 node -e 包装调用，formatter/tool_key 为 node（与 julia/Rscript/pwsh 档位同构）。前置条件：被检文件所在项目须安装 npm-groovy-lint（devDependency），依赖解析失败退 2 工具故障、绝不静默放行。check 通过 API 以 --rulesets 显式限定 npm-groovy-lint 内置 .groovylintrc-format.json 的全部 40 条 formatting/braces/convention 规则做只读 lint：0=合规、1=存在格式违规、2=语法解析错误(NglParseError)/java 或依赖缺失/内部失败，三态本机全实测（check 全程 stdout 静默，md5 不变）。不能直接用其 CLI：默认规则集混入 NoDef/CompileStatic 等非格式规则且 --failon 默认 info 导致 clean 文件也退 1；--rulesets \"ruleset:formatting\"/ruleset XML 文件等形态经其 JSON 规则读取器解析会崩溃退 2（No such rule named [ruleset:formatting]）。apply 用 API --format（npm-groovy-lint 官方格式化模式，自动应用内置格式规则集修复）：已实测修复空行/尾随空格/分号/空格违规、幂等；因实测 --format 会部分改写语法残缺文件，apply 先做只读 parse 预检，含 NglParseError 时退 2 且文件不动（实测 md5 不变）。限制：--noserver 每次调用冷启动 java 有秒级延迟；check 硬编码与内置 format 配置一致的 40 条规则、不读项目级 .groovylintrc-format.json（项目同名配置只影响 apply 的格式化行为，改写后可能与 check 规则不一致）；只排版，不检查默认规则集中的代码质量项（NoDef、CompileStatic 等被刻意排除），不能替代 CodeNarc 完整 lint。",
+      "unformatted_exit_codes": [
+        1
+      ],
+      "unparsable_detection": "none"
+    },
+    {
+      "language": "clojure",
+      "status": "integrated",
+      "formatter": "cljfmt",
+      "tool_key": "cljfmt",
+      "check_argv": [
+        "check",
+        "{file}"
+      ],
+      "apply_argv": [
+        "fix",
+        "{file}"
+      ],
+      "config_markers": [
+        ".cljfmt.edn"
+      ],
+      "extensions": [
+        ".clj",
+        ".cljs",
+        ".cljc",
+        ".edn"
+      ],
+      "dialects": {},
+      "notes": "Clojure 社区主流格式化器 cljfmt（实测 0.16.6）。check_argv 属 B 类：check 子命令对未格式化文件打印 diff 并退出 1，合规时输出 'All source files formatted correctly' 并退出 0；apply_argv 为 fix 子命令，就地重写并退出 0。独立可执行文件可 brew install cljfmt（homebrew-core bottled 0.16.6）；本机经 clojure CLI（clojure -M -m cljfmt.main）以相同版本实跑验证两个方向的退出码，并经差分测试确认 .cljfmt.edn 项目配置真实生效（如 remove-trailing-whitespace? 开关）。只按内置/配置规则排版（缩进、缺失空格、尾随空白等），不做语义或宏展开检查；默认不删除表内多余空格（如 (a  b) 双空格实测不判违规）；对不存在的路径退出 1，与『不合规』同码而非故障码。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
+    },
+    {
+      "language": "powershell",
+      "status": "integrated",
+      "formatter": "pwsh",
+      "tool_key": "pwsh",
+      "check_argv": [
+        "-NoProfile",
+        "-Command",
+        "$ErrorActionPreference='Stop'; try { $f='{file}'; $src=[System.IO.File]::ReadAllText($f); $errs=$null; [System.Management.Automation.Language.Parser]::ParseInput($src,[ref]$null,[ref]$errs)|Out-Null; if ($errs.Count -gt 0) { [Console]::Error.WriteLine('parse errors'); exit 2 }; $fmt=Invoke-Formatter -ScriptDefinition $src; if ($fmt -ceq $src) { exit 0 } else { exit 1 } } catch { [Console]::Error.WriteLine($_.Exception.Message); exit 2 }"
+      ],
+      "apply_argv": [
+        "-NoProfile",
+        "-Command",
+        "$ErrorActionPreference='Stop'; try { $f='{file}'; $src=[System.IO.File]::ReadAllText($f); $errs=$null; [System.Management.Automation.Language.Parser]::ParseInput($src,[ref]$null,[ref]$errs)|Out-Null; if ($errs.Count -gt 0) { [Console]::Error.WriteLine('parse errors'); exit 2 }; $fmt=Invoke-Formatter -ScriptDefinition $src; [System.IO.File]::WriteAllText($f,$fmt); exit 0 } catch { [Console]::Error.WriteLine($_.Exception.Message); exit 2 }"
+      ],
+      "config_markers": [],
+      "extensions": [
+        ".ps1",
+        ".psm1"
+      ],
+      "dialects": {
+        "pwsh": "7.6.6",
+        "psscriptanalyzer": "1.25.0"
+      },
+      "notes": "PowerShell 官方格式化入口是 PSScriptAnalyzer 模块的 Invoke-Formatter 命令（本机 pwsh 7.6.6 + PSScriptAnalyzer 1.25.0，Install-Module -Scope CurrentUser 实装后实测），它不是独立可执行文件，故 formatter 绑定 pwsh 解释器、以 -Command 包装调用（与 julia/Rscript 档位同构）。包装脚本先用 PowerShell 自带 Parser 做语法校验：已格式化退出 0、有排版差异退出 1、解析错误/读文件失败/模块缺失退出 2（工具故障）——三态均实测，解决了『语法错误与不合规混淆』问题；check 全程只读（实测文件 md5 不变、stdout 0 字节）；apply 就地写回退出 0，实测幂等、解析损坏文件不改动并退出 2。前置条件：须先安装模块（Install-Module PSScriptAnalyzer），未安装时 Invoke-Formatter 命令不存在 → 退出 2 工具故障，不静默通过。限制：使用 Invoke-Formatter 默认格式化规则，不读项目 PSScriptAnalyzerSettings.psd1（无项目级风格配置，config_markers 为空）；{file} 以单引号内嵌于命令文本，路径含单引号会破坏命令（实测含 $ 与空格的路径均正常）；只排版，不做 lint 规则检查（那是 Invoke-ScriptAnalyzer 的职责）。",
+      "unformatted_exit_codes": [
+        1
+      ],
+      "unparsable_detection": "none"
+    },
+    {
+      "language": "zig",
+      "status": "integrated",
+      "formatter": "zig",
+      "tool_key": "zig",
+      "check_argv": [
+        "fmt",
+        "--check",
+        "{file}"
+      ],
+      "apply_argv": [
+        "fmt",
+        "{file}"
+      ],
+      "config_markers": [],
+      "extensions": [
+        ".zig",
+        ".zon"
+      ],
+      "dialects": {},
+      "notes": "zig fmt 是 Zig 工具链内置官方格式化器（可执行文件为 zig，通过 fmt 子命令调用）。已在本机实跑验证（zig 0.16.0）：check 退出 0=合规、1=不合规（文件名打到 stdout，不影响 B 类退出码判定），apply 成功退出 0。zig fmt 没有任何配置文件，官方固定风格不可调；不检查语义与 lint；语法错误的文件 check 与不存在文件同样退出 1（会被判为不合规，随后 apply 阶段以非 0 失败兜底，不会静默通过）；除 .zig 外也支持 .zon（已实测）。",
+      "unparsable_detection": "clang_format_xml",
+      "unformatted_exit_codes": [
+        1
+      ]
+    },
+    {
+      "language": "nim",
+      "status": "integrated",
+      "formatter": "nph",
+      "tool_key": "nph",
+      "check_argv": [
+        "--check",
+        "{file}"
+      ],
+      "apply_argv": [
+        "{file}"
+      ],
+      "config_markers": [
+        ".nph.toml"
+      ],
+      "extensions": [
+        ".nim",
+        ".nims",
+        ".nimble"
+      ],
+      "dialects": {},
+      "notes": "Nim 官方自带的 nimpretty 已实测无 --check/只读检查模式（--check 被当未知参数：打印 usage 后退出 0 且不改文件，无法满足退出码契约），故选用社区事实标准 nph（nimble install nph）。已在本机实跑验证（nph 0.7.0 prerelease）：nph --check {file} 退出 0=合规、1=不合规（摘要走 stderr，stdout 为空），语法错误退出 3（按工具故障处理，与不合规可区分），nph {file} 就地格式化退出 0。读取项目 .nph.toml 配置。nph 尚为 prerelease 成熟度，只判格式不检查语义，极端用例建议配合版本控制使用；不在 PATH 时需用 --tool 绑定绝对路径。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
+    },
+    {
+      "language": "crystal",
+      "status": "integrated",
+      "formatter": "crystal",
+      "tool_key": "crystal",
+      "check_argv": [
+        "tool",
+        "format",
+        "--check",
+        "{file}"
+      ],
+      "apply_argv": [
+        "tool",
+        "format",
+        "{file}"
+      ],
+      "config_markers": [],
+      "extensions": [
+        ".cr"
+      ],
+      "dialects": {},
+      "notes": "crystal tool format 是 Crystal 官方内置格式化器（可执行文件为 crystal，通过 tool format 子命令调用）。已在本机实跑验证（crystal 1.21.1）：check 退出 0=合规、1=不合规（提示语走 stderr），apply 成功退出 0。没有任何配置文件，官方固定风格不可调；不检查语义与 lint；注意文件不存在时 --check 也退出 0（本运行时会预先过滤不存在的文件，因此无静默放行路径），语法错误文件会以非 0 退出。",
+      "unparsable_detection": "clang_format_xml",
+      "unformatted_exit_codes": [
+        1
+      ]
+    },
+    {
+      "language": "julia",
+      "status": "integrated",
+      "formatter": "julia",
+      "tool_key": "julia",
+      "check_argv": [
+        "-e",
+        "using JuliaFormatter; try; path = ARGS[1]; src = read(path, String); cd(dirname(abspath(path))); exit(format_text(src) == src ? 0 : 1); catch; exit(2); end",
+        "{file}"
+      ],
+      "apply_argv": [
+        "-e",
+        "using JuliaFormatter; try; path = ARGS[1]; src = read(path, String); cd(dirname(abspath(path))); open(path, \"w\") do io; write(io, format_text(src)); end; catch; exit(2); end",
+        "{file}"
+      ],
+      "config_markers": [
+        ".JuliaFormatter.toml",
+        "Project.toml"
+      ],
+      "extensions": [
+        ".jl"
+      ],
+      "dialects": {},
+      "notes": "JuliaFormatter.jl 是 Julia 生态事实标准格式化器（本机实测 2.14.0），但它不是独立可执行文件而是 Julia 包，须经 julia -e 包装调用。属 B 类，包装器已真实验证：check 用 format_text 与源码逐字对比，已格式化退出 0、需格式化退出 1、解析错误退出 2（工具故障），并从被检查文件所在目录向上查找 .JuliaFormatter.toml 风格配置（已实测文件相对项目根的配置可被发现）；apply 用 format_text 结果写回，解析错误退出 2 且不改动文件——特意不用 format_file，因为它会吞掉解析错误并假报成功（本机实测其返回真值）。限制：julia 冷启动与 JIT 编译有数秒级延迟，适合批量检查；需先安装包（julia -e 'using Pkg; Pkg.add(\"JuliaFormatter\")'）；只判格式，不检查注释完整性。",
+      "unparsable_detection": "clang_format_xml",
+      "unformatted_exit_codes": [
+        1
+      ]
+    },
+    {
+      "language": "elm",
+      "status": "integrated",
+      "formatter": "sh",
+      "tool_key": "sh",
+      "check_argv": [
+        "-c",
+        "#!/bin/sh\n# elm-format 只读检查：丢弃 stdout，判定纯粹由退出码承担。\n#\n# 本机 0.8.8 实测：elm-format --validate 判定通过时仍向 stdout 打印 \"[]\"，\n# 而运行时把「退出 0 且 stdout 非空」判为 A 类语义（gofmt -l 那种），\n# 会把每一个合规的 Elm 文件误判为需重排。\nf=\"$1\"\n[ -f \"$f\" ] || exit 2\ncommand -v elm-format >/dev/null 2>&1 || exit 2\nelm-format --validate \"$f\" >/dev/null 2>&1\nexit $?\n",
+        "codeguard",
+        "{file}"
+      ],
+      "apply_argv": [
+        "-c",
+        "#!/bin/sh\nf=\"$1\"\n[ -f \"$f\" ] || exit 2\ncommand -v elm-format >/dev/null 2>&1 || exit 2\nelm-format --yes \"$f\" >/dev/null 2>&1\nexit $?\n",
+        "codeguard",
+        "{file}"
+      ],
+      "config_markers": [
+        "elm.json"
+      ],
+      "extensions": [
+        ".elm"
+      ],
+      "dialects": {},
+      "notes": "elm-format 是 Elm 官方格式化器。**必须经 wrapper 丢弃 stdout**：本机 0.8.8 实测 `elm-format --validate` 判定通过时仍向 stdout 打印 `[]`，而运行时把「退出 0 且 stdout 非空」判为 A 类语义（gofmt -l 那种），直接调用会把每一个合规的 Elm 文件误判为需重排。限制：只处理排版，不做类型检查或 lint 规则检查。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
+    },
+    {
+      "language": "lua",
+      "status": "integrated",
+      "formatter": "stylua",
+      "tool_key": "stylua",
+      "check_argv": [
+        "--check",
+        "{file}"
+      ],
+      "apply_argv": [
+        "{file}"
+      ],
+      "config_markers": [
+        "stylua.toml",
+        ".stylua.toml"
+      ],
+      "extensions": [
+        ".lua"
+      ],
+      "dialects": {},
+      "notes": "stylua 本机实跑验证（Homebrew 安装 2.5.2，B 类：0=合规、1=不合规、≥2=工具故障）。--check 只读，已实测不改动源文件且退出码三态正确（含语法坏文件返回 2）。默认 --syntax All、缩进为 Tab；项目可用 stylua.toml / .stylua.toml（向上查找）或 .editorconfig 覆盖。apply 不带参数直接对 {file} 就地格式化，实测退出 0。只做排版，不检查逻辑与未定义变量。不解析 Luau 扩展语法，Luau 代码请用本批 luau 档位。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
+    },
+    {
+      "language": "luau",
+      "status": "integrated",
+      "formatter": "stylua",
+      "tool_key": "stylua",
+      "check_argv": [
+        "--check",
+        "--syntax",
+        "luau",
+        "{file}"
+      ],
+      "apply_argv": [
+        "--syntax",
+        "luau",
+        "{file}"
+      ],
+      "config_markers": [
+        "stylua.toml",
+        ".stylua.toml"
+      ],
+      "extensions": [
+        ".luau"
+      ],
+      "dialects": {
+        "syntax": "luau"
+      },
+      "notes": "与 lua 档位共用同一 stylua 可执行（实测 2.5.2），但必须带 --syntax luau 才能解析 Luau 扩展语法（类型标注、复合赋值等）；实测省略该 flag 时 Luau 文件解析失败返回 2，该参数不可省。check/apply 退出码语义与 lua 档位一致（0/1/2），check 只读不改文件已实测。stylua.toml 亦支持 syntax = \"Luau\" 持久化方言设置。只做排版，类型检查需 luau-analyze，不在 format 档案范围内。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
+    },
+    {
+      "language": "pascal",
+      "status": "integrated",
+      "formatter": "pasfmt",
+      "tool_key": "pasfmt",
+      "check_argv": [
+        "--mode=check",
+        "{file}"
+      ],
+      "apply_argv": [
+        "{file}"
+      ],
+      "config_markers": [
+        "pasfmt.toml"
+      ],
+      "extensions": [
+        ".pas",
+        ".dpr",
+        ".dpk",
+        ".lpr"
+      ],
+      "dialects": {
+        "pasfmt": "0.7.0"
+      },
+      "notes": "integrated：pasfmt 本机源码构建实跑验证（git main=0.7.0+dev，Rust 实现的 Delphi 生态主流格式化器，0.7.0 于 2025-11 发布）。它并非『无 check 模式』：CLI 原生 --mode=check（README 未写但 CHANGELOG、--help 与源码测试均确认，随 0.7.0 版本发布）。B 类三态实测：已格式化退出 0 且 stdout 为空；不合规退出 1 并在 stderr 打 'ERROR CHECK: … has incorrect formatting'；check 全程只读（实测 md5 不变）；apply 为默认 files 模式就地写回退出 0，实测幂等（二次 apply 字节不变），1MB 文件 0.64s；UTF-8 内容（中文/变音符）实测无损；.lpr 作为显式文件实测可检查可写回（其目录遍历只认 .pas/.dpr/.dpk，运行时恰为逐文件显式调用，四种扩展全覆盖）。限制：语法损坏文件也退出 1（与不合规同码，按不合规处理而非工具故障，但不会把损坏误判为合规），常规路径无 ≥2 工具故障码（仅参数错误退出 2）；pasfmt.toml 从进程当前目录向上查找，codeguard 工作目录不在项目内时读不到项目配置（退回默认风格）；apply 会把 CRLF 归一为 LF、把 0 字节文件写成单个换行（空文件按不合规报告）；只排版不做任何 lint。安装摩擦：GitHub release 仅发 Windows/Linux 二进制，macOS 需 cargo install --locked --git https://github.com/integrated-application-development/pasfmt（本机 Rust 1.98.1 构建通过，要求 ≥1.82）。已实测并否决的替代方案：FPC 自带 ptop（brew，v1.2，2005 年）退出码完全不可信（损坏/缺失输入均退 0），二进制垃圾输入会无界写出（实测写出 37GB 才异常终止），只能靠 bash wrapper（临时副本→ptop→字节比对 + ulimit 封顶输出）满足契约——wrapper 已完整实测（ptop 一遍收敛幂等成立、三态退出码正确、check 只读），但 ptop 风格侵入性强（关键字改大小写、插前导空行），且字节比对属合成 check 而非工具原生能力，故选 pasfmt。",
+      "unformatted_exit_codes": [
+        1
+      ],
+      "unparsable_detection": "none"
+    },
+    {
+      "language": "r",
+      "status": "integrated",
+      "formatter": "Rscript",
+      "tool_key": "Rscript",
+      "check_argv": [
+        "-e",
+        "f<-commandArgs(TRUE)[1]; t<-tempfile(fileext='.R'); ok<-invisible(file.copy(f,t,overwrite=TRUE)); res<-try(withCallingHandlers(invisible(capture.output(suppressMessages(styler::style_file(t)))),warning=function(w) stop(conditionMessage(w))),silent=TRUE); if(!isTRUE(ok)||inherits(res,'try-error')||!file.exists(t)) quit(status=2L); same<-identical(readBin(f,'raw',file.size(f)),readBin(t,'raw',file.size(t))); unlink(t); quit(status=if(same) 0L else 1L)",
+        "{file}"
+      ],
+      "apply_argv": [
+        "-e",
+        "f<-commandArgs(TRUE)[1]; res<-try(withCallingHandlers(invisible(capture.output(suppressMessages(styler::style_file(f)))),warning=function(w) stop(conditionMessage(w))),silent=TRUE); quit(status=if(inherits(res,'try-error')) 2L else 0L)",
+        "{file}"
+      ],
+      "config_markers": [],
+      "extensions": [
+        ".r",
+        ".R"
+      ],
+      "dialects": {
+        "style_guide": "tidyverse"
+      },
+      "notes": "R 生态无独立格式化器可执行文件，采用事实标准 styler 包（tidyverse 风格）经 Rscript 调用，因此 formatter/tool_key 为 Rscript，用 --tool Rscript=<abs> 绑定；styler 包必须已安装（Rscript -e 'install.packages(\"styler\")'）。本机 R 4.6.1 + CRAN styler 实测通过。check 表达式：文件复制到临时副本→styler::style_file(副本)→与原文件按字节比对——相同 0、不同 1、复制失败或样式化报错（含语法解析失败）2，标准 B 类三态，且已实测 check 全程绝不改动原文件（warning 也升级为失败，防止解析坏文件误判合规）。apply 用 style_file 就地改写，实测幂等，语法坏文件返回 2 而非假成功。style_file 依扩展名识别文件类型，.r 与 .R 均实测可用；非 UTF-8 或带 BOM 文件按字节比对可能误报不合规。styler 无独立配置文件（config_markers 为空），排版偏好经 R options 设置；只管排版，不做 lintr 检查。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
+    },
+    {
+      "language": "cfml",
+      "status": "integrated",
+      "formatter": "cfformat",
+      "tool_key": "cfformat",
+      "check_argv": [
+        "--check",
+        "{file}"
+      ],
+      "apply_argv": [
+        "-w",
+        "{file}"
+      ],
+      "config_markers": [
+        ".cfformat.json"
+      ],
+      "extensions": [
+        ".cfc",
+        ".cfm",
+        ".cfs"
+      ],
+      "dialects": {
+        "cfformat": "0.3.1"
+      },
+      "notes": "integrated：cfformat（CommandBox cfformat 模块的 Rust 重写，同作者 jcberquist，0.3.1 于 2026-10-05 发布，本机源码构建实跑验证）是 CFML 生态事实标准格式化器：单二进制、无 JVM 依赖、活跃维护。B 类三态实测：已格式化退出 0 且 stdout 为空；不合规退出 1 并在 stdout 列出文件路径；文件缺失/不可读/非 UTF-8/.cfformat.json 配置错误/内部错误退出 2（工具故障类真实存在；唯语法损坏文件与不合规同码退出 1，按不合规处理，不会把损坏误判为合规）。check 全程只读（实测 md5 不变）；apply 为 -w 就地写回退出 0，实测幂等，2.3MB 文件 0.2s；.cfc/.cfm/.cfs 作为显式文件均实测可用（--cfm 标志只作用于目录遍历，对单文件报参数错误退出 2，故 check_argv 不带它；单文件按内容嗅探 script/tags 模式）。设置按被检查文件向上查找最近的 .cfformat.json（实测 tab_indent 设置生效），另有 ~/.cfformat.json 兜底，配置损坏退出 2 不静默放行。限制：默认风格为 4 空格缩进、字符串单引号化、CRLF 归一为 LF（Windows 来源文件会整文件重写）；空文件视为合规；tag 模式里的 <script> 岛由内置 oxc（Prettier 打印器）处理，读项目 .prettierrc 但只认其部分键；只排版不做 lint。安装：release 提供 macOS universal 二进制（curl -fL -o ~/.local/bin/cfformat https://github.com/jcberquist/cfformat/releases/latest/download/cfformat_macos），或 cargo install --locked --git https://github.com/jcberquist/cfformat cfformat-cli（本机 Rust 1.98.1 构建通过，要求 ≥1.97）。旧档案『社区尝试小众且久未维护』的结论已过时；Adobe ColdFusion Builder 的 CodeFormatter 经复核确无独立 CLI。",
+      "unformatted_exit_codes": [
+        1
+      ],
+      "unparsable_detection": "none"
+    },
+    {
+      "language": "cobol",
+      "status": "integrated",
+      "formatter": "sh",
+      "tool_key": "sh",
+      "check_argv": [
+        "-c",
+        "#!/bin/sh\n# COBOL 固定格式排版只读检查（GnuCOBOL cobc 方言双探针）\n#\n# COBOL-85 固定格式规定源码必须位于第 7-72 列（1-6 列为序号区），\n# 越界或缩进错乱即违反排版约定；但 GnuCOBOL 对「列区违规」与「语法错误」\n# 一律返回退出码 1，无法直接区分——若不区分，损坏的 COBOL 会被误报为\n# 「需要重排」，而真正需要重排的文件又会被当成工具故障。\n#\n# 解法：分别以自由格式（-free，无列区限制）与固定格式（-fixed，有列区约束）\n# 各编译一次：\n#   两者皆过        → 0 排版合规\n#   free 过/fixed 挂 → 1 列区/固定格式排版违规（真正的格式问题）\n#   两者皆挂        → 2 语法错误，不属格式范畴，降级为未完成\n# 仅做语法与列区判定，不改写源码。\nf=\"$1\"\n[ -f \"$f\" ] || exit 2\nCOBC=\"${CODEGUARD_COBOL_CC:-cobc}\"\ncommand -v \"$COBC\" >/dev/null 2>&1 || exit 2\n\"$COBC\" -fsyntax-only -free  \"$f\" >/dev/null 2>&1; fr=$?\n\"$COBC\" -fsyntax-only -fixed \"$f\" >/dev/null 2>&1; fx=$?\nif [ \"$fr\" -eq 0 ] && [ \"$fx\" -eq 0 ]; then exit 0; fi\nif [ \"$fr\" -eq 0 ] && [ \"$fx\" -ne 0 ]; then exit 1; fi\nexit 2\n",
+        "codeguard",
+        "{file}"
+      ],
+      "apply_argv": [
+        "-c",
+        "#!/bin/sh\n# COBOL 固定格式自动重排。\n#\n# GnuCOBOL 不提供源码重排能力，且 COBOL 固定格式的列区约定涉及序号区\n# （第 1-6 列）与代码区（第 7-72 列）的重新分配，任何自动重写都存在\n# 改坏语义的风险（序号区被业务代码占用时尤甚）。\n# 因此 apply 模式**如实拒绝自动修复**并给出可执行指引，而不是冒险改写源码。\n# 排版修正需由人工按 COBOL-85 列区约定完成，或改用自由格式（COBOL-2002）\n# 从根本上免除列区约束。\nf=\"$1\"\n[ -f \"$f\" ] || exit 2\necho \"COBOL 固定格式无安全的自动重排方案：请人工按第 7-72 列代码区约定修正，或改用 -free 自由格式\" >&2\nexit 2\n",
+        "codeguard",
+        "{file}"
+      ],
+      "config_markers": [
+        "cobc.options"
+      ],
+      "extensions": [
+        ".cbl",
+        ".cob",
+        ".cpy",
+        ".ccp",
+        ".cobol"
+      ],
+      "dialects": {
+        "fixed_format": "COBOL-85",
+        "free_format": "COBOL-2002"
+      },
+      "unformatted_exit_codes": [
+        1
+      ],
+      "notes": "COBOL 无任何可用的开源/CLI 格式化器（穷尽检索：npm cobol-formatter/cobolfmt/cobol-pretty-print 均无结果；PyPI cobol-formatter/cobolfmt 404；Maven Central 17 个 COBOL artifact 全为 parser 或分析器（cobol2j/cobrix/emf.cobol）无格式化能力；GitHub 无带 release 的 COBOL formatter；商业方案 COBClean/IBM Z Open Editor 为 Windows GUI 或商业产品）。本条目改用 **GnuCOBOL 编译器（cobc）作为排版规则执行器**——这是 COBOL 生态中唯一能对源码给出确定性判定的 CLI 工具，且 COBOL-85 固定格式的列区约定（源码必须位于第 7-72 列，1-6 列为序号区）本身就是排版规范，由编译器强制执行比自建格式化器更可信。**方言双探针解决退出码歧义**：cobc 对「列区违规」与「语法错误」一律退 1，直接使用会把损坏 COBOL 误报为「需重排」；因此分别以 -free（无列区约束）与 -fixed（有列区约束）各编译一次：两者皆过→0 合规；free 过而 fixed 挂→1 列区排版违规；两者皆挂→2 语法错误，降级为未完成而不误判为格式问题。实测三态正确。检查全程只读（-fsyntax-only 不产出目标文件）。**apply 模式如实拒绝自动修复**：cobc 不提供源码重排，而 COBOL 固定格式的列区重分配涉及序号区与代码区边界，自动改写存在改坏语义的风险，因此返回退出 2 并给出人工修正或改用自由格式的指引，不冒险改写源码。限制：只判定列区与语法，不检查缩进宽度、大小写风格、行长上限等 cobc 不强制的风格项；自由格式（COBOL-2002）文件因不受列区约束，恒判为合规。",
+      "unparsable_detection": "none"
+    },
+    {
+      "language": "vbnet",
+      "status": "integrated",
+      "formatter": "bash",
+      "tool_key": "bash",
+      "check_argv": [
+        "-c",
+        "f=\"$1\"; { [ -n \"$f\" ] && [ -f \"$f\" ]; } || exit 2\nline=\"$(dotnet --list-sdks 2>/dev/null | tail -1)\"; [ -n \"$line\" ] || exit 2\nver=\"${line%% *}\"; root=\"${line#*\\[}\"; root=\"${root%\\]}\"\nrb=\"$root/$ver/DotnetTools/dotnet-format\"\n[ -f \"$rb/Microsoft.CodeAnalysis.VisualBasic.Workspaces.dll\" ] || rb=\"$(find \"$root/$ver\" -type d -name dotnet-format 2>/dev/null | head -1)\"\n[ -f \"$rb/Microsoft.CodeAnalysis.VisualBasic.Workspaces.dll\" ] || exit 2\nt=\"$(mktemp -d \"${TMPDIR:-/tmp}/cg-vbnet.XXXXXX\")\" || exit 2\ntrap 'rm -rf \"$t\"' EXIT\n{ printf '#r \"%s/Microsoft.CodeAnalysis.dll\"\\n#r \"%s/Microsoft.CodeAnalysis.VisualBasic.dll\"\\n#r \"%s/Microsoft.CodeAnalysis.Workspaces.dll\"\\n#r \"%s/Microsoft.CodeAnalysis.VisualBasic.Workspaces.dll\"\\n' \"$rb\" \"$rb\" \"$rb\" \"$rb\"; cat <<'FSX'\nopen System\nopen System.IO\nopen Microsoft.CodeAnalysis\nopen Microsoft.CodeAnalysis.VisualBasic\nopen Microsoft.CodeAnalysis.Formatting\nlet path = Environment.GetEnvironmentVariable \"CG_VBNET_FILE\"\nlet mode = Environment.GetEnvironmentVariable \"CG_VBNET_MODE\"\ntry\n    if isNull path || not (File.Exists path) then\n        eprintfn \"file not found\"\n        Environment.Exit 2\n    let src = File.ReadAllText path\n    let tree = VisualBasicSyntaxTree.ParseText(src)\n    let errs =\n        tree.GetDiagnostics()\n        |> Seq.filter (fun d -> d.Severity = DiagnosticSeverity.Error)\n        |> Seq.toList\n    if not errs.IsEmpty then\n        eprintfn \"VB parse errors: %d\" errs.Length\n        Environment.Exit 2\n    let ws = new AdhocWorkspace()\n    let formatted = (Formatter.Format(tree.GetRoot(), ws)).ToFullString()\n    if mode = \"apply\" then\n        if formatted <> src then File.WriteAllText(path, formatted)\n        Environment.Exit 0\n    else\n        if formatted = src then Environment.Exit 0 else Environment.Exit 1\nwith\n| ex ->\n    eprintfn \"wrapper error: %s\" ex.Message\n    Environment.Exit 2\nFSX\n} > \"$t/vbfmt.fsx\" || exit 2\nCG_VBNET_FILE=\"$f\" CG_VBNET_MODE=check dotnet fsi --exec \"$t/vbfmt.fsx\" >/dev/null\n",
+        "codeguard",
+        "{file}"
+      ],
+      "apply_argv": [
+        "-c",
+        "f=\"$1\"; { [ -n \"$f\" ] && [ -f \"$f\" ]; } || exit 2\nline=\"$(dotnet --list-sdks 2>/dev/null | tail -1)\"; [ -n \"$line\" ] || exit 2\nver=\"${line%% *}\"; root=\"${line#*\\[}\"; root=\"${root%\\]}\"\nrb=\"$root/$ver/DotnetTools/dotnet-format\"\n[ -f \"$rb/Microsoft.CodeAnalysis.VisualBasic.Workspaces.dll\" ] || rb=\"$(find \"$root/$ver\" -type d -name dotnet-format 2>/dev/null | head -1)\"\n[ -f \"$rb/Microsoft.CodeAnalysis.VisualBasic.Workspaces.dll\" ] || exit 2\nt=\"$(mktemp -d \"${TMPDIR:-/tmp}/cg-vbnet.XXXXXX\")\" || exit 2\ntrap 'rm -rf \"$t\"' EXIT\n{ printf '#r \"%s/Microsoft.CodeAnalysis.dll\"\\n#r \"%s/Microsoft.CodeAnalysis.VisualBasic.dll\"\\n#r \"%s/Microsoft.CodeAnalysis.Workspaces.dll\"\\n#r \"%s/Microsoft.CodeAnalysis.VisualBasic.Workspaces.dll\"\\n' \"$rb\" \"$rb\" \"$rb\" \"$rb\"; cat <<'FSX'\nopen System\nopen System.IO\nopen Microsoft.CodeAnalysis\nopen Microsoft.CodeAnalysis.VisualBasic\nopen Microsoft.CodeAnalysis.Formatting\nlet path = Environment.GetEnvironmentVariable \"CG_VBNET_FILE\"\nlet mode = Environment.GetEnvironmentVariable \"CG_VBNET_MODE\"\ntry\n    if isNull path || not (File.Exists path) then\n        eprintfn \"file not found\"\n        Environment.Exit 2\n    let src = File.ReadAllText path\n    let tree = VisualBasicSyntaxTree.ParseText(src)\n    let errs =\n        tree.GetDiagnostics()\n        |> Seq.filter (fun d -> d.Severity = DiagnosticSeverity.Error)\n        |> Seq.toList\n    if not errs.IsEmpty then\n        eprintfn \"VB parse errors: %d\" errs.Length\n        Environment.Exit 2\n    let ws = new AdhocWorkspace()\n    let formatted = (Formatter.Format(tree.GetRoot(), ws)).ToFullString()\n    if mode = \"apply\" then\n        if formatted <> src then File.WriteAllText(path, formatted)\n        Environment.Exit 0\n    else\n        if formatted = src then Environment.Exit 0 else Environment.Exit 1\nwith\n| ex ->\n    eprintfn \"wrapper error: %s\" ex.Message\n    Environment.Exit 2\nFSX\n} > \"$t/vbfmt.fsx\" || exit 2\nCG_VBNET_FILE=\"$f\" CG_VBNET_MODE=apply dotnet fsi --exec \"$t/vbfmt.fsx\" >/dev/null\n",
+        "codeguard",
+        "{file}"
+      ],
+      "config_markers": [],
+      "extensions": [
+        ".vb"
+      ],
+      "dialects": {
+        "dotnet_sdk": "10.0.401"
+      },
+      "notes": "integrated：bash 包装 dotnet fsi（.NET SDK 自带 F# Interactive）加载 SDK 自带的 dotnet-format 捆绑 Roslyn 程序集（DotnetTools/dotnet-format/ 下的 Microsoft.CodeAnalysis.VisualBasic(.Workspaces)/Workspaces），用 VisualBasicSyntaxTree.ParseText 解析 + Formatter.Format 与源码逐字对比，逐文件判定——无需安装任何额外工具，只要求 .NET SDK 6+（不是仅运行时：fsi 与程序集都随 SDK 分发；SDK 发现走 dotnet --list-sdks，缺失即退出 2 工具故障）。选型原因：dotnet format 直连已实测不可用（.NET SDK 10.0.401 复现）——--include 传绝对路径对脏文件退出 0 且 stdout/stderr 全空（静默假阴性），语法损坏的 .vb verify 与 apply 均退出 0 且不改文件（静默假通过），无 MSBuild 工程的裸 .vb 抛未处理异常退出 1；本包装在三态上都实测封堵：check 合规退出 0（stdout 0 字节，已重定向）、需格式化退出 1、语法解析错误/文件不可读/SDK 缺失退出 2（工具故障，不静默通过），check 全程只读（实测前后 md5 一致），apply 退出 0 就地写回且幂等、解析坏文件退出 2 且不改动。退出码为标准 B 类 [1]；fsi 内 Environment.Exit 经 bash 透传为进程退出码（实测）。限制：只做 Roslyn 默认选项的空白/缩进/换行排版（Formatter.Format），不读项目 .editorconfig（config_markers 为空的原因），不做类型检查/编译/语义诊断——语义报错但语法合法的文件照常检查（与 fsharp fantomas、powershell Invoke-Formatter 档位同级）；每文件约 1.5-2.5 秒（fsi 冷启动开销，与 julia 档位同级），批量检查耗时明显；带 BOM 的文件 check 正常，apply 会以无 BOM UTF-8 重写；apply 失败时不写文件（坏文件不会写半截）。",
+      "unformatted_exit_codes": [
+        1
+      ],
+      "unparsable_detection": "none"
+    },
+    {
+      "language": "erlang",
+      "status": "integrated",
+      "formatter": "erlfmt",
+      "tool_key": "erlfmt",
+      "check_argv": [
+        "--check",
+        "{file}"
+      ],
+      "apply_argv": [
+        "-w",
+        "{file}"
+      ],
+      "config_markers": [
+        "rebar.config"
+      ],
+      "extensions": [
+        ".erl",
+        ".hrl"
+      ],
+      "dialects": {},
+      "notes": "erlfmt 是 WhatsApp 出品、Erlang 生态事实标准格式化器（brew install erlfmt，本机实测 1.8.0）。属 B 类，已真实验证：--check 对未格式化文件退出 1 并打印 [warn] 文件名与 Forgot to run erlfmt? 提示，已格式化退出 0；-w 就地格式化退出 0。风格约定经 rebar.config 的 erlfmt 段配置。限制：--check 对语法错误的文件会跳过并按已格式化处理（本机实测退出 0），存在假通过，format 检查不能替代语法检查；只判格式，不检查注释完整性。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
+    },
+    {
+      "language": "arkts",
+      "status": "integrated",
+      "formatter": "node",
+      "tool_key": "node",
+      "check_argv": [
+        "-e",
+        "const fs=require(\"node:fs\"),path=require(\"node:path\"),m=require(\"node:module\");\n(async()=>{\ntry{\nconst mode=process.argv[1];\nconst file=path.resolve(process.argv[2]);\nif(!fs.existsSync(file)){console.error(\"file not found: \"+file);process.exit(2);}\nconst req=m.createRequire(path.join(path.dirname(file),\"a.js\"));\nlet oxkPath;\ntry{oxkPath=req.resolve(\"@ohos-rs/oxk/format\");}catch(e){console.error(\"@ohos-rs/oxk not resolvable from \"+file+\" (install it as project devDependency): \"+e.message);process.exit(2);}\nconst oxk=req(oxkPath);\nconst src=fs.readFileSync(file,\"utf8\");\nlet result;\ntry{result=await oxk.format(file,src,{});}catch(e){console.error(\"oxk format error: file left untouched, \"+e.message);process.exit(2);}\nconst errors=(result&&result.errors)||[];\nif(errors.length>0){console.error(\"arkts parse error: file left untouched, \"+errors.join(\"; \"));process.exit(2);}\nconst out=result.code;\nif(mode===\"apply\"){if(out!==src){fs.writeFileSync(file,out);}process.exit(0);}\nprocess.exit(out===src?0:1);\n}catch(e){console.error(\"wrapper error: \"+(e&&e.message));process.exit(2);}\n})();",
+        "check",
+        "{file}"
+      ],
+      "apply_argv": [
+        "-e",
+        "const fs=require(\"node:fs\"),path=require(\"node:path\"),m=require(\"node:module\");\n(async()=>{\ntry{\nconst mode=process.argv[1];\nconst file=path.resolve(process.argv[2]);\nif(!fs.existsSync(file)){console.error(\"file not found: \"+file);process.exit(2);}\nconst req=m.createRequire(path.join(path.dirname(file),\"a.js\"));\nlet oxkPath;\ntry{oxkPath=req.resolve(\"@ohos-rs/oxk/format\");}catch(e){console.error(\"@ohos-rs/oxk not resolvable from \"+file+\" (install it as project devDependency): \"+e.message);process.exit(2);}\nconst oxk=req(oxkPath);\nconst src=fs.readFileSync(file,\"utf8\");\nlet result;\ntry{result=await oxk.format(file,src,{});}catch(e){console.error(\"oxk format error: file left untouched, \"+e.message);process.exit(2);}\nconst errors=(result&&result.errors)||[];\nif(errors.length>0){console.error(\"arkts parse error: file left untouched, \"+errors.join(\"; \"));process.exit(2);}\nconst out=result.code;\nif(mode===\"apply\"){if(out!==src){fs.writeFileSync(file,out);}process.exit(0);}\nprocess.exit(out===src?0:1);\n}catch(e){console.error(\"wrapper error: \"+(e&&e.message));process.exit(2);}\n})();",
+        "apply",
+        "{file}"
+      ],
+      "config_markers": [],
+      "extensions": [
+        ".ets"
+      ],
+      "dialects": {
+        "oxk": "0.9.0"
+      },
+      "unformatted_exit_codes": [
+        1
+      ],
+      "notes": "integrated：ArkTS 专用格式化器 @ohos-rs/oxk（基于 OXC/oxc 的 Rust 解析器，实测 0.9.0，npm 安装即得，原生解析 .ets 的 ArkTS 语法——@Entry/@Component/struct/build 链式调用/@State/@Prop/@Link/@Watch/@Observed/@Extend/@Styles/@Builder/ForEach/LazyForEach/$r() 资源/as 断言均已实测正确排版、不丢码），但它是 node 包而非独立可执行文件，故经 node -e 包装调用，formatter/tool_key 为 node。不能直接用 prettier：实测 prettier 3.9.9 --parser typescript 对 @Component struct 报 SyntaxError（Declaration expected，struct 非 TS 语法而 UI struct 是该语言主体），npm 亦无 prettier-plugin-arkts/ets；华为官方链路均无可用 CLI 格式化入口：codelinter（command-line-tools 内）只做 lint 检查无 format 子命令，DevEco Studio 格式化是 IDE/LSP 内部能力，@arkts/language-server/@arkts/language-service（ohosvscode）为 Volar LSP 包无单文件 CLI，tree-sitter-arkts 只是语法不是格式化器。oxk 的 CLI（oxk format）默认就地改写且无 --check/--write 之分的只读模式，不能充当 check，且 CLI 读项目 .oxfmtrc.json 而单文件 API 不读——为保 check/apply 判定一致，两者统一走本 wrapper 的内置默认风格（双引号、分号、2 空格缩进、链式调用收拢到收尾花括号），故 config_markers 为空。前置条件：被检文件所在项目（沿目录向上含 monorepo 根）须安装 @ohos-rs/oxk 为 devDependency，解析失败退 2 工具故障、绝不静默放行（check/apply 实测均退 2 且文件不动）。check 经 createRequire 加载其 format API 在内存中排版并与源码逐字对比：退出 0=合规（stdout 静默，已实测 md5 不变）、1=需格式化、2=ArkTS 解析错误（errors 非空）/依赖缺失/文件不可读——三态全实测，语法损坏的 struct 代码不会被误判合规。apply 用同一 API 排版后仅在结果不同才写回：退出 0=成功，解析错误退 2 且不落盘（实测破损文件字节不变，无写半截风险），重复 apply 幂等（实测二次 apply md5 不变、复检 0）。unformatted_exit_codes=[1] 为标准 B 类。限制：只排版不检查 ArkTS 语言违例（arkts-no-any 等约束归 lint 类别，不冒充）；不读 .oxfmtrc.json 项目配置，风格固定为 oxk 内置默认，与 DevEco 默认风格不尽相同；空文件/仅注释文件判合规；带 BOM 文件判不合规且 apply 会去 BOM；纯 TS 语法文件（无 struct）同样按 TS 规则排版；oxk 0.9.0 发布不久，若升级需复测退出码三态。",
+      "unparsable_detection": "none"
+    },
+    {
+      "language": "metal",
+      "status": "integrated",
+      "formatter": "clang-format",
+      "tool_key": "clang-format",
+      "check_argv": [
+        "--dry-run",
+        "--Werror",
+        "--style=file",
+        "{file}"
+      ],
+      "apply_argv": [
+        "-i",
+        "--style=file",
+        "{file}"
+      ],
+      "config_markers": [
+        ".clang-format",
+        "_clang-format"
+      ],
+      "extensions": [
+        ".metal"
+      ],
+      "dialects": {},
+      "notes": "Metal 着色语言接入 clang-format（C 系解析器）。此前以「无第三方 .metal 专用格式化器」标 not_integrated，但该理由不成立：codeguard format 是**独立的格式类别**，按项目铁律只判代码风格、不冒充语义校验——Metal Shading Language 复用 C++14 子集语法，其 [[buffer(n)]] 属性、address_space 等扩展在 C++ 解析器下均可正常解析，因此用 C 系解析器排版正是该类别的本职，不构成「借用非专用工具」的问题。实测（本机 clang-format 23.1.3）：排版乱的 .metal 退 1（不合规）；clang-format 自身产出的合规样例退 0。**关键安全措施**：clang-format 对无法解析的源文件会原样输出并静默退 0，会把「无法检查」误报为「格式合规」——运行时对该语言启用第二遍探测（--output-replacements-xml 的 incomplete_format 属性），实测语法损坏的 .metal 正确降级为 source_not_parsable_by_formatter / 退出 3，不再静默放行。同机制同时修复了 c/cpp/objc/cuda/protobuf 五个已接入语言的同类假阴性。限制：clang-format 按 C++ 方言排版，**不校验 Metal 语义**——kernel/vertex 函数签名是否合法、地址空间标注是否正确、MSL 版本兼容性等属 syntax 核心能力，由 metal 编译器与专用 lint 承接，不由本档次的格式检查覆盖；排版后的代码仍须经 xcrun metal 编译验证。",
+      "unformatted_exit_codes": [
+        1
+      ],
+      "unparsable_detection": "clang_format_xml"
+    },
+    {
+      "language": "liquid",
+      "status": "integrated",
+      "formatter": "node",
+      "tool_key": "node",
+      "check_argv": [
+        "-e",
+        "const fs=require(\"node:fs\"),path=require(\"node:path\"),m=require(\"node:module\"),u=require(\"node:url\");\n(async()=>{\ntry{\nconst file=path.resolve(process.argv[2]||process.argv[1]);\nif(!fs.existsSync(file)){console.error(\"file not found: \"+file);process.exit(2);}\nconst req=m.createRequire(path.join(path.dirname(file),\"a.js\"));\nlet prettierPath,pluginPath;\ntry{prettierPath=req.resolve(\"prettier\");}catch(e){console.error(\"prettier not resolvable from \"+file+\" (install it as project devDependency): \"+e.message);process.exit(2);}\ntry{pluginPath=req.resolve(\"@shopify/prettier-plugin-liquid\");}catch(e){console.error(\"@shopify/prettier-plugin-liquid not resolvable from \"+file+\" (install it as project devDependency): \"+e.message);process.exit(2);}\nconst prettier=req(prettierPath);\nlet plugin=await import(u.pathToFileURL(pluginPath).href);\nplugin=plugin.default||plugin;\nconst src=fs.readFileSync(file,\"utf8\");\nlet config=null;\ntry{config=await prettier.resolveConfig(file);}catch(e){config=null;}\nconst options=Object.assign({},config||{},{parser:\"liquid-html\",plugins:[plugin]});\nlet out;\ntry{out=await prettier.format(src,options);}catch(e){console.error(\"prettier format error: \"+e.message);process.exit(2);}\nprocess.exit(out===src?0:1);\n}catch(e){console.error(\"wrapper error: \"+(e&&e.message));process.exit(2);}\n})();",
+        "{file}"
+      ],
+      "apply_argv": [
+        "-e",
+        "const fs=require(\"node:fs\"),path=require(\"node:path\"),m=require(\"node:module\"),u=require(\"node:url\");\n(async()=>{\ntry{\nconst file=path.resolve(process.argv[2]||process.argv[1]);\nif(!fs.existsSync(file)){console.error(\"file not found: \"+file);process.exit(2);}\nconst req=m.createRequire(path.join(path.dirname(file),\"a.js\"));\nlet prettierPath,pluginPath;\ntry{prettierPath=req.resolve(\"prettier\");}catch(e){console.error(\"prettier not resolvable from \"+file+\" (install it as project devDependency): \"+e.message);process.exit(2);}\ntry{pluginPath=req.resolve(\"@shopify/prettier-plugin-liquid\");}catch(e){console.error(\"@shopify/prettier-plugin-liquid not resolvable from \"+file+\" (install it as project devDependency): \"+e.message);process.exit(2);}\nconst prettier=req(prettierPath);\nlet plugin=await import(u.pathToFileURL(pluginPath).href);\nplugin=plugin.default||plugin;\nconst src=fs.readFileSync(file,\"utf8\");\nlet config=null;\ntry{config=await prettier.resolveConfig(file);}catch(e){config=null;}\nconst options=Object.assign({},config||{},{parser:\"liquid-html\",plugins:[plugin]});\nlet out;\ntry{out=await prettier.format(src,options);}catch(e){console.error(\"prettier format error: file left untouched, \"+e.message);process.exit(2);}\nfs.writeFileSync(file,out);\nprocess.exit(0);\n}catch(e){console.error(\"wrapper error: \"+(e&&e.message));process.exit(2);}\n})();",
+        "{file}"
+      ],
+      "config_markers": [
+        ".prettierrc",
+        ".prettierrc.json",
+        ".prettierrc.yaml",
+        "prettier.config.js"
+      ],
+      "extensions": [
+        ".liquid"
+      ],
+      "dialects": {},
+      "notes": "Liquid 模板的事实标准格式化器是 prettier + Shopify 官方插件 @shopify/prettier-plugin-liquid（实测 prettier 3.9.9 + 插件 3.x，parser 名为 liquid-html 而非 liquid），但插件是 node 包而非独立可执行文件，故经 node -e 包装调用，formatter/tool_key 为 node。不能直接用 prettier CLI：实测显式 --plugin 指定插件但项目未安装时，prettier 退 1 且 stdout 为空（Cannot find package 打在 stderr），与本工具「退 1=不合规」同码，会对未配置项目全量误报；不带插件则 No parser could be inferred 退 2。包装器先用 createRequire 从被检文件所在项目解析 prettier 与插件：任一缺失退 2（工具故障/未配置，绝不静默放行，实测 check/apply 均退 2 且文件不动）；随后调 prettier.format 与原文对比：0=合规、1=需格式化、prettier 抛错退 2，check 全程只读（实测 md5 不变、stdout 静默），apply 就地写回、实测幂等且解析失败不落盘。resolveConfig 已实测读取项目 .prettierrc（printWidth 改动会改变判定），config_markers 据此声明。限制：liquid-html 解析器宽松，残缺模板（未闭合 if 等）多数不会抛错而是被当作需格式化（check 退 1、apply 会重写补全，与官方 CLI --write 行为一致），不能依赖它做语法校验；只排版，不覆盖 theme-check 的 lint 规则；需项目预装 prettier 与插件两个 devDependency。 【2026-10-08 复核修正】此前 final_five 分片据 prettier CLI 测试判为 not_integrated，理由是「插件缺失与需格式化同为退出 1」。该结论只覆盖 CLI 路径，未覆盖本档案的 node wrapper。实测 wrapper 四场景全部正确：合规 0；不合规 1；移走 node_modules 后依赖解析失败退 2（工具故障，不误判为不合规）；文件不存在退 2。apply 实测就地重排退出 0、复检 0 幂等。wrapper 用 createRequire 从被检文件所在目录解析依赖，正是它把「依赖缺失」与「需格式化」彻底分离，因此本条目维持 integrated。",
+      "unformatted_exit_codes": [
+        1
+      ],
+      "unparsable_detection": "none"
+    },
+    {
+      "language": "cuda",
+      "status": "integrated",
+      "formatter": "clang-format",
+      "tool_key": "clang-format",
+      "check_argv": [
+        "--dry-run",
+        "--Werror",
+        "--style=file",
+        "{file}"
+      ],
+      "apply_argv": [
+        "-i",
+        "--style=file",
+        "{file}"
+      ],
+      "config_markers": [
+        ".clang-format",
+        "_clang-format"
+      ],
+      "extensions": [
+        ".cu",
+        ".cuh"
+      ],
+      "dialects": {
+        "standard": "c++17"
+      },
+      "notes": "clang-format 内核原生把 .cu/.cuh 识别为 CUDA C++，与主档案 c/cpp/objc 共用同一工具与参数，check 为 B 类（--dry-run --Werror：退出 0=合规、1=不合规、≥2=工具故障），apply 用 -i 就地写入。已在 Homebrew llvm clang-format 23.1.2 与 Apple CLT 21.0.0 实测：.cu 就地格式化、.cu/.cuh 违规检出、__global__/__device__ 均正常解析。限制：只做排版格式化，不检查 CUDA 语义、线程安全或内存正确性；项目无 .clang-format 时回退 LLVM 内置风格，可能与团队风格不一致；运行时仍需通过 --tool clang-format=ABS_PATH 绑定实际二进制。",
+      "unparsable_detection": "clang_format_xml",
+      "unformatted_exit_codes": [
+        1
+      ]
+    },
+    {
+      "language": "ansible",
+      "status": "integrated",
+      "formatter": "prettier",
+      "tool_key": "prettier",
+      "check_argv": [
+        "--list-different",
+        "{file}"
+      ],
+      "apply_argv": [
+        "--write",
+        "{file}"
+      ],
+      "config_markers": [
+        ".ansible-lint",
+        "ansible.cfg",
+        ".prettierrc",
+        ".editorconfig"
+      ],
+      "extensions": [
+        ".yml",
+        ".yaml"
+      ],
+      "dialects": {},
+      "notes": "Ansible 无专属格式化器，按项目既有架构决策归口 yaml 通道——rulepacks/legacy_languages.json 的 ansible 条目自身即写明：extensions 为空数组、install_hint 为「playbook 检查由 ansible-lint 承接（yaml 通道）」、markers 含 playbook.yml。Ansible playbook 本质是 YAML，其排版由 format_profiles.json 的 yaml 条目（prettier --list-different）统一处理，因此 **不重复声明第二条 ansible 通道**：同一批 .yml/.yaml 若被两个语言条目各跑一次，既浪费预算又可能在配置漂移时产生互相矛盾的风格判定。实测否决 ansible-lint 作为格式化器：ansible-lint 26.9.0 的 --fix / --fix=yaml / --fix=none 三种形态都会重排 YAML，但只要残留 fqcn、name[casing] 等语义违规就一律退 2，不存在「修完即退 0」的调用形态，无法满足 apply 的「退出 0 = 成功」契约；其 --tags yaml 只读检查虽退 0/2，但 2 与 YAML 解析错误同码，损坏文件会被误报为需格式化（实测 broken.yml 确认）。结论：ansible 不提供独立 format 通道，其文件已由 yaml 通道覆盖，属显式架构归口而非未完成项。语义级检查（ansible-lint 规则）属 lint 类别，不在本档案职责内。",
+      "routed_to": "yaml",
+      "unformatted_exit_codes": [
+        1
+      ],
+      "unparsable_detection": "none"
+    }
+  ]
+}

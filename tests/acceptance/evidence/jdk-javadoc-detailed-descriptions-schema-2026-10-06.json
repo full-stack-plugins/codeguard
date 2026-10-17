@@ -1,0 +1,16 @@
+{
+  "meta_valid": 440,
+  "actual_reports_valid": 102,
+  "constructed_aborted_valid": 1,
+  "forgeries_rejected": [
+    "coverage",
+    "version",
+    "rule",
+    "checker",
+    "location",
+    "authority",
+    "unexpected"
+  ],
+  "old_consumers_rejected": 6,
+  "old_schemas_byte_preserved": 430
+}

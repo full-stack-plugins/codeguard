@@ -1,0 +1,40 @@
+{
+  "evidence_type": "javadoc_task_recheck_local_acceptance",
+  "source_sha256": {
+    "crates/codeguard-cli/src/javadoc_task_recheck.rs": "92c9be83f9541b5f8b4c9af4b406d5272b1ea73936972279bcec46292b88b658",
+    "crates/codeguard-cli/src/task_verify_command.rs": "c298288d7bf334159e9921d397e0d0232d6e2fd8cca816ee2a0d8c94f5d382d7",
+    "crates/codeguard-cli/src/task_attempt_command.rs": "f6a00d65dd74f60f1dfc4f8050f09710490ff79642f04f942c63c4eb01b56a2f",
+    "crates/codeguard-cli/src/next_command.rs": "6c8b3b47ecbfb01bbab2bfd98f30e472f83fae4ddd036504337490f8e2d98d71",
+    "crates/codeguard-cli/src/work_sync/javadoc_report.rs": "7b1f5fe8fc3e2222f3c54dd7b3d52ec90f7135a986e660ba60fc67d34e7ef57f",
+    "crates/codeguard-cli/tests/java_comments_cli.rs": "7cc2173085607c2385a66b6ce4f8feee4c40d52cc8c4efd6ab03883091b03625"
+  },
+  "regression": {
+    "passed": 81,
+    "failed": 0,
+    "ignored": 28
+  },
+  "explicit_jdk_task_test": {
+    "passed": 1,
+    "failed": 0,
+    "ignored": 0,
+    "overlaps_regression_ignored": true
+  },
+  "actual_schema_validation": {
+    "wrapper_next": "valid",
+    "native_and_public_recheck_reports": 4,
+    "fake_coverage": "rejected"
+  },
+  "clippy": "passed",
+  "layering": "passed",
+  "openspec_strict": "passed",
+  "closure_status": "not_integrated",
+  "delivery_decision": "not_evaluated",
+  "remaining": [
+    "trusted_closure",
+    "recurrence",
+    "maven_multifile_workbench",
+    "standalone_file_workbench",
+    "host_acceptance",
+    "cross_platform_acceptance"
+  ]
+}

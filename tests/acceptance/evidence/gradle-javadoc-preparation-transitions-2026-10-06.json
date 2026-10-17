@@ -1,0 +1,218 @@
+{
+  "evidence_kind": "constructed_preparation_transitions",
+  "previews": [
+    {
+      "authority": "local_unverified",
+      "command_status": "complete",
+      "delivery_decision": "not_evaluated",
+      "disposition": "actionable",
+      "exit_code": 0,
+      "next_actions": [],
+      "operation": "next",
+      "reason": "local_task_selected",
+      "repair_brief": {
+        "action_id": "restore-checker-environment",
+        "affected_paths": [
+          "src/main/java/Sample.java"
+        ],
+        "authority": "local_unverified",
+        "build_root": ".",
+        "checker_id": "java.gradle.javadoc",
+        "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+        "constraints": [
+          "先恢复检查完整性",
+          "不得关闭检查器或修改无关源码"
+        ],
+        "disposition": "actionable",
+        "evidence_ref": {
+          "first_report_sha256": "cd8ae37076939cb6c062aa7ce815bcb1467e0a5c32dff08c504e7ebe4f4dceff",
+          "first_run_id": "javadoc-gradle-44685-1791285795899131000"
+        },
+        "history": {
+          "attempt_count": 0,
+          "awaiting_verification": false,
+          "budget": 2,
+          "no_progress_count": 0,
+          "open_attempt_id": null,
+          "recent": []
+        },
+        "kind": "blocker",
+        "latest_diagnostic_reason": "native_execution_incomplete",
+        "latest_preparation_ref": {
+          "report_sha256": "cd8ae37076939cb6c062aa7ce815bcb1467e0a5c32dff08c504e7ebe4f4dceff",
+          "run_id": "javadoc-gradle-44685-1791285795899131000"
+        },
+        "observation_scope": "selected_gradle_javadoc_inputs",
+        "reason_code": "gradle_javadoc_preparation_required",
+        "recheck_argv": [
+          "codeguard",
+          "check",
+          "java",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-gradle-sync-44685-1",
+          "--gradle-javadoc",
+          "--gradle-bundle",
+          "<已核验原Gradle绝对路径>",
+          "--java-home",
+          "<已核验原JDK21绝对路径>",
+          "--gradle-project-file",
+          "build.gradle",
+          "--gradle-project-file",
+          "settings.gradle",
+          "--gradle-project-file",
+          "src/main/java/Sample.java",
+          "--format=json"
+        ],
+        "rule_basis": "原Gradle官方Javadoc任务原生诊断；完整详细规则与源集尚未验收",
+        "schema_version": "0.22.0",
+        "scope": ".",
+        "step": "核对原Gradle/JDK与原项目规则、源集；环境故障先恢复工具，规则/覆盖缺口须明确具体政策，不修改无关源码",
+        "task_id": "CG-B-9aebf6877bb1b844d23ecd72d4c4e9fb",
+        "task_verify_status": "not_integrated"
+      },
+      "report_type": "repair_brief_preview",
+      "schema_version": "0.22.0"
+    },
+    {
+      "authority": "local_unverified",
+      "command_status": "complete",
+      "delivery_decision": "not_evaluated",
+      "disposition": "actionable",
+      "exit_code": 0,
+      "next_actions": [],
+      "operation": "next",
+      "reason": "local_task_selected",
+      "repair_brief": {
+        "action_id": "restore-checker-environment",
+        "affected_paths": [
+          "src/main/java/Sample.java"
+        ],
+        "authority": "local_unverified",
+        "build_root": ".",
+        "checker_id": "java.gradle.javadoc",
+        "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+        "constraints": [
+          "先恢复检查完整性",
+          "不得关闭检查器或修改无关源码"
+        ],
+        "disposition": "actionable",
+        "evidence_ref": {
+          "first_report_sha256": "cd8ae37076939cb6c062aa7ce815bcb1467e0a5c32dff08c504e7ebe4f4dceff",
+          "first_run_id": "javadoc-gradle-44685-1791285795899131000"
+        },
+        "history": {
+          "attempt_count": 0,
+          "awaiting_verification": false,
+          "budget": 2,
+          "no_progress_count": 0,
+          "open_attempt_id": null,
+          "recent": []
+        },
+        "kind": "blocker",
+        "latest_diagnostic_reason": "request_cancelled",
+        "latest_preparation_ref": {
+          "report_sha256": "676aafca8599036829e3ae0ad38c8d48ee3c609b93a17f45b5977cc909e6cbf6",
+          "run_id": "javadoc-gradle-44685-1791285796025163000"
+        },
+        "observation_scope": "selected_gradle_javadoc_inputs",
+        "reason_code": "gradle_javadoc_preparation_required",
+        "recheck_argv": [
+          "codeguard",
+          "check",
+          "java",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-gradle-sync-44685-1",
+          "--gradle-javadoc",
+          "--gradle-bundle",
+          "<已核验原Gradle绝对路径>",
+          "--java-home",
+          "<已核验原JDK21绝对路径>",
+          "--gradle-project-file",
+          "build.gradle",
+          "--gradle-project-file",
+          "settings.gradle",
+          "--gradle-project-file",
+          "src/main/java/Sample.java",
+          "--format=json"
+        ],
+        "rule_basis": "原Gradle官方Javadoc任务原生诊断；完整详细规则与源集尚未验收",
+        "schema_version": "0.22.0",
+        "scope": ".",
+        "step": "核对原Gradle/JDK与原项目规则、源集；环境故障先恢复工具，规则/覆盖缺口须明确具体政策，不修改无关源码",
+        "task_id": "CG-B-9aebf6877bb1b844d23ecd72d4c4e9fb",
+        "task_verify_status": "not_integrated"
+      },
+      "report_type": "repair_brief_preview",
+      "schema_version": "0.22.0"
+    },
+    {
+      "authority": "local_unverified",
+      "command_status": "complete",
+      "delivery_decision": "not_evaluated",
+      "disposition": "needs_decision",
+      "exit_code": 0,
+      "next_actions": [],
+      "operation": "next",
+      "reason": "local_task_selected",
+      "repair_brief": {
+        "action_id": "review-project-policy",
+        "affected_paths": [
+          "src/main/java/Sample.java"
+        ],
+        "authority": "local_unverified",
+        "build_root": ".",
+        "checker_id": "java.gradle.javadoc",
+        "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+        "constraints": [
+          "先恢复检查完整性",
+          "不得关闭检查器或修改无关源码"
+        ],
+        "disposition": "needs_decision",
+        "evidence_ref": {
+          "first_report_sha256": "cd8ae37076939cb6c062aa7ce815bcb1467e0a5c32dff08c504e7ebe4f4dceff",
+          "first_run_id": "javadoc-gradle-44685-1791285795899131000"
+        },
+        "history": {
+          "attempt_count": 0,
+          "awaiting_verification": false,
+          "budget": 2,
+          "no_progress_count": 0,
+          "open_attempt_id": null,
+          "recent": []
+        },
+        "kind": "blocker",
+        "latest_diagnostic_reason": "selected_sources_and_complete_documentation_rules_unverified",
+        "latest_preparation_ref": {
+          "report_sha256": "92a9c11198bdfbf6b66ad5719d612541294e3ee1ce9ff4d579746ebb9b4afb1c",
+          "run_id": "javadoc-gradle-44685-1791285796090377000"
+        },
+        "observation_scope": "selected_gradle_javadoc_inputs",
+        "reason_code": "gradle_javadoc_preparation_required",
+        "recheck_argv": [
+          "codeguard",
+          "check",
+          "java",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-gradle-sync-44685-1",
+          "--gradle-javadoc",
+          "--gradle-bundle",
+          "<已核验原Gradle绝对路径>",
+          "--java-home",
+          "<已核验原JDK21绝对路径>",
+          "--gradle-project-file",
+          "build.gradle",
+          "--gradle-project-file",
+          "settings.gradle",
+          "--gradle-project-file",
+          "src/main/java/Sample.java",
+          "--format=json"
+        ],
+        "rule_basis": "原Gradle官方Javadoc任务原生诊断；完整详细规则与源集尚未验收",
+        "schema_version": "0.22.0",
+        "scope": ".",
+        "step": "核对原Gradle/JDK与原项目规则、源集；环境故障先恢复工具，规则/覆盖缺口须明确具体政策，不修改无关源码",
+        "task_id": "CG-B-9aebf6877bb1b844d23ecd72d4c4e9fb",
+        "task_verify_status": "not_integrated"
+      },
+      "report_type": "repair_brief_preview",
+      "schema_version": "0.22.0"
+    }
+  ]
+}

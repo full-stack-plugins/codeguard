@@ -1,0 +1,35 @@
+{
+  "evidence_type": "javadoc_project_workbench_local_acceptance",
+  "source_sha256": {
+    "crates/codeguard-cli/src/javadoc_workbench.rs": "f7e347178737c676fe03a6c2fc0ca9ab8552fadfdcf97420842ec272936fdf4c",
+    "crates/codeguard-cli/src/work_sync/javadoc_report.rs": "161aa8f0be48f975808a833b167f826aa82e7c04fe2bdfb17d918c2924a12401",
+    "crates/codeguard-cli/src/java_comments_command.rs": "5c249c8a403712e8544ea926004215f08127b8dedc80be2fc5c62cf9475f8606",
+    "crates/codeguard-cli/src/next_command.rs": "a4e150c1a8cad7aa9cbbb33d6423f4a8b2586a049df09430b560b5decd56f723",
+    "crates/codeguard-cli/src/work_sync.rs": "9eadcd5a1afb03eba2fddd18cec8856ad97f254a1f703bcd27f04cad3341995f",
+    "crates/codeguard-cli/tests/java_comments_cli.rs": "ad5be9b3945bbff7cab9fa8a902b4c806b263788639b2c1795b2bcc1836de155"
+  },
+  "regression": {
+    "passed": 46,
+    "failed": 0,
+    "ignored": 17
+  },
+  "explicit_jdk_project_test": {
+    "passed": 1,
+    "failed": 0,
+    "ignored": 0,
+    "overlaps_regression_ignored": true
+  },
+  "schema_actual_reports": "configured_and_missing_wrapper_next_and_saved_observations_valid",
+  "clippy": "passed",
+  "layering": "passed",
+  "openspec_strict": "passed",
+  "task_verify_status": "not_integrated",
+  "delivery_decision": "not_evaluated",
+  "remaining_scopes": [
+    "standalone_file_workbench",
+    "maven_multifile_workbench",
+    "task_verify",
+    "trusted_closure",
+    "host_acceptance"
+  ]
+}

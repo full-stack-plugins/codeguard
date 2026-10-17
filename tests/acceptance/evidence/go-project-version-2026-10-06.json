@@ -1,0 +1,510 @@
+{
+  "scope": "local_fixed_go_1_23_4_syntax_only",
+  "records": [
+    {
+      "case": "compatible",
+      "report": {
+        "delivery_decision": "not_evaluated",
+        "execution": "local_observation",
+        "host_blocking_verified": false,
+        "local_feedback": {
+          "candidate_recovery_count": 0,
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "go_syntax": {
+            "authority": "local_unverified",
+            "coverage_proven": false,
+            "delivery_decision": "not_evaluated",
+            "files": [
+              {
+                "current": true,
+                "native": {
+                  "companion_binding_sha256": "19436fb5bd7825f4450058b0704166c843979e04dddada5174d14710174fe7e4",
+                  "diagnostics": [
+                    {
+                      "column": 12,
+                      "column_unit": "utf8_byte",
+                      "line": 2,
+                      "rule_id": "go.syntax"
+                    },
+                    {
+                      "column": 14,
+                      "column_unit": "utf8_byte",
+                      "line": 2,
+                      "rule_id": "go.syntax"
+                    }
+                  ],
+                  "gofmt_sha256": "f0e9b77df6dcfeec18d33bd9305ff034c28aa2142d3a4fa3aa44e62a44c89e3b",
+                  "input_type": "whole_file",
+                  "reason": "go_native_syntax_diagnostics",
+                  "status": "diagnostics_observed",
+                  "tool_sha256": "5900a8e0942f88b7bacf2b44b397b4950c8dc9f850a16ae1249e1636860dd6ef",
+                  "version": "go1.23.4"
+                },
+                "next_action": "先核对项目Go版本是否适用，再按当前原生行号确认和修复语法；按UTF-8字节列定位；继续go vet与完整项目检查",
+                "path": "app.go",
+                "recheck_argv": [
+                  "codeguard",
+                  "task",
+                  "verify",
+                  "CG-B-3b7d7cf18f60a19edb435a153aa30a27",
+                  "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-go-version-q0847k29",
+                  "--go-tool",
+                  "/usr/local/go/bin/go",
+                  "--format=json"
+                ],
+                "source_sha256": "cdcb7b5c81af6ffdcf7b000d28b4814ccb27e8f7879d9c7e3248c0303c208341",
+                "task_id": "CG-B-3b7d7cf18f60a19edb435a153aa30a27",
+                "task_sync_reason": null,
+                "tool_path": "/usr/local/go/bin/go"
+              }
+            ],
+            "local_parse_complete": true,
+            "report_type": "go_syntax_scan",
+            "schema_version": "0.2.0",
+            "scope": "single_frozen_go_files",
+            "scope_stable": true,
+            "source_file_count": 1,
+            "task_status": "synced_partial",
+            "tool_selection": {
+              "executable": "/usr/local/go/bin/go",
+              "source": "explicit"
+            },
+            "unobserved_count": 0
+          },
+          "kotlin_lint": null,
+          "native_unwired_files": [],
+          "next_action": "repair_native_source",
+          "node_lint": {
+            "backlog_status": "not_connected",
+            "coverage_proven": false,
+            "delivery_decision": "not_evaluated",
+            "files": [],
+            "new_blockers": 0,
+            "new_findings": 0,
+            "next": null,
+            "reason": "eslint_files_incomplete",
+            "status": "incomplete",
+            "unexecuted_files": []
+          },
+          "python_lint": null,
+          "report_type": "hook_fast_feedback",
+          "requested_paths": [
+            "app.go"
+          ],
+          "ruby_lint": null,
+          "scan_scope": "selected_files",
+          "schema_version": "0.12.0",
+          "shell_lint": null,
+          "swift_lint": null,
+          "syntax_candidates": {
+            "authority": "candidate_unqualified",
+            "delivery_decision": "incomplete",
+            "execution_phase": "after_native",
+            "native_preferred_count": 1,
+            "next_action": "核对适用语言版本与原生 lint/编译器；候选恢复节点不是已确认违规，零恢复也不表示完整通过",
+            "observations": [],
+            "reason": "native_preferred",
+            "skipped_count": 0,
+            "source_file_count": 1,
+            "status": "not_run",
+            "unrouted_count": 0
+          },
+          "syntax_tasks": {
+            "failures": [],
+            "new_blockers": 0,
+            "status": "synced_partial",
+            "tasks": []
+          },
+          "unavailable_files": [],
+          "zig_lint": null
+        },
+        "plan": {
+          "action": "fast_file_check",
+          "host_blocking_claimed": false,
+          "may_claim_delivery": false,
+          "requires_git_snapshot": false,
+          "scope_resolution_reason": null,
+          "soft_result_reuse_candidate": true,
+          "target_paths": [
+            "app.go"
+          ],
+          "task_id": null
+        },
+        "reason": null,
+        "report_type": "hook_execution_feedback",
+        "schema_version": "0.22.0",
+        "soft_result_reused": false
+      }
+    },
+    {
+      "case": "minimum_newer",
+      "report": {
+        "delivery_decision": "not_evaluated",
+        "execution": "local_observation",
+        "host_blocking_verified": false,
+        "local_feedback": {
+          "candidate_recovery_count": 0,
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "go_syntax": {
+            "authority": "local_unverified",
+            "coverage_proven": false,
+            "delivery_decision": "not_evaluated",
+            "files": [
+              {
+                "current": true,
+                "native": {
+                  "companion_binding_sha256": null,
+                  "diagnostics": [],
+                  "gofmt_sha256": null,
+                  "input_type": "whole_file",
+                  "reason": "go_project_version_mismatch",
+                  "status": "incomplete",
+                  "tool_sha256": null,
+                  "version": null
+                },
+                "next_action": "核对项目声明版本、选定Go1.23.4及同目录gofmt及预算后原工具复检；不改无关源码、不换工具绕过失败",
+                "path": "app.go",
+                "recheck_argv": [
+                  "codeguard",
+                  "task",
+                  "verify",
+                  "CG-B-3b7d7cf18f60a19edb435a153aa30a27",
+                  "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-go-version-q0847k29",
+                  "--go-tool",
+                  "/usr/local/go/bin/go",
+                  "--format=json"
+                ],
+                "source_sha256": "cdcb7b5c81af6ffdcf7b000d28b4814ccb27e8f7879d9c7e3248c0303c208341",
+                "task_id": "CG-B-3b7d7cf18f60a19edb435a153aa30a27",
+                "task_sync_reason": null,
+                "tool_path": "/usr/local/go/bin/go"
+              }
+            ],
+            "local_parse_complete": false,
+            "report_type": "go_syntax_scan",
+            "schema_version": "0.2.0",
+            "scope": "single_frozen_go_files",
+            "scope_stable": true,
+            "source_file_count": 1,
+            "task_status": "synced_partial",
+            "tool_selection": {
+              "executable": "/usr/local/go/bin/go",
+              "source": "explicit"
+            },
+            "unobserved_count": 0
+          },
+          "kotlin_lint": null,
+          "native_unwired_files": [],
+          "next_action": "review_native_results_and_resolve_incomplete_checks",
+          "node_lint": {
+            "backlog_status": "not_connected",
+            "coverage_proven": false,
+            "delivery_decision": "not_evaluated",
+            "files": [],
+            "new_blockers": 0,
+            "new_findings": 0,
+            "next": null,
+            "reason": "eslint_files_incomplete",
+            "status": "incomplete",
+            "unexecuted_files": []
+          },
+          "python_lint": null,
+          "report_type": "hook_fast_feedback",
+          "requested_paths": [
+            "app.go"
+          ],
+          "ruby_lint": null,
+          "scan_scope": "selected_files",
+          "schema_version": "0.12.0",
+          "shell_lint": null,
+          "swift_lint": null,
+          "syntax_candidates": {
+            "authority": "candidate_unqualified",
+            "delivery_decision": "incomplete",
+            "execution_phase": "after_native",
+            "native_preferred_count": 1,
+            "next_action": "核对适用语言版本与原生 lint/编译器；候选恢复节点不是已确认违规，零恢复也不表示完整通过",
+            "observations": [],
+            "reason": "native_preferred",
+            "skipped_count": 0,
+            "source_file_count": 1,
+            "status": "not_run",
+            "unrouted_count": 0
+          },
+          "syntax_tasks": {
+            "failures": [],
+            "new_blockers": 0,
+            "status": "synced_partial",
+            "tasks": []
+          },
+          "unavailable_files": [],
+          "zig_lint": null
+        },
+        "plan": {
+          "action": "fast_file_check",
+          "host_blocking_claimed": false,
+          "may_claim_delivery": false,
+          "requires_git_snapshot": false,
+          "scope_resolution_reason": null,
+          "soft_result_reuse_candidate": true,
+          "target_paths": [
+            "app.go"
+          ],
+          "task_id": null
+        },
+        "reason": null,
+        "report_type": "hook_execution_feedback",
+        "schema_version": "0.22.0",
+        "soft_result_reused": false
+      }
+    },
+    {
+      "case": "toolchain_newer",
+      "report": {
+        "delivery_decision": "not_evaluated",
+        "execution": "local_observation",
+        "host_blocking_verified": false,
+        "local_feedback": {
+          "candidate_recovery_count": 0,
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "go_syntax": {
+            "authority": "local_unverified",
+            "coverage_proven": false,
+            "delivery_decision": "not_evaluated",
+            "files": [
+              {
+                "current": true,
+                "native": {
+                  "companion_binding_sha256": null,
+                  "diagnostics": [],
+                  "gofmt_sha256": null,
+                  "input_type": "whole_file",
+                  "reason": "go_project_toolchain_mismatch",
+                  "status": "incomplete",
+                  "tool_sha256": null,
+                  "version": null
+                },
+                "next_action": "核对项目声明版本、选定Go1.23.4及同目录gofmt及预算后原工具复检；不改无关源码、不换工具绕过失败",
+                "path": "app.go",
+                "recheck_argv": [
+                  "codeguard",
+                  "task",
+                  "verify",
+                  "CG-B-3b7d7cf18f60a19edb435a153aa30a27",
+                  "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-go-version-q0847k29",
+                  "--go-tool",
+                  "/usr/local/go/bin/go",
+                  "--format=json"
+                ],
+                "source_sha256": "cdcb7b5c81af6ffdcf7b000d28b4814ccb27e8f7879d9c7e3248c0303c208341",
+                "task_id": "CG-B-3b7d7cf18f60a19edb435a153aa30a27",
+                "task_sync_reason": null,
+                "tool_path": "/usr/local/go/bin/go"
+              }
+            ],
+            "local_parse_complete": false,
+            "report_type": "go_syntax_scan",
+            "schema_version": "0.2.0",
+            "scope": "single_frozen_go_files",
+            "scope_stable": true,
+            "source_file_count": 1,
+            "task_status": "synced_partial",
+            "tool_selection": {
+              "executable": "/usr/local/go/bin/go",
+              "source": "explicit"
+            },
+            "unobserved_count": 0
+          },
+          "kotlin_lint": null,
+          "native_unwired_files": [],
+          "next_action": "review_native_results_and_resolve_incomplete_checks",
+          "node_lint": {
+            "backlog_status": "not_connected",
+            "coverage_proven": false,
+            "delivery_decision": "not_evaluated",
+            "files": [],
+            "new_blockers": 0,
+            "new_findings": 0,
+            "next": null,
+            "reason": "eslint_files_incomplete",
+            "status": "incomplete",
+            "unexecuted_files": []
+          },
+          "python_lint": null,
+          "report_type": "hook_fast_feedback",
+          "requested_paths": [
+            "app.go"
+          ],
+          "ruby_lint": null,
+          "scan_scope": "selected_files",
+          "schema_version": "0.12.0",
+          "shell_lint": null,
+          "swift_lint": null,
+          "syntax_candidates": {
+            "authority": "candidate_unqualified",
+            "delivery_decision": "incomplete",
+            "execution_phase": "after_native",
+            "native_preferred_count": 1,
+            "next_action": "核对适用语言版本与原生 lint/编译器；候选恢复节点不是已确认违规，零恢复也不表示完整通过",
+            "observations": [],
+            "reason": "native_preferred",
+            "skipped_count": 0,
+            "source_file_count": 1,
+            "status": "not_run",
+            "unrouted_count": 0
+          },
+          "syntax_tasks": {
+            "failures": [],
+            "new_blockers": 0,
+            "status": "synced_partial",
+            "tasks": []
+          },
+          "unavailable_files": [],
+          "zig_lint": null
+        },
+        "plan": {
+          "action": "fast_file_check",
+          "host_blocking_claimed": false,
+          "may_claim_delivery": false,
+          "requires_git_snapshot": false,
+          "scope_resolution_reason": null,
+          "soft_result_reuse_candidate": true,
+          "target_paths": [
+            "app.go"
+          ],
+          "task_id": null
+        },
+        "reason": null,
+        "report_type": "hook_execution_feedback",
+        "schema_version": "0.22.0",
+        "soft_result_reused": false
+      }
+    },
+    {
+      "case": "duplicate",
+      "report": {
+        "delivery_decision": "not_evaluated",
+        "execution": "local_observation",
+        "host_blocking_verified": false,
+        "local_feedback": {
+          "candidate_recovery_count": 0,
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "go_syntax": {
+            "authority": "local_unverified",
+            "coverage_proven": false,
+            "delivery_decision": "not_evaluated",
+            "files": [
+              {
+                "current": true,
+                "native": {
+                  "companion_binding_sha256": null,
+                  "diagnostics": [],
+                  "gofmt_sha256": null,
+                  "input_type": "whole_file",
+                  "reason": "go_project_version_unresolved",
+                  "status": "incomplete",
+                  "tool_sha256": null,
+                  "version": null
+                },
+                "next_action": "核对项目声明版本、选定Go1.23.4及同目录gofmt及预算后原工具复检；不改无关源码、不换工具绕过失败",
+                "path": "app.go",
+                "recheck_argv": [
+                  "codeguard",
+                  "task",
+                  "verify",
+                  "CG-B-3b7d7cf18f60a19edb435a153aa30a27",
+                  "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-go-version-q0847k29",
+                  "--go-tool",
+                  "/usr/local/go/bin/go",
+                  "--format=json"
+                ],
+                "source_sha256": "cdcb7b5c81af6ffdcf7b000d28b4814ccb27e8f7879d9c7e3248c0303c208341",
+                "task_id": "CG-B-3b7d7cf18f60a19edb435a153aa30a27",
+                "task_sync_reason": null,
+                "tool_path": "/usr/local/go/bin/go"
+              }
+            ],
+            "local_parse_complete": false,
+            "report_type": "go_syntax_scan",
+            "schema_version": "0.2.0",
+            "scope": "single_frozen_go_files",
+            "scope_stable": true,
+            "source_file_count": 1,
+            "task_status": "synced_partial",
+            "tool_selection": {
+              "executable": "/usr/local/go/bin/go",
+              "source": "explicit"
+            },
+            "unobserved_count": 0
+          },
+          "kotlin_lint": null,
+          "native_unwired_files": [],
+          "next_action": "review_native_results_and_resolve_incomplete_checks",
+          "node_lint": {
+            "backlog_status": "not_connected",
+            "coverage_proven": false,
+            "delivery_decision": "not_evaluated",
+            "files": [],
+            "new_blockers": 0,
+            "new_findings": 0,
+            "next": null,
+            "reason": "eslint_files_incomplete",
+            "status": "incomplete",
+            "unexecuted_files": []
+          },
+          "python_lint": null,
+          "report_type": "hook_fast_feedback",
+          "requested_paths": [
+            "app.go"
+          ],
+          "ruby_lint": null,
+          "scan_scope": "selected_files",
+          "schema_version": "0.12.0",
+          "shell_lint": null,
+          "swift_lint": null,
+          "syntax_candidates": {
+            "authority": "candidate_unqualified",
+            "delivery_decision": "incomplete",
+            "execution_phase": "after_native",
+            "native_preferred_count": 1,
+            "next_action": "核对适用语言版本与原生 lint/编译器；候选恢复节点不是已确认违规，零恢复也不表示完整通过",
+            "observations": [],
+            "reason": "native_preferred",
+            "skipped_count": 0,
+            "source_file_count": 1,
+            "status": "not_run",
+            "unrouted_count": 0
+          },
+          "syntax_tasks": {
+            "failures": [],
+            "new_blockers": 0,
+            "status": "synced_partial",
+            "tasks": []
+          },
+          "unavailable_files": [],
+          "zig_lint": null
+        },
+        "plan": {
+          "action": "fast_file_check",
+          "host_blocking_claimed": false,
+          "may_claim_delivery": false,
+          "requires_git_snapshot": false,
+          "scope_resolution_reason": null,
+          "soft_result_reuse_candidate": true,
+          "target_paths": [
+            "app.go"
+          ],
+          "task_id": null
+        },
+        "reason": null,
+        "report_type": "hook_execution_feedback",
+        "schema_version": "0.22.0",
+        "soft_result_reused": false
+      }
+    }
+  ]
+}

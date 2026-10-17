@@ -310,3 +310,56 @@ fn invalid_position_discards_all_findings_in_current_module() {
     assert_eq!(feedback["modules_completed"], 0);
     std::fs::remove_dir_all(root).unwrap();
 }
+
+#[cfg(unix)]
+#[test]
+fn cancelled_go_vet_scan_returns_130_with_cancelled_status() {
+    let root =
+        std::env::temp_dir().join(format!("codeguard-go-lint-cancel-{}", std::process::id()));
+    std::fs::create_dir_all(&root).unwrap();
+    std::fs::write(root.join("go.mod"), "module example.com/root\n\ngo 1.23\n").unwrap();
+    std::fs::write(root.join("main.go"), "package main\nfunc main() {}\n").unwrap();
+    let tool = root.join("go-fake");
+    std::fs::write(
+        &tool,
+        "#!/bin/sh\nif [ \"$1\" = version ]; then printf 'go version go1.23.4 darwin/arm64\\n'; exit 0; fi\nprintf started > \"$0.started\"\nexec /bin/sleep 30\n",
+    )
+    .unwrap();
+    std::fs::set_permissions(&tool, std::fs::Permissions::from_mode(0o700)).unwrap();
+    let child = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["lint", "go"])
+        .arg(&root)
+        .arg("--go-tool")
+        .arg(&tool)
+        .args(["--format", "json"])
+        .stdout(std::process::Stdio::piped())
+        .stderr(std::process::Stdio::piped())
+        .spawn()
+        .unwrap();
+    let marker = tool.with_extension("started");
+    let wait_start = std::time::Instant::now();
+    while !marker.exists() && wait_start.elapsed() < std::time::Duration::from_secs(10) {
+        std::thread::sleep(std::time::Duration::from_millis(5));
+    }
+    assert!(marker.exists(), "原生 vet 扫描必须先启动");
+    let kill = Command::new("/bin/kill")
+        .arg("-INT")
+        .arg(child.id().to_string())
+        .status()
+        .unwrap();
+    assert!(kill.success(), "SIGINT 必须送达 CLI 进程");
+    let output = child.wait_with_output().unwrap();
+    assert_eq!(
+        output.status.code(),
+        Some(130),
+        "取消必须返回 130 而不是普通未完成 3；stdout={}",
+        String::from_utf8_lossy(&output.stdout)
+    );
+    let feedback: Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(feedback["command_status"], "cancelled", "{feedback}");
+    assert_eq!(feedback["reason"], "request_cancelled", "{feedback}");
+    assert_eq!(feedback["native_status"], "incomplete", "{feedback}");
+    assert!(feedback["findings"].as_array().unwrap().is_empty());
+    assert_eq!(feedback["delivery_decision"], "not_evaluated");
+    std::fs::remove_dir_all(root).unwrap();
+}

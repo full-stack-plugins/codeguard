@@ -1,0 +1,1120 @@
+{
+  "adapter_source_sha256": "8b7e1cf50919037929317e1c934deba0bf9384a2ebf08953c0cc33f86fe2bf99",
+  "cases": [
+    {
+      "ast_sha256": "0a63c1b0563c2145291a61fd3ca6e7f8e955360d0915f65ec6f3727ffdb7eb11",
+      "case": "absent",
+      "language": "c",
+      "native_stderr_empty": true,
+      "observation": {
+        "authority": "local_unverified",
+        "coverage_proven": false,
+        "errors_and_behavior": "not_evaluated",
+        "functions": [
+          {
+            "column_byte": 5,
+            "comment_presence": "absent",
+            "line": 1,
+            "missing_components": [
+              "documentation_comment"
+            ],
+            "name": "f",
+            "offset_byte": 4,
+            "parameters": [],
+            "purpose_description": "unknown",
+            "return_description": "unknown",
+            "structure_status": "observed_supported_subset"
+          }
+        ],
+        "observation_type": "clang_function_documentation_structure",
+        "qualification": "not_granted",
+        "schema_version": "0.1.0",
+        "semantic_accuracy": "not_evaluated",
+        "unresolved_declaration_kinds": []
+      },
+      "source_sha256": "7bf024eee88707a82f52c3cccc61183794964679fd595c1258814ec0446c4f46",
+      "standard": "c11"
+    },
+    {
+      "ast_sha256": "128d5c1201bd9c43ab0252a7faafccf2e65da2fec315eea5571593bc955648b8",
+      "case": "empty",
+      "language": "c",
+      "native_stderr_empty": true,
+      "observation": {
+        "authority": "local_unverified",
+        "coverage_proven": false,
+        "errors_and_behavior": "not_evaluated",
+        "functions": [
+          {
+            "column_byte": 5,
+            "comment_presence": "present",
+            "line": 2,
+            "missing_components": [
+              "purpose",
+              "parameter:x",
+              "return"
+            ],
+            "name": "f",
+            "offset_byte": 11,
+            "parameters": [
+              {
+                "description": "missing",
+                "index": 0,
+                "name": "x"
+              }
+            ],
+            "purpose_description": "missing",
+            "return_description": "missing",
+            "structure_status": "observed_supported_subset"
+          }
+        ],
+        "observation_type": "clang_function_documentation_structure",
+        "qualification": "not_granted",
+        "schema_version": "0.1.0",
+        "semantic_accuracy": "not_evaluated",
+        "unresolved_declaration_kinds": []
+      },
+      "source_sha256": "7b562ce8bdd15564e5ab934dcdf498d1e76045a85d8e8eef403d04e32270c8ff",
+      "standard": "c11"
+    },
+    {
+      "ast_sha256": "d71e40fc3317f99a0ef65791ec22000a1733c2051ba9404df638afced264a167",
+      "case": "purpose_only",
+      "language": "c",
+      "native_stderr_empty": true,
+      "observation": {
+        "authority": "local_unverified",
+        "coverage_proven": false,
+        "errors_and_behavior": "not_evaluated",
+        "functions": [
+          {
+            "column_byte": 5,
+            "comment_presence": "present",
+            "line": 2,
+            "missing_components": [
+              "parameter:x",
+              "return"
+            ],
+            "name": "f",
+            "offset_byte": 27,
+            "parameters": [
+              {
+                "description": "missing",
+                "index": 0,
+                "name": "x"
+              }
+            ],
+            "purpose_description": "nonempty",
+            "return_description": "missing",
+            "structure_status": "observed_supported_subset"
+          }
+        ],
+        "observation_type": "clang_function_documentation_structure",
+        "qualification": "not_granted",
+        "schema_version": "0.1.0",
+        "semantic_accuracy": "not_evaluated",
+        "unresolved_declaration_kinds": []
+      },
+      "source_sha256": "4b22ded590287abc273baa65c46ebcbe38046f9b5c5855ea0ade8fbf03a02281",
+      "standard": "c11"
+    },
+    {
+      "ast_sha256": "e065e58d463ec96e7d704ade0c8ffb4a7b392451817952ee8d9213944f9dd38e",
+      "case": "complete",
+      "language": "c",
+      "native_stderr_empty": true,
+      "observation": {
+        "authority": "local_unverified",
+        "coverage_proven": false,
+        "errors_and_behavior": "not_evaluated",
+        "functions": [
+          {
+            "column_byte": 5,
+            "comment_presence": "present",
+            "line": 5,
+            "missing_components": [],
+            "name": "f",
+            "offset_byte": 81,
+            "parameters": [
+              {
+                "description": "nonempty",
+                "index": 0,
+                "name": "x"
+              }
+            ],
+            "purpose_description": "nonempty",
+            "return_description": "nonempty",
+            "structure_status": "observed_supported_subset"
+          }
+        ],
+        "observation_type": "clang_function_documentation_structure",
+        "qualification": "not_granted",
+        "schema_version": "0.1.0",
+        "semantic_accuracy": "not_evaluated",
+        "unresolved_declaration_kinds": []
+      },
+      "source_sha256": "ac9078fea8bf478075e1c5db43f56aef30d57f846de48d1b860649874061f88d",
+      "standard": "c11"
+    },
+    {
+      "ast_sha256": "c5d68fb60849d0e7d0a4340aadb57befbdb053f96408af64920fd1187de9e751",
+      "case": "unicode",
+      "language": "c",
+      "native_stderr_empty": true,
+      "observation": {
+        "authority": "local_unverified",
+        "coverage_proven": false,
+        "errors_and_behavior": "not_evaluated",
+        "functions": [
+          {
+            "column_byte": 5,
+            "comment_presence": "present",
+            "line": 5,
+            "missing_components": [],
+            "name": "f",
+            "offset_byte": 86,
+            "parameters": [
+              {
+                "description": "nonempty",
+                "index": 0,
+                "name": "x"
+              }
+            ],
+            "purpose_description": "nonempty",
+            "return_description": "nonempty",
+            "structure_status": "observed_supported_subset"
+          }
+        ],
+        "observation_type": "clang_function_documentation_structure",
+        "qualification": "not_granted",
+        "schema_version": "0.1.0",
+        "semantic_accuracy": "not_evaluated",
+        "unresolved_declaration_kinds": []
+      },
+      "source_sha256": "3a56df2c09dfeeec0277b2c3b429bfcf41efacf3f9c04c584948bca484a417f9",
+      "standard": "c11"
+    },
+    {
+      "ast_sha256": "08d4940faf6d0f1d20ce38d2b7d884298fd5d012906dee23db97378fc605823b",
+      "case": "brief_void",
+      "language": "c",
+      "native_stderr_empty": true,
+      "observation": {
+        "authority": "local_unverified",
+        "coverage_proven": false,
+        "errors_and_behavior": "not_evaluated",
+        "functions": [
+          {
+            "column_byte": 6,
+            "comment_presence": "present",
+            "line": 2,
+            "missing_components": [],
+            "name": "f",
+            "offset_byte": 38,
+            "parameters": [],
+            "purpose_description": "nonempty",
+            "return_description": "not_applicable",
+            "structure_status": "observed_supported_subset"
+          }
+        ],
+        "observation_type": "clang_function_documentation_structure",
+        "qualification": "not_granted",
+        "schema_version": "0.1.0",
+        "semantic_accuracy": "not_evaluated",
+        "unresolved_declaration_kinds": []
+      },
+      "source_sha256": "06292d24c53c1de628fc57e0d23c920f4aef873bb70bd3f11b15305a79034db3",
+      "standard": "c11"
+    },
+    {
+      "ast_sha256": "4353297c803b105a145e76097249b4bde255af2d993508e8242ea8dc197267cc",
+      "case": "blank_param",
+      "language": "c",
+      "native_stderr_empty": false,
+      "observation": {
+        "authority": "local_unverified",
+        "coverage_proven": false,
+        "errors_and_behavior": "not_evaluated",
+        "functions": [
+          {
+            "column_byte": 5,
+            "comment_presence": "present",
+            "line": 5,
+            "missing_components": [
+              "parameter:x"
+            ],
+            "name": "f",
+            "offset_byte": 53,
+            "parameters": [
+              {
+                "description": "missing",
+                "index": 0,
+                "name": "x"
+              }
+            ],
+            "purpose_description": "nonempty",
+            "return_description": "nonempty",
+            "structure_status": "observed_supported_subset"
+          }
+        ],
+        "observation_type": "clang_function_documentation_structure",
+        "qualification": "not_granted",
+        "schema_version": "0.1.0",
+        "semantic_accuracy": "not_evaluated",
+        "unresolved_declaration_kinds": []
+      },
+      "source_sha256": "734747002b74efce1f72c5f7c1f7c522c68456a1eb50fc2c7a88bc5c27eb416a",
+      "standard": "c11"
+    },
+    {
+      "ast_sha256": "0c8c5a12297ec138b3cc2d376c5ea9fe1042ea54354025e0f3068cd232e565ed",
+      "case": "unnamed",
+      "language": "c",
+      "native_stderr_empty": true,
+      "observation": {
+        "authority": "local_unverified",
+        "coverage_proven": false,
+        "errors_and_behavior": "not_evaluated",
+        "functions": [
+          {
+            "column_byte": 5,
+            "comment_presence": "present",
+            "line": 4,
+            "missing_components": [],
+            "name": "f",
+            "offset_byte": 41,
+            "parameters": [
+              {
+                "description": "unknown_unnamed",
+                "index": 0,
+                "name": null
+              }
+            ],
+            "purpose_description": "nonempty",
+            "return_description": "nonempty",
+            "structure_status": "observed_supported_subset"
+          }
+        ],
+        "observation_type": "clang_function_documentation_structure",
+        "qualification": "not_granted",
+        "schema_version": "0.1.0",
+        "semantic_accuracy": "not_evaluated",
+        "unresolved_declaration_kinds": []
+      },
+      "source_sha256": "0d250d0a0ecbfaf825365a7ad2bf076a1676ab33c7ad9469723b5ee9d0b467d1",
+      "standard": "c11"
+    },
+    {
+      "ast_sha256": "f5301025350d0c0b13760756387a6f2953a2c504292447c25b7d47dd8aa99930",
+      "case": "alias",
+      "language": "c",
+      "native_stderr_empty": true,
+      "observation": {
+        "authority": "local_unverified",
+        "coverage_proven": false,
+        "errors_and_behavior": "not_evaluated",
+        "functions": [
+          {
+            "column_byte": 8,
+            "comment_presence": "present",
+            "line": 5,
+            "missing_components": [],
+            "name": "f",
+            "offset_byte": 69,
+            "parameters": [
+              {
+                "description": "nonempty",
+                "index": 0,
+                "name": "x"
+              }
+            ],
+            "purpose_description": "nonempty",
+            "return_description": "unknown",
+            "structure_status": "observed_supported_subset"
+          }
+        ],
+        "observation_type": "clang_function_documentation_structure",
+        "qualification": "not_granted",
+        "schema_version": "0.1.0",
+        "semantic_accuracy": "not_evaluated",
+        "unresolved_declaration_kinds": []
+      },
+      "source_sha256": "848950e16daaacf0e2124403d03cb5a7c2dcb40b70f9a079813d307399c705cd",
+      "standard": "c11"
+    },
+    {
+      "ast_sha256": "6035eedbb1c40b8afe43defcbb6c0c5c69ed1ebed8234d6edf81cd23243b50af",
+      "case": "redeclared",
+      "language": "c",
+      "native_stderr_empty": true,
+      "observation": {
+        "authority": "local_unverified",
+        "coverage_proven": false,
+        "errors_and_behavior": "not_evaluated",
+        "functions": [
+          {
+            "column_byte": 5,
+            "comment_presence": "present",
+            "line": 5,
+            "missing_components": [],
+            "name": "f",
+            "offset_byte": 59,
+            "parameters": [
+              {
+                "description": "nonempty",
+                "index": 0,
+                "name": "x"
+              }
+            ],
+            "purpose_description": "nonempty",
+            "return_description": "nonempty",
+            "structure_status": "observed_supported_subset"
+          },
+          {
+            "column_byte": 5,
+            "comment_presence": "unknown_redeclaration",
+            "line": 6,
+            "missing_components": [],
+            "name": "f",
+            "offset_byte": 73,
+            "parameters": [],
+            "purpose_description": "unknown",
+            "return_description": "unknown",
+            "structure_status": "unknown_redeclaration"
+          }
+        ],
+        "observation_type": "clang_function_documentation_structure",
+        "qualification": "not_granted",
+        "schema_version": "0.1.0",
+        "semantic_accuracy": "not_evaluated",
+        "unresolved_declaration_kinds": []
+      },
+      "source_sha256": "f690c343c5819a0c2da289fd31e5c194f9ed65863641bb4d26d2502346add094",
+      "standard": "c11"
+    },
+    {
+      "ast_sha256": "0405a09512c8ca4c4ed12c4baee34db9d0db13c35ab47338f0b4943881655991",
+      "case": "copydoc",
+      "language": "c",
+      "native_stderr_empty": true,
+      "observation": {
+        "authority": "local_unverified",
+        "coverage_proven": false,
+        "errors_and_behavior": "not_evaluated",
+        "functions": [
+          {
+            "column_byte": 5,
+            "comment_presence": "present",
+            "line": 2,
+            "missing_components": [],
+            "name": "f",
+            "offset_byte": 29,
+            "parameters": [],
+            "purpose_description": "unknown",
+            "return_description": "unknown",
+            "structure_status": "unresolved_comment_structure"
+          }
+        ],
+        "observation_type": "clang_function_documentation_structure",
+        "qualification": "not_granted",
+        "schema_version": "0.1.0",
+        "semantic_accuracy": "not_evaluated",
+        "unresolved_declaration_kinds": []
+      },
+      "source_sha256": "f29fc98c586cc14a42ff617726d34473c94129b4fecc5efb228606ed14357b09",
+      "standard": "c11"
+    },
+    {
+      "ast_sha256": "b907e8843cbd39e3492a8749dd0dca9f0d6d9c3055ad7863e648d4c83ccab863",
+      "case": "absent",
+      "language": "c++",
+      "native_stderr_empty": true,
+      "observation": {
+        "authority": "local_unverified",
+        "coverage_proven": false,
+        "errors_and_behavior": "not_evaluated",
+        "functions": [
+          {
+            "column_byte": 5,
+            "comment_presence": "absent",
+            "line": 1,
+            "missing_components": [
+              "documentation_comment"
+            ],
+            "name": "f",
+            "offset_byte": 4,
+            "parameters": [],
+            "purpose_description": "unknown",
+            "return_description": "unknown",
+            "structure_status": "observed_supported_subset"
+          }
+        ],
+        "observation_type": "clang_function_documentation_structure",
+        "qualification": "not_granted",
+        "schema_version": "0.1.0",
+        "semantic_accuracy": "not_evaluated",
+        "unresolved_declaration_kinds": []
+      },
+      "source_sha256": "7bf024eee88707a82f52c3cccc61183794964679fd595c1258814ec0446c4f46",
+      "standard": "c++17"
+    },
+    {
+      "ast_sha256": "9140d70a286a83c770ae7c55b9a30a0189b7e7308f7757df6c42ea194b1f7738",
+      "case": "empty",
+      "language": "c++",
+      "native_stderr_empty": true,
+      "observation": {
+        "authority": "local_unverified",
+        "coverage_proven": false,
+        "errors_and_behavior": "not_evaluated",
+        "functions": [
+          {
+            "column_byte": 5,
+            "comment_presence": "present",
+            "line": 2,
+            "missing_components": [
+              "purpose",
+              "parameter:x",
+              "return"
+            ],
+            "name": "f",
+            "offset_byte": 11,
+            "parameters": [
+              {
+                "description": "missing",
+                "index": 0,
+                "name": "x"
+              }
+            ],
+            "purpose_description": "missing",
+            "return_description": "missing",
+            "structure_status": "observed_supported_subset"
+          }
+        ],
+        "observation_type": "clang_function_documentation_structure",
+        "qualification": "not_granted",
+        "schema_version": "0.1.0",
+        "semantic_accuracy": "not_evaluated",
+        "unresolved_declaration_kinds": []
+      },
+      "source_sha256": "7b562ce8bdd15564e5ab934dcdf498d1e76045a85d8e8eef403d04e32270c8ff",
+      "standard": "c++17"
+    },
+    {
+      "ast_sha256": "435f42e128710aadaf7f31a9968c9a15ad5510964e5035086551a77ef593dcda",
+      "case": "purpose_only",
+      "language": "c++",
+      "native_stderr_empty": true,
+      "observation": {
+        "authority": "local_unverified",
+        "coverage_proven": false,
+        "errors_and_behavior": "not_evaluated",
+        "functions": [
+          {
+            "column_byte": 5,
+            "comment_presence": "present",
+            "line": 2,
+            "missing_components": [
+              "parameter:x",
+              "return"
+            ],
+            "name": "f",
+            "offset_byte": 27,
+            "parameters": [
+              {
+                "description": "missing",
+                "index": 0,
+                "name": "x"
+              }
+            ],
+            "purpose_description": "nonempty",
+            "return_description": "missing",
+            "structure_status": "observed_supported_subset"
+          }
+        ],
+        "observation_type": "clang_function_documentation_structure",
+        "qualification": "not_granted",
+        "schema_version": "0.1.0",
+        "semantic_accuracy": "not_evaluated",
+        "unresolved_declaration_kinds": []
+      },
+      "source_sha256": "4b22ded590287abc273baa65c46ebcbe38046f9b5c5855ea0ade8fbf03a02281",
+      "standard": "c++17"
+    },
+    {
+      "ast_sha256": "8d7450d66f1e4b861f27475ce6eced2c317212442d773bfe4299ce304d47d8ab",
+      "case": "complete",
+      "language": "c++",
+      "native_stderr_empty": true,
+      "observation": {
+        "authority": "local_unverified",
+        "coverage_proven": false,
+        "errors_and_behavior": "not_evaluated",
+        "functions": [
+          {
+            "column_byte": 5,
+            "comment_presence": "present",
+            "line": 5,
+            "missing_components": [],
+            "name": "f",
+            "offset_byte": 81,
+            "parameters": [
+              {
+                "description": "nonempty",
+                "index": 0,
+                "name": "x"
+              }
+            ],
+            "purpose_description": "nonempty",
+            "return_description": "nonempty",
+            "structure_status": "observed_supported_subset"
+          }
+        ],
+        "observation_type": "clang_function_documentation_structure",
+        "qualification": "not_granted",
+        "schema_version": "0.1.0",
+        "semantic_accuracy": "not_evaluated",
+        "unresolved_declaration_kinds": []
+      },
+      "source_sha256": "ac9078fea8bf478075e1c5db43f56aef30d57f846de48d1b860649874061f88d",
+      "standard": "c++17"
+    },
+    {
+      "ast_sha256": "978d0b0042229ccc1f0050381533070830473a0430defcc9be13d7c9a5acd168",
+      "case": "unicode",
+      "language": "c++",
+      "native_stderr_empty": true,
+      "observation": {
+        "authority": "local_unverified",
+        "coverage_proven": false,
+        "errors_and_behavior": "not_evaluated",
+        "functions": [
+          {
+            "column_byte": 5,
+            "comment_presence": "present",
+            "line": 5,
+            "missing_components": [],
+            "name": "f",
+            "offset_byte": 86,
+            "parameters": [
+              {
+                "description": "nonempty",
+                "index": 0,
+                "name": "x"
+              }
+            ],
+            "purpose_description": "nonempty",
+            "return_description": "nonempty",
+            "structure_status": "observed_supported_subset"
+          }
+        ],
+        "observation_type": "clang_function_documentation_structure",
+        "qualification": "not_granted",
+        "schema_version": "0.1.0",
+        "semantic_accuracy": "not_evaluated",
+        "unresolved_declaration_kinds": []
+      },
+      "source_sha256": "3a56df2c09dfeeec0277b2c3b429bfcf41efacf3f9c04c584948bca484a417f9",
+      "standard": "c++17"
+    },
+    {
+      "ast_sha256": "fee6f3f7a418fbe0bf28b6426a1101462e7b3ea412d2dcb34af7b5183240cdc5",
+      "case": "brief_void",
+      "language": "c++",
+      "native_stderr_empty": true,
+      "observation": {
+        "authority": "local_unverified",
+        "coverage_proven": false,
+        "errors_and_behavior": "not_evaluated",
+        "functions": [
+          {
+            "column_byte": 6,
+            "comment_presence": "present",
+            "line": 2,
+            "missing_components": [],
+            "name": "f",
+            "offset_byte": 38,
+            "parameters": [],
+            "purpose_description": "nonempty",
+            "return_description": "not_applicable",
+            "structure_status": "observed_supported_subset"
+          }
+        ],
+        "observation_type": "clang_function_documentation_structure",
+        "qualification": "not_granted",
+        "schema_version": "0.1.0",
+        "semantic_accuracy": "not_evaluated",
+        "unresolved_declaration_kinds": []
+      },
+      "source_sha256": "06292d24c53c1de628fc57e0d23c920f4aef873bb70bd3f11b15305a79034db3",
+      "standard": "c++17"
+    },
+    {
+      "ast_sha256": "e5e2fd495848779cbce701af5b5ef623c7fe72d58ba87dc09ce79b81f6af83da",
+      "case": "blank_param",
+      "language": "c++",
+      "native_stderr_empty": false,
+      "observation": {
+        "authority": "local_unverified",
+        "coverage_proven": false,
+        "errors_and_behavior": "not_evaluated",
+        "functions": [
+          {
+            "column_byte": 5,
+            "comment_presence": "present",
+            "line": 5,
+            "missing_components": [
+              "parameter:x"
+            ],
+            "name": "f",
+            "offset_byte": 53,
+            "parameters": [
+              {
+                "description": "missing",
+                "index": 0,
+                "name": "x"
+              }
+            ],
+            "purpose_description": "nonempty",
+            "return_description": "nonempty",
+            "structure_status": "observed_supported_subset"
+          }
+        ],
+        "observation_type": "clang_function_documentation_structure",
+        "qualification": "not_granted",
+        "schema_version": "0.1.0",
+        "semantic_accuracy": "not_evaluated",
+        "unresolved_declaration_kinds": []
+      },
+      "source_sha256": "734747002b74efce1f72c5f7c1f7c522c68456a1eb50fc2c7a88bc5c27eb416a",
+      "standard": "c++17"
+    },
+    {
+      "ast_sha256": "7875e467e89c911ded9a27ff62557dc8ebe6880b1dea1eb06df769900a0b7f6c",
+      "case": "unnamed",
+      "language": "c++",
+      "native_stderr_empty": true,
+      "observation": {
+        "authority": "local_unverified",
+        "coverage_proven": false,
+        "errors_and_behavior": "not_evaluated",
+        "functions": [
+          {
+            "column_byte": 5,
+            "comment_presence": "present",
+            "line": 4,
+            "missing_components": [],
+            "name": "f",
+            "offset_byte": 41,
+            "parameters": [
+              {
+                "description": "unknown_unnamed",
+                "index": 0,
+                "name": null
+              }
+            ],
+            "purpose_description": "nonempty",
+            "return_description": "nonempty",
+            "structure_status": "observed_supported_subset"
+          }
+        ],
+        "observation_type": "clang_function_documentation_structure",
+        "qualification": "not_granted",
+        "schema_version": "0.1.0",
+        "semantic_accuracy": "not_evaluated",
+        "unresolved_declaration_kinds": []
+      },
+      "source_sha256": "0d250d0a0ecbfaf825365a7ad2bf076a1676ab33c7ad9469723b5ee9d0b467d1",
+      "standard": "c++17"
+    },
+    {
+      "ast_sha256": "049c0ee0d7d0c74001fb5a7ff83f4407854431fac9bfef00e1991c9c37569b2a",
+      "case": "alias",
+      "language": "c++",
+      "native_stderr_empty": true,
+      "observation": {
+        "authority": "local_unverified",
+        "coverage_proven": false,
+        "errors_and_behavior": "not_evaluated",
+        "functions": [
+          {
+            "column_byte": 8,
+            "comment_presence": "present",
+            "line": 5,
+            "missing_components": [],
+            "name": "f",
+            "offset_byte": 69,
+            "parameters": [
+              {
+                "description": "nonempty",
+                "index": 0,
+                "name": "x"
+              }
+            ],
+            "purpose_description": "nonempty",
+            "return_description": "unknown",
+            "structure_status": "observed_supported_subset"
+          }
+        ],
+        "observation_type": "clang_function_documentation_structure",
+        "qualification": "not_granted",
+        "schema_version": "0.1.0",
+        "semantic_accuracy": "not_evaluated",
+        "unresolved_declaration_kinds": []
+      },
+      "source_sha256": "848950e16daaacf0e2124403d03cb5a7c2dcb40b70f9a079813d307399c705cd",
+      "standard": "c++17"
+    },
+    {
+      "ast_sha256": "7ae3ce5bb769be7af8397112b87811f249978527e12d0c79eb0aa17e418eaaf9",
+      "case": "redeclared",
+      "language": "c++",
+      "native_stderr_empty": true,
+      "observation": {
+        "authority": "local_unverified",
+        "coverage_proven": false,
+        "errors_and_behavior": "not_evaluated",
+        "functions": [
+          {
+            "column_byte": 5,
+            "comment_presence": "present",
+            "line": 5,
+            "missing_components": [],
+            "name": "f",
+            "offset_byte": 59,
+            "parameters": [
+              {
+                "description": "nonempty",
+                "index": 0,
+                "name": "x"
+              }
+            ],
+            "purpose_description": "nonempty",
+            "return_description": "nonempty",
+            "structure_status": "observed_supported_subset"
+          },
+          {
+            "column_byte": 5,
+            "comment_presence": "unknown_redeclaration",
+            "line": 6,
+            "missing_components": [],
+            "name": "f",
+            "offset_byte": 73,
+            "parameters": [],
+            "purpose_description": "unknown",
+            "return_description": "unknown",
+            "structure_status": "unknown_redeclaration"
+          }
+        ],
+        "observation_type": "clang_function_documentation_structure",
+        "qualification": "not_granted",
+        "schema_version": "0.1.0",
+        "semantic_accuracy": "not_evaluated",
+        "unresolved_declaration_kinds": []
+      },
+      "source_sha256": "f690c343c5819a0c2da289fd31e5c194f9ed65863641bb4d26d2502346add094",
+      "standard": "c++17"
+    },
+    {
+      "ast_sha256": "5dfea35c3f104c7766e213c23cf7802e8ab1fecc90cdfaeeee6e7053039f5695",
+      "case": "copydoc",
+      "language": "c++",
+      "native_stderr_empty": true,
+      "observation": {
+        "authority": "local_unverified",
+        "coverage_proven": false,
+        "errors_and_behavior": "not_evaluated",
+        "functions": [
+          {
+            "column_byte": 5,
+            "comment_presence": "present",
+            "line": 2,
+            "missing_components": [],
+            "name": "f",
+            "offset_byte": 29,
+            "parameters": [],
+            "purpose_description": "unknown",
+            "return_description": "unknown",
+            "structure_status": "unresolved_comment_structure"
+          }
+        ],
+        "observation_type": "clang_function_documentation_structure",
+        "qualification": "not_granted",
+        "schema_version": "0.1.0",
+        "semantic_accuracy": "not_evaluated",
+        "unresolved_declaration_kinds": []
+      },
+      "source_sha256": "f29fc98c586cc14a42ff617726d34473c94129b4fecc5efb228606ed14357b09",
+      "standard": "c++17"
+    },
+    {
+      "ast_sha256": "ff7269a91d645f73d9c683fe52db8b965346e5f9d0216a5e7665c22caa09fdb1",
+      "case": "newline",
+      "language": "c",
+      "newline": "\n",
+      "observation": {
+        "authority": "local_unverified",
+        "coverage_proven": false,
+        "errors_and_behavior": "not_evaluated",
+        "functions": [
+          {
+            "column_byte": 5,
+            "comment_presence": "absent",
+            "line": 2,
+            "missing_components": [
+              "documentation_comment"
+            ],
+            "name": "f",
+            "offset_byte": 17,
+            "parameters": [],
+            "purpose_description": "unknown",
+            "return_description": "unknown",
+            "structure_status": "observed_supported_subset"
+          }
+        ],
+        "observation_type": "clang_function_documentation_structure",
+        "qualification": "not_granted",
+        "schema_version": "0.1.0",
+        "semantic_accuracy": "not_evaluated",
+        "unresolved_declaration_kinds": []
+      },
+      "source_sha256": "11a133e1315db833317d64bd9dd2e1e7c484e80f4c2e99eabc72a9489b5e75b6"
+    },
+    {
+      "ast_sha256": "f633c81402033cda7e092959db1a7c556b6c6b754735cfe6363f91c4e141ef42",
+      "case": "newline",
+      "language": "c++",
+      "newline": "\n",
+      "observation": {
+        "authority": "local_unverified",
+        "coverage_proven": false,
+        "errors_and_behavior": "not_evaluated",
+        "functions": [
+          {
+            "column_byte": 5,
+            "comment_presence": "absent",
+            "line": 2,
+            "missing_components": [
+              "documentation_comment"
+            ],
+            "name": "f",
+            "offset_byte": 17,
+            "parameters": [],
+            "purpose_description": "unknown",
+            "return_description": "unknown",
+            "structure_status": "observed_supported_subset"
+          }
+        ],
+        "observation_type": "clang_function_documentation_structure",
+        "qualification": "not_granted",
+        "schema_version": "0.1.0",
+        "semantic_accuracy": "not_evaluated",
+        "unresolved_declaration_kinds": []
+      },
+      "source_sha256": "11a133e1315db833317d64bd9dd2e1e7c484e80f4c2e99eabc72a9489b5e75b6"
+    },
+    {
+      "ast_sha256": "a379f21853475370ab5c386cad374c3f2fb9d68f99c26f57f013a5f29c3527e1",
+      "case": "newline",
+      "language": "c",
+      "newline": "\r",
+      "observation": {
+        "authority": "local_unverified",
+        "coverage_proven": false,
+        "errors_and_behavior": "not_evaluated",
+        "functions": [
+          {
+            "column_byte": 5,
+            "comment_presence": "absent",
+            "line": 2,
+            "missing_components": [
+              "documentation_comment"
+            ],
+            "name": "f",
+            "offset_byte": 17,
+            "parameters": [],
+            "purpose_description": "unknown",
+            "return_description": "unknown",
+            "structure_status": "observed_supported_subset"
+          }
+        ],
+        "observation_type": "clang_function_documentation_structure",
+        "qualification": "not_granted",
+        "schema_version": "0.1.0",
+        "semantic_accuracy": "not_evaluated",
+        "unresolved_declaration_kinds": []
+      },
+      "source_sha256": "538782bc7aebd2037b0d4d32ff7ecd49f5cda2b4dd8edefb4f9839be9db16348"
+    },
+    {
+      "ast_sha256": "5be8f854b2422051efb6389899afca59d2c8f4f0628adfc7cc0ba4efbe4a4500",
+      "case": "newline",
+      "language": "c++",
+      "newline": "\r",
+      "observation": {
+        "authority": "local_unverified",
+        "coverage_proven": false,
+        "errors_and_behavior": "not_evaluated",
+        "functions": [
+          {
+            "column_byte": 5,
+            "comment_presence": "absent",
+            "line": 2,
+            "missing_components": [
+              "documentation_comment"
+            ],
+            "name": "f",
+            "offset_byte": 17,
+            "parameters": [],
+            "purpose_description": "unknown",
+            "return_description": "unknown",
+            "structure_status": "observed_supported_subset"
+          }
+        ],
+        "observation_type": "clang_function_documentation_structure",
+        "qualification": "not_granted",
+        "schema_version": "0.1.0",
+        "semantic_accuracy": "not_evaluated",
+        "unresolved_declaration_kinds": []
+      },
+      "source_sha256": "538782bc7aebd2037b0d4d32ff7ecd49f5cda2b4dd8edefb4f9839be9db16348"
+    },
+    {
+      "ast_sha256": "feaca5f9d6003801576c1662d9ab9cddf50570fcc13dc262e98f91805e87c430",
+      "case": "newline",
+      "language": "c",
+      "newline": "\r\n",
+      "observation": {
+        "authority": "local_unverified",
+        "coverage_proven": false,
+        "errors_and_behavior": "not_evaluated",
+        "functions": [
+          {
+            "column_byte": 5,
+            "comment_presence": "absent",
+            "line": 2,
+            "missing_components": [
+              "documentation_comment"
+            ],
+            "name": "f",
+            "offset_byte": 18,
+            "parameters": [],
+            "purpose_description": "unknown",
+            "return_description": "unknown",
+            "structure_status": "observed_supported_subset"
+          }
+        ],
+        "observation_type": "clang_function_documentation_structure",
+        "qualification": "not_granted",
+        "schema_version": "0.1.0",
+        "semantic_accuracy": "not_evaluated",
+        "unresolved_declaration_kinds": []
+      },
+      "source_sha256": "fed0d7da625bab580bb9b18ee0ce0dbb9a2248812161e730e5ca3b41cb089719"
+    },
+    {
+      "ast_sha256": "6c666282c0fff25a3b0d522c4fdaa6fe684377de1e68c2e0deb19aaa8b2df94d",
+      "case": "newline",
+      "language": "c++",
+      "newline": "\r\n",
+      "observation": {
+        "authority": "local_unverified",
+        "coverage_proven": false,
+        "errors_and_behavior": "not_evaluated",
+        "functions": [
+          {
+            "column_byte": 5,
+            "comment_presence": "absent",
+            "line": 2,
+            "missing_components": [
+              "documentation_comment"
+            ],
+            "name": "f",
+            "offset_byte": 18,
+            "parameters": [],
+            "purpose_description": "unknown",
+            "return_description": "unknown",
+            "structure_status": "observed_supported_subset"
+          }
+        ],
+        "observation_type": "clang_function_documentation_structure",
+        "qualification": "not_granted",
+        "schema_version": "0.1.0",
+        "semantic_accuracy": "not_evaluated",
+        "unresolved_declaration_kinds": []
+      },
+      "source_sha256": "fed0d7da625bab580bb9b18ee0ce0dbb9a2248812161e730e5ca3b41cb089719"
+    },
+    {
+      "ast_sha256": "3acc6d185fec50ab0ced8f4421ea90572dd44a95757a5289bab2777a1973a00c",
+      "case": "newline",
+      "language": "c",
+      "newline": "\n\r",
+      "observation": {
+        "authority": "local_unverified",
+        "coverage_proven": false,
+        "errors_and_behavior": "not_evaluated",
+        "functions": [
+          {
+            "column_byte": 5,
+            "comment_presence": "absent",
+            "line": 3,
+            "missing_components": [
+              "documentation_comment"
+            ],
+            "name": "f",
+            "offset_byte": 18,
+            "parameters": [],
+            "purpose_description": "unknown",
+            "return_description": "unknown",
+            "structure_status": "observed_supported_subset"
+          }
+        ],
+        "observation_type": "clang_function_documentation_structure",
+        "qualification": "not_granted",
+        "schema_version": "0.1.0",
+        "semantic_accuracy": "not_evaluated",
+        "unresolved_declaration_kinds": []
+      },
+      "source_sha256": "c3d00c169dbf911dadbefb00928dbd05dfe338b78e668a82cd707b8fcf4eaff2"
+    },
+    {
+      "ast_sha256": "3f22de6bf825a51c420031e97757fc69156d4d6fd9ff960f1064154030788a75",
+      "case": "newline",
+      "language": "c++",
+      "newline": "\n\r",
+      "observation": {
+        "authority": "local_unverified",
+        "coverage_proven": false,
+        "errors_and_behavior": "not_evaluated",
+        "functions": [
+          {
+            "column_byte": 5,
+            "comment_presence": "absent",
+            "line": 3,
+            "missing_components": [
+              "documentation_comment"
+            ],
+            "name": "f",
+            "offset_byte": 18,
+            "parameters": [],
+            "purpose_description": "unknown",
+            "return_description": "unknown",
+            "structure_status": "observed_supported_subset"
+          }
+        ],
+        "observation_type": "clang_function_documentation_structure",
+        "qualification": "not_granted",
+        "schema_version": "0.1.0",
+        "semantic_accuracy": "not_evaluated",
+        "unresolved_declaration_kinds": []
+      },
+      "source_sha256": "c3d00c169dbf911dadbefb00928dbd05dfe338b78e668a82cd707b8fcf4eaff2"
+    }
+  ],
+  "evidence_kind": "development_native_ast_contract",
+  "independent_holdout": false,
+  "qualification": "not_granted",
+  "test_source_sha256": "e79cf2b5618220674a73a2090090b236002d594325e88e66f6902402e9248bff",
+  "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2"
+}

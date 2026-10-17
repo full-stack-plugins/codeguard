@@ -1,0 +1,69 @@
+{
+  "authority": "local_unverified",
+  "command_status": "incomplete",
+  "delivery_decision": "not_evaluated",
+  "event_persisted": true,
+  "execution_budget": {
+    "enforcement": "native_execution_only",
+    "source": "builtin_default",
+    "timeout_ms": 1800000
+  },
+  "exit_code": 3,
+  "kind": "finding",
+  "native_scan": {
+    "authority": "local_unverified",
+    "coverage_proven": false,
+    "delivery_decision": "not_evaluated",
+    "dialect": "bash",
+    "input_stable": true,
+    "native": {
+      "configuration_mode": "builtin_without_global_rc",
+      "diagnostics": [],
+      "environment_codes": [],
+      "reason": "shellcheck_no_diagnostics",
+      "report_valid": true,
+      "status": "completed",
+      "tool_sha256": "68b842bed0fa9af12b3c63d0d99b5bbbfe33cb13f911179913020da2041ce1f5",
+      "version": "0.11.0"
+    },
+    "original_configuration": {
+      "global_configuration": "not_loaded",
+      "reason": null,
+      "sha256": null,
+      "source_path": null,
+      "status": "missing"
+    },
+    "original_ref": {
+      "run_id": "shellcheck-1791219857087065000-15151-0",
+      "sha256": "c7b3dff3b48bf75c4b285b6298b296104282fa60f16a4c271e5c9bc97f043404"
+    },
+    "path": "app.sh",
+    "project_configuration": {
+      "global_configuration": "not_loaded",
+      "reason": null,
+      "sha256": null,
+      "source_path": null,
+      "status": "missing"
+    },
+    "report_type": "shellcheck_task_recheck",
+    "requested_config": null,
+    "run_id": "shellcheck-1791219859050516000-15223-0",
+    "schema_version": "0.1.0",
+    "source_sha256": "77190c368ce9e84805d1cfa0293555f56d6ae4df6345b86e587a4afbd54eb8ff",
+    "suppression_status": "no_disable_comment_observed",
+    "task_id": "CG-9e3be727dbf76c8e55a5ca543cc21506",
+    "task_kind": "finding",
+    "task_rule": "SC2086",
+    "workspace_binding": "bound",
+    "workspace_id": "ws-a44e61052b3d2f0f7de098b8ee06b96f"
+  },
+  "next_actions": [
+    "inspect_native_recheck_and_policy_before_closure"
+  ],
+  "observation": "candidate_absent_unverified_policy",
+  "operation": "task_verify",
+  "reason": null,
+  "report_type": "task_verification_preview",
+  "schema_version": "0.24.0",
+  "task_id": "CG-9e3be727dbf76c8e55a5ca543cc21506"
+}

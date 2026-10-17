@@ -1,0 +1,37 @@
+{
+  "schema_version": "0.1.0",
+  "report_type": "gradle_model_probe_acceptance",
+  "production_qualified": false,
+  "default_tests": {
+    "passed": 9,
+    "failed": 0,
+    "ignored": 2
+  },
+  "actual_existing_gradle_tests": {
+    "passed": 2,
+    "failed": 0,
+    "ignored": 0
+  },
+  "actual_report_count": 12,
+  "forgery_rejected_count": 6,
+  "schema_meta_count": 410,
+  "input_scope": "selected_project_files",
+  "quality_tasks_executed": false,
+  "public_cli_connected": false,
+  "source_sha256": {
+    "crates/codeguard-cli/src/gradle_model_probe.rs": "330375e868befa667d9ce846c96d854cb2f9b8afedc308ac5f1f0303e2eb3269",
+    "crates/codeguard-cli/src/gradle_model_probe_request.rs": "2598e214cb7852eb5709c1b17d706ed79b60650404326dec792f8ef36c694d2e",
+    "crates/codeguard-cli/resources/gradle_checker_model.init.gradle": "f84431ce09fcb594c7f00ba89a2118fe054d865ca8e4fea6312668ba5443453a",
+    "crates/codeguard-cli/tests/gradle_model_probe.rs": "a8e23d707f1d2bd1d7454ffbc3201b85d47a13f79585abc8a55f3173dcb0f4e2",
+    "schemas/gradle-model-probe-v0.1.schema.json": "1cb53178fc1f5dd25e1ffd53007d5cff51ba55213254531c5adaee029b306c06",
+    "tests/acceptance/evidence/gradle-native-model-probe-reports-2026-10-06.json": "861baa8f6f579c6bfdf41ef7ff48c6761268f9879f62252a01860647c7426445"
+  },
+  "remaining": [
+    "public_command_binding",
+    "complete_project_and_jdk_identity",
+    "native_quality_and_vulnerability_execution",
+    "dependency_graph_database_freshness",
+    "stable_repair_closure",
+    "independent_holdout_platform_host_acceptance"
+  ]
+}

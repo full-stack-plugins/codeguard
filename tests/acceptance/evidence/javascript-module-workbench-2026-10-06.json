@@ -1,0 +1,51 @@
+{
+  "date": "2026-10-06",
+  "source_base": "3c807bc75935b9f07105ae8818f300fded5962d3",
+  "scope": "declared_javascript_module_project_lint_and_edit_integration",
+  "related_tests": {
+    "passed": 18,
+    "failed": 0,
+    "ignored": 5
+  },
+  "original_import_forgeries_rejected": 5,
+  "schema_forgeries_rejected": 6,
+  "actual_reports_validated": 7,
+  "schema_definitions": 408,
+  "module_context_change_blocks_native_launch": true,
+  "clean_candidate_closes_task": false,
+  "independent_holdout": false,
+  "formal_grammar_qualification": 0,
+  "grammar_count": 32,
+  "npm_publication": false,
+  "report_bundle": {
+    "path": "tests/acceptance/evidence/javascript-module-workbench-reports-2026-10-06.json",
+    "sha256": "e96e0fa278c72d046e341cec2d5798c022974d7dc7dbef01886400b5a665ed5c"
+  },
+  "hook_and_query_regression": {
+    "passed": 71,
+    "failed": 0,
+    "ignored": 3
+  },
+  "strict_feature_clippy": "passed",
+  "strict_default_clippy": "passed",
+  "layering": "passed",
+  "openspec_strict": "passed",
+  "logs": [
+    {
+      "path": "/private/tmp/cg-js-module-workbench-v21.log",
+      "sha256": "6a7adb76c6699202432174ffd4441ace2ad4ae0077af94f5512d864e8f679f44"
+    },
+    {
+      "path": "/private/tmp/cg-js-module-hook-regression.log",
+      "sha256": "c235c0f3513af5612ed71b2c651fbe9812ab695d2da29a7a473d4596926bdffa"
+    },
+    {
+      "path": "/private/tmp/cg-js-module-final-feature-clippy.log",
+      "sha256": "5390b291365e05e730af50d8b15881235ac97309c04cb7c207908f3086788097"
+    },
+    {
+      "path": "/private/tmp/cg-js-module-final-default-clippy.log",
+      "sha256": "8eb9fb17b47c1e62234a114fb0b826e47b03d4ab1b08991e71ac85888c4874a4"
+    }
+  ]
+}

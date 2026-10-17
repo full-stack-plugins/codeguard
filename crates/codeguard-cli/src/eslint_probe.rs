@@ -41,6 +41,24 @@ pub fn run_eslint_probe(req: &EslintProbeRequest, cancelled: &AtomicBool) -> Esl
         (&req.command.config, 1024 * 1024),
     ];
     inputs.extend(req.command.sources.iter().map(|p| (p, 16 * 1024 * 1024)));
+    // 与请求构造方镜像：TS 方言且包根存在 tsconfig.json 时冻结为输入身份。
+    // 任何存在形态都纳入核对，中途换成链接或新建都能被识别为输入变化而非静默放行。
+    let mut tsconfig_input: Option<PathBuf> = None;
+    if req.command.sources.iter().any(|p| {
+        p.extension()
+            .and_then(|extension| extension.to_str())
+            .is_some_and(|extension| matches!(extension, "ts" | "tsx" | "mts" | "cts"))
+    }) {
+        let tsconfig = req.cwd.join("tsconfig.json");
+        if std::fs::symlink_metadata(&tsconfig).is_ok()
+            && !inputs.iter().any(|(path, _)| **path == tsconfig)
+        {
+            tsconfig_input = Some(tsconfig);
+        }
+    }
+    if let Some(tsconfig) = &tsconfig_input {
+        inputs.push((tsconfig, 1024 * 1024));
+    }
     if req.expected_sha256.len()
         != inputs
             .iter()

@@ -1,0 +1,2353 @@
+[
+  {
+    "authority": "local_unverified",
+    "category_candidates": [
+      {
+        "capability_status": "gap",
+        "category": "lint",
+        "checker_id": "node.eslint",
+        "language": "typescript",
+        "legacy_status": "stable",
+        "next_action": "读取逐文件 ESLint 原生发现与准备原因，按项目原配置复检；缺工具或配置的模块继续语法初检",
+        "reason": "eslint_project_coverage_unverified",
+        "status": "native_incomplete"
+      },
+      {
+        "capability_status": "gap",
+        "category": "comments",
+        "checker_id": null,
+        "language": "typescript",
+        "legacy_status": "stable",
+        "next_action": null,
+        "reason": "native_adapter_not_integrated",
+        "status": "not_integrated"
+      },
+      {
+        "capability_status": "gap",
+        "category": "dependencies",
+        "checker_id": null,
+        "language": "typescript",
+        "legacy_status": "stable",
+        "next_action": null,
+        "reason": "native_adapter_not_integrated",
+        "status": "not_integrated"
+      },
+      {
+        "capability_status": "gap",
+        "category": "cve",
+        "checker_id": "node.npm.audit",
+        "language": "typescript",
+        "legacy_status": "stable",
+        "next_action": "核对逐npm构建根的原生诊断、锁版本及漏洞源覆盖及时效，取得稳定任务并用原工具复检",
+        "reason": "npm_advisory_coverage_and_freshness_unverified",
+        "status": "native_incomplete"
+      },
+      {
+        "capability_status": "gap",
+        "category": "security",
+        "checker_id": null,
+        "language": "typescript",
+        "legacy_status": "stable",
+        "next_action": null,
+        "reason": "native_adapter_not_integrated",
+        "status": "not_integrated"
+      },
+      {
+        "capability_status": "gap",
+        "category": "build",
+        "checker_id": null,
+        "language": "typescript",
+        "legacy_status": "stable",
+        "next_action": null,
+        "reason": "native_adapter_not_integrated",
+        "status": "not_integrated"
+      }
+    ],
+    "command_status": "incomplete",
+    "delivery_decision": "incomplete",
+    "discovery": {
+      "blocked_paths": [],
+      "build_roots": [
+        {
+          "manifests": [
+            "package.json"
+          ],
+          "path": "."
+        }
+      ],
+      "checker_configurations": [
+        {
+          "build_root": ".",
+          "category": "lint",
+          "checker_id": "node.eslint",
+          "configuration": "unknown",
+          "configuration_ref": "package.json",
+          "next_action": "确认项目原 ESLint 版本、调用参数及选中配置；用原生工具核验逐文件规则、parser/插件与导入闭包，不套用默认规则或自动迁移配置",
+          "reason": "eslint_configuration_not_observed"
+        },
+        {
+          "build_root": ".",
+          "category": "cve",
+          "checker_id": "node.npm.audit",
+          "configuration": "missing",
+          "configuration_ref": "package.json",
+          "next_action": "核对项目原npm审计调用、工具版本、锁文件、配置及漏洞数据时效；不执行清单中的任意脚本、不用缺工具解释源码违规",
+          "reason": "npm_audit_script_not_observed"
+        }
+      ],
+      "declared_versions": {},
+      "languages": [
+        {
+          "id": "typescript",
+          "manifests": [
+            "package.json"
+          ],
+          "source_files": [
+            "input.cjs",
+            "input.js",
+            "input.mjs"
+          ]
+        }
+      ],
+      "lockfiles": [],
+      "manifest_sha256": {
+        "package.json": "6dc1b06d6b093e9cccb20bee06a93836eee0420ae26803ca2ce4065d82f070d1"
+      },
+      "native_tool_candidates": [
+        {
+          "build_root": ".",
+          "checker_id": "node.eslint",
+          "declaration_observed": false,
+          "next_action": "确认项目是否要求 ESLint，以及其本地或显式原生工具位置与配置",
+          "observed_version": null,
+          "state": "unknown"
+        }
+      ],
+      "observation_complete": true,
+      "observed_entries": 5,
+      "report_type": "discovery",
+      "root": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-js-module-workbench-66199",
+      "schema_version": "0.4.0",
+      "scope_summary": {
+        "configuration_exception_files_observed": 0,
+        "dependency_roots_excluded": 0,
+        "dot_prefix_roots_excluded": 1,
+        "git_safety_status": "not_evaluated",
+        "ordinary_scan_policy": "project_sources_default_v2"
+      },
+      "source_set_candidates": [],
+      "unknown_conditions": [
+        "version_not_declared:package.json",
+        "build_model_not_evaluated",
+        "some_manifest_metadata_not_parsed",
+        "source_sets_not_fully_classified",
+        "dialects_not_classified"
+      ]
+    },
+    "execution_budget": {
+      "enforcement": "native_execution_only",
+      "jobs_limit": 4,
+      "jobs_source": "builtin_default",
+      "native_task_count": 2,
+      "source": "builtin_default",
+      "started_native_task_count": 2,
+      "timeout_ms": 1800000
+    },
+    "execution_tasks": [
+      {
+        "id": "node.lint",
+        "status": "native_incomplete"
+      },
+      {
+        "id": "npm.cve.0",
+        "status": "native_incomplete"
+      }
+    ],
+    "exit_code": 3,
+    "export": {
+      "reason_code": null,
+      "status": "not_requested"
+    },
+    "native_results": {
+      "erlang_lint": null,
+      "go_lint": null,
+      "java_cve": null,
+      "java_dependencies": null,
+      "java_javadoc": null,
+      "java_p3c": null,
+      "kotlin_lint": null,
+      "node_lint": {
+        "backlog_status": "not_connected",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "files": [
+          {
+            "feedback": {
+              "coverage_proven": false,
+              "delivery_decision": "not_evaluated",
+              "findings": [],
+              "local_coherent": false,
+              "next_action": "提供显式 Node、原 ESLint JS 入口、具体版本、原工作目录与项目原 flat config 后复检；不安装或替换规则",
+              "reason": "eslint_execution_context_missing",
+              "report_type": "eslint_local_feedback",
+              "schema_version": "0.2.0",
+              "status": "incomplete",
+              "suppressed_count": 0,
+              "workbench": null,
+              "workbench_status": "not_connected"
+            },
+            "path": "input.cjs",
+            "source_sha256": null
+          },
+          {
+            "feedback": {
+              "coverage_proven": false,
+              "delivery_decision": "not_evaluated",
+              "findings": [],
+              "local_coherent": false,
+              "next_action": "提供显式 Node、原 ESLint JS 入口、具体版本、原工作目录与项目原 flat config 后复检；不安装或替换规则",
+              "reason": "eslint_execution_context_missing",
+              "report_type": "eslint_local_feedback",
+              "schema_version": "0.2.0",
+              "status": "incomplete",
+              "suppressed_count": 0,
+              "workbench": null,
+              "workbench_status": "not_connected"
+            },
+            "path": "input.js",
+            "source_sha256": null
+          },
+          {
+            "feedback": {
+              "coverage_proven": false,
+              "delivery_decision": "not_evaluated",
+              "findings": [],
+              "local_coherent": false,
+              "next_action": "提供显式 Node、原 ESLint JS 入口、具体版本、原工作目录与项目原 flat config 后复检；不安装或替换规则",
+              "reason": "eslint_execution_context_missing",
+              "report_type": "eslint_local_feedback",
+              "schema_version": "0.2.0",
+              "status": "incomplete",
+              "suppressed_count": 0,
+              "workbench": null,
+              "workbench_status": "not_connected"
+            },
+            "path": "input.mjs",
+            "source_sha256": null
+          }
+        ],
+        "new_blockers": 0,
+        "new_findings": 0,
+        "next": null,
+        "reason": "eslint_files_incomplete",
+        "status": "incomplete",
+        "unexecuted_files": []
+      },
+      "npm_cve": [
+        {
+          "backlog_status": "synced_partial",
+          "build_root": ".",
+          "feedback": {
+            "advisory_coverage": "not_evaluated",
+            "configuration": {
+              "build_root": ".",
+              "category": "cve",
+              "checker_id": "node.npm.audit",
+              "configuration": "missing",
+              "configuration_ref": "package.json",
+              "next_action": "核对项目原npm审计调用、工具版本、锁文件、配置及漏洞数据时效；不执行清单中的任意脚本、不用缺工具解释源码违规",
+              "reason": "npm_audit_script_not_observed"
+            },
+            "delivery_decision": "not_evaluated",
+            "dependency_total": null,
+            "execution_budget": {
+              "enforcement": "native_execution_only",
+              "source": "builtin_default",
+              "timeout_ms": 1800000
+            },
+            "findings": [],
+            "local_coherent": false,
+            "next_action": "运行codeguard next获取本构建根的稳定任务，先核验环境与漏洞源覆盖，再按原工具复检；零发现不自动关闭任务",
+            "reason": "npm_lock_missing",
+            "report_type": "npm_cve_feedback",
+            "schema_version": "0.3.0",
+            "status": "incomplete",
+            "tool_approval": "unverified",
+            "workbench": {
+              "failed_reports": 0,
+              "new_blockers": 1,
+              "status": "synced_partial"
+            },
+            "workbench_status": "synced_partial"
+          },
+          "observation": {
+            "advisories": [],
+            "authority": "local_unverified",
+            "build_root": ".",
+            "checker_id": "node.npm.audit",
+            "component_count": 0,
+            "coverage_proven": false,
+            "delivery_decision": "not_evaluated",
+            "diagnostic_reason": "npm_lock_missing",
+            "lock_sha256": null,
+            "lock_state": "missing",
+            "manifest_sha256": "6dc1b06d6b093e9cccb20bee06a93836eee0420ae26803ca2ce4065d82f070d1",
+            "report_type": "npm_cve_workbench_observation",
+            "run_id": "npm-66205-0-1791275864196944000",
+            "schema_version": "0.2.0",
+            "workspace_binding": "bound",
+            "workspace_id": "ws-9eb357e111ccf32e4e0a8f306a29d22f"
+          }
+        }
+      ],
+      "python_cve": [],
+      "python_lint": null,
+      "ruby_lint": null,
+      "rust_build": null,
+      "rust_comments": null,
+      "rust_cve": null,
+      "rust_lint": null,
+      "shell_lint": null,
+      "swift_lint": null,
+      "zig_lint": null
+    },
+    "next": {
+      "authority": "local_unverified",
+      "command_status": "complete",
+      "delivery_decision": "not_evaluated",
+      "disposition": "actionable",
+      "exit_code": 0,
+      "next_actions": [],
+      "operation": "next",
+      "reason": "local_task_selected",
+      "repair_brief": {
+        "action_id": "restore-checker-environment",
+        "affected_paths": [
+          "package.json",
+          "package-lock.json"
+        ],
+        "authority": "local_unverified",
+        "build_root": ".",
+        "checker_id": "node.npm.audit",
+        "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+        "constraints": [
+          "先恢复检查完整性",
+          "不得关闭检查器或修改无关源码"
+        ],
+        "disposition": "actionable",
+        "evidence_ref": {
+          "first_report_sha256": "cbf0868aab7f3263aa0364a6b34300edbd853093b2535f971c58f5d088e8ce94",
+          "first_run_id": "npm-66205-0-1791275864196944000"
+        },
+        "history": {
+          "attempt_count": 0,
+          "awaiting_verification": false,
+          "budget": 2,
+          "no_progress_count": 0,
+          "open_attempt_id": null,
+          "recent": []
+        },
+        "kind": "blocker",
+        "reason_code": "npm_audit_coverage_unverified",
+        "recheck_argv": [
+          "codeguard",
+          "cve",
+          "typescript",
+          ".",
+          "--workspace",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-js-module-workbench-66199",
+          "--node-tool",
+          "<原绝对路径>",
+          "--npm-entry",
+          "<原绝对路径>",
+          "--npm-version",
+          "<原具体版本>",
+          "--userconfig",
+          "<原绝对路径>",
+          "--globalconfig",
+          "<原绝对路径>",
+          "--registry",
+          "<已核验审计源>"
+        ],
+        "schema_version": "0.1.0",
+        "scope": ".",
+        "step": "先恢复package.json及锁文件的可读普通文件和物理路径，再核对语法、重复字段、scripts类型，修正配置后恢复原生npm审计；再核验锁节点和漏洞源覆盖及时效，按原报告修订依赖并复检，局部零发现不得关闭任务",
+        "task_id": "CG-B-cfc5eb25bceb4eba94142ec6fb505d01"
+      },
+      "report_type": "repair_brief_preview",
+      "schema_version": "0.1.0"
+    },
+    "obligation_status": "unresolved",
+    "operation": "check",
+    "reason": "full_project_obligations_and_trusted_policy_unavailable",
+    "report_type": "check_feedback",
+    "required_obligations": null,
+    "schema_version": "0.60.0",
+    "selection": "all",
+    "syntax_candidates": {
+      "authority": "candidate_unqualified",
+      "delivery_decision": "incomplete",
+      "execution_phase": "after_native",
+      "native_preferred_count": 0,
+      "next_action": "核对适用语言版本，使用原生 lint/编译器对原始源码确认；原生确认合法时调查 grammar 版本/兼容性或扫描预算，诊断成立时才按真实位置修复；零恢复不表示完整通过",
+      "observations": [
+        {
+          "byte_offset": 0,
+          "grammar_qualified": false,
+          "grammar_sha256": "7978e62bcc851ab1d1f6dcd4678f9eda79df2b3b3490e75f81dd819d9bccccfa",
+          "known_limitations": [
+            "Node 24.18.0 module syntax differential agrees on 13 narrow cases; script mode, other versions, systematic precision, complete native-first lint route and release remain unqualified"
+          ],
+          "language": "javascript",
+          "path": "input.cjs",
+          "reason": null,
+          "recoveries": [],
+          "recovery_count": 0,
+          "scope": "whole_file",
+          "source_sha256": "a4688a271f970bc9d4bd5ad3a736ff802730df3b5aa1024e49aa2b286ede3312",
+          "status": "candidate_observed"
+        },
+        {
+          "byte_offset": 0,
+          "grammar_qualified": false,
+          "grammar_sha256": "7978e62bcc851ab1d1f6dcd4678f9eda79df2b3b3490e75f81dd819d9bccccfa",
+          "javascript_mode_observation": {
+            "basis": "nearest_package_type",
+            "delivery_decision": "not_evaluated",
+            "mode": "module",
+            "native_execution": "not_run",
+            "package_path": "package.json",
+            "package_sha256": "6dc1b06d6b093e9cccb20bee06a93836eee0420ae26803ca2ce4065d82f070d1",
+            "reason": "explicit_package_type_native_confirmation_required",
+            "report_type": "javascript_mode_observation",
+            "schema_version": "0.1.0",
+            "searched_directories": [
+              "."
+            ],
+            "source_path": "input.js",
+            "source_sha256": "a4688a271f970bc9d4bd5ad3a736ff802730df3b5aa1024e49aa2b286ede3312"
+          },
+          "known_limitations": [
+            "Node 24.18.0 module syntax differential agrees on 13 narrow cases; script mode, other versions, systematic precision, complete native-first lint route and release remain unqualified"
+          ],
+          "language": "javascript",
+          "path": "input.js",
+          "reason": null,
+          "recoveries": [],
+          "recovery_count": 0,
+          "scope": "whole_file",
+          "source_sha256": "a4688a271f970bc9d4bd5ad3a736ff802730df3b5aa1024e49aa2b286ede3312",
+          "status": "candidate_observed",
+          "structural_observation_count": 1,
+          "structural_observations": [
+            {
+              "basis": "codeguard_structure_rule",
+              "end_byte": 9,
+              "end_column_byte": 9,
+              "end_row": 0,
+              "parent_syntax_kind": "return_statement",
+              "rule_id": "codeguard.javascript.module_return_outside_function",
+              "rule_sha256": "a87fb74d19d215148c8be5c1785f7e872873f38fcf5e35a53631351a85455295",
+              "rule_version": "1.0.0",
+              "start_byte": 0,
+              "start_column_byte": 0,
+              "start_row": 0
+            }
+          ]
+        },
+        {
+          "byte_offset": 0,
+          "grammar_qualified": false,
+          "grammar_sha256": "7978e62bcc851ab1d1f6dcd4678f9eda79df2b3b3490e75f81dd819d9bccccfa",
+          "javascript_mode_observation": {
+            "basis": "extension_mjs",
+            "delivery_decision": "not_evaluated",
+            "mode": "module",
+            "native_execution": "not_run",
+            "package_path": null,
+            "package_sha256": null,
+            "reason": "explicit_extension_mode_native_confirmation_required",
+            "report_type": "javascript_mode_observation",
+            "schema_version": "0.1.0",
+            "searched_directories": [],
+            "source_path": "input.mjs",
+            "source_sha256": "a4688a271f970bc9d4bd5ad3a736ff802730df3b5aa1024e49aa2b286ede3312"
+          },
+          "known_limitations": [
+            "Node 24.18.0 module syntax differential agrees on 13 narrow cases; script mode, other versions, systematic precision, complete native-first lint route and release remain unqualified"
+          ],
+          "language": "javascript",
+          "path": "input.mjs",
+          "reason": null,
+          "recoveries": [],
+          "recovery_count": 0,
+          "scope": "whole_file",
+          "source_sha256": "a4688a271f970bc9d4bd5ad3a736ff802730df3b5aa1024e49aa2b286ede3312",
+          "status": "candidate_observed",
+          "structural_observation_count": 1,
+          "structural_observations": [
+            {
+              "basis": "codeguard_structure_rule",
+              "end_byte": 9,
+              "end_column_byte": 9,
+              "end_row": 0,
+              "parent_syntax_kind": "return_statement",
+              "rule_id": "codeguard.javascript.module_return_outside_function",
+              "rule_sha256": "a87fb74d19d215148c8be5c1785f7e872873f38fcf5e35a53631351a85455295",
+              "rule_version": "1.0.0",
+              "start_byte": 0,
+              "start_column_byte": 0,
+              "start_row": 0
+            }
+          ]
+        }
+      ],
+      "reason": "candidate_unqualified",
+      "skipped_count": 0,
+      "source_file_count": 3,
+      "status": "observed_partial",
+      "unrouted_count": 0
+    },
+    "syntax_tasks": {
+      "failures": [],
+      "new_blockers": 2,
+      "status": "synced_partial",
+      "tasks": [
+        {
+          "language": "javascript",
+          "path": "input.js",
+          "task_id": "CG-B-02f60516b49589312be2e4e772650efa"
+        },
+        {
+          "language": "javascript",
+          "path": "input.mjs",
+          "task_id": "CG-B-ceaa3a1cd3b48850d86aca2bd51faed8"
+        }
+      ]
+    },
+    "unresolved_conditions": [
+      "build_model_not_evaluated",
+      "dialects_not_classified",
+      "node_lint_incomplete",
+      "npm_advisory_coverage_and_freshness_unverified",
+      "npm_cve_task_incomplete",
+      "required_obligations_unresolved",
+      "some_manifest_metadata_not_parsed",
+      "source_sets_not_fully_classified",
+      "tool_lock_unverified",
+      "trusted_policy_unavailable",
+      "version_not_declared:package.json"
+    ]
+  },
+  {
+    "authority": "local_unverified",
+    "category_candidates": [
+      {
+        "capability_status": "gap",
+        "category": "lint",
+        "checker_id": "node.eslint",
+        "language": "typescript",
+        "legacy_status": "stable",
+        "next_action": "读取逐文件 ESLint 原生发现与准备原因，按项目原配置复检；缺工具或配置的模块继续语法初检",
+        "reason": "eslint_project_coverage_unverified",
+        "status": "native_incomplete"
+      },
+      {
+        "capability_status": "gap",
+        "category": "comments",
+        "checker_id": null,
+        "language": "typescript",
+        "legacy_status": "stable",
+        "next_action": null,
+        "reason": "native_adapter_not_integrated",
+        "status": "not_integrated"
+      },
+      {
+        "capability_status": "gap",
+        "category": "dependencies",
+        "checker_id": null,
+        "language": "typescript",
+        "legacy_status": "stable",
+        "next_action": null,
+        "reason": "native_adapter_not_integrated",
+        "status": "not_integrated"
+      },
+      {
+        "capability_status": "gap",
+        "category": "cve",
+        "checker_id": "node.npm.audit",
+        "language": "typescript",
+        "legacy_status": "stable",
+        "next_action": "核对逐npm构建根的原生诊断、锁版本及漏洞源覆盖及时效，取得稳定任务并用原工具复检",
+        "reason": "npm_advisory_coverage_and_freshness_unverified",
+        "status": "native_incomplete"
+      },
+      {
+        "capability_status": "gap",
+        "category": "security",
+        "checker_id": null,
+        "language": "typescript",
+        "legacy_status": "stable",
+        "next_action": null,
+        "reason": "native_adapter_not_integrated",
+        "status": "not_integrated"
+      },
+      {
+        "capability_status": "gap",
+        "category": "build",
+        "checker_id": null,
+        "language": "typescript",
+        "legacy_status": "stable",
+        "next_action": null,
+        "reason": "native_adapter_not_integrated",
+        "status": "not_integrated"
+      }
+    ],
+    "command_status": "incomplete",
+    "delivery_decision": "incomplete",
+    "discovery": {
+      "blocked_paths": [],
+      "build_roots": [
+        {
+          "manifests": [
+            "package.json"
+          ],
+          "path": "."
+        }
+      ],
+      "checker_configurations": [
+        {
+          "build_root": ".",
+          "category": "lint",
+          "checker_id": "node.eslint",
+          "configuration": "unknown",
+          "configuration_ref": "package.json",
+          "next_action": "确认项目原 ESLint 版本、调用参数及选中配置；用原生工具核验逐文件规则、parser/插件与导入闭包，不套用默认规则或自动迁移配置",
+          "reason": "eslint_configuration_not_observed"
+        },
+        {
+          "build_root": ".",
+          "category": "cve",
+          "checker_id": "node.npm.audit",
+          "configuration": "missing",
+          "configuration_ref": "package.json",
+          "next_action": "核对项目原npm审计调用、工具版本、锁文件、配置及漏洞数据时效；不执行清单中的任意脚本、不用缺工具解释源码违规",
+          "reason": "npm_audit_script_not_observed"
+        }
+      ],
+      "declared_versions": {},
+      "languages": [
+        {
+          "id": "typescript",
+          "manifests": [
+            "package.json"
+          ],
+          "source_files": [
+            "input.cjs",
+            "input.js",
+            "input.mjs"
+          ]
+        }
+      ],
+      "lockfiles": [],
+      "manifest_sha256": {
+        "package.json": "6dc1b06d6b093e9cccb20bee06a93836eee0420ae26803ca2ce4065d82f070d1"
+      },
+      "native_tool_candidates": [
+        {
+          "build_root": ".",
+          "checker_id": "node.eslint",
+          "declaration_observed": false,
+          "next_action": "确认项目是否要求 ESLint，以及其本地或显式原生工具位置与配置",
+          "observed_version": null,
+          "state": "unknown"
+        }
+      ],
+      "observation_complete": true,
+      "observed_entries": 5,
+      "report_type": "discovery",
+      "root": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-js-module-workbench-66199",
+      "schema_version": "0.4.0",
+      "scope_summary": {
+        "configuration_exception_files_observed": 0,
+        "dependency_roots_excluded": 0,
+        "dot_prefix_roots_excluded": 1,
+        "git_safety_status": "not_evaluated",
+        "ordinary_scan_policy": "project_sources_default_v2"
+      },
+      "source_set_candidates": [],
+      "unknown_conditions": [
+        "version_not_declared:package.json",
+        "build_model_not_evaluated",
+        "some_manifest_metadata_not_parsed",
+        "source_sets_not_fully_classified",
+        "dialects_not_classified"
+      ]
+    },
+    "execution_budget": {
+      "enforcement": "native_execution_only",
+      "jobs_limit": 4,
+      "jobs_source": "builtin_default",
+      "native_task_count": 2,
+      "source": "builtin_default",
+      "started_native_task_count": 2,
+      "timeout_ms": 1800000
+    },
+    "execution_tasks": [
+      {
+        "id": "node.lint",
+        "status": "native_incomplete"
+      },
+      {
+        "id": "npm.cve.0",
+        "status": "native_incomplete"
+      }
+    ],
+    "exit_code": 3,
+    "export": {
+      "reason_code": null,
+      "status": "not_requested"
+    },
+    "native_results": {
+      "erlang_lint": null,
+      "go_lint": null,
+      "java_cve": null,
+      "java_dependencies": null,
+      "java_javadoc": null,
+      "java_p3c": null,
+      "kotlin_lint": null,
+      "node_lint": {
+        "backlog_status": "not_connected",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "files": [
+          {
+            "feedback": {
+              "coverage_proven": false,
+              "delivery_decision": "not_evaluated",
+              "findings": [],
+              "local_coherent": false,
+              "next_action": "提供显式 Node、原 ESLint JS 入口、具体版本、原工作目录与项目原 flat config 后复检；不安装或替换规则",
+              "reason": "eslint_execution_context_missing",
+              "report_type": "eslint_local_feedback",
+              "schema_version": "0.2.0",
+              "status": "incomplete",
+              "suppressed_count": 0,
+              "workbench": null,
+              "workbench_status": "not_connected"
+            },
+            "path": "input.cjs",
+            "source_sha256": null
+          },
+          {
+            "feedback": {
+              "coverage_proven": false,
+              "delivery_decision": "not_evaluated",
+              "findings": [],
+              "local_coherent": false,
+              "next_action": "提供显式 Node、原 ESLint JS 入口、具体版本、原工作目录与项目原 flat config 后复检；不安装或替换规则",
+              "reason": "eslint_execution_context_missing",
+              "report_type": "eslint_local_feedback",
+              "schema_version": "0.2.0",
+              "status": "incomplete",
+              "suppressed_count": 0,
+              "workbench": null,
+              "workbench_status": "not_connected"
+            },
+            "path": "input.js",
+            "source_sha256": null
+          },
+          {
+            "feedback": {
+              "coverage_proven": false,
+              "delivery_decision": "not_evaluated",
+              "findings": [],
+              "local_coherent": false,
+              "next_action": "提供显式 Node、原 ESLint JS 入口、具体版本、原工作目录与项目原 flat config 后复检；不安装或替换规则",
+              "reason": "eslint_execution_context_missing",
+              "report_type": "eslint_local_feedback",
+              "schema_version": "0.2.0",
+              "status": "incomplete",
+              "suppressed_count": 0,
+              "workbench": null,
+              "workbench_status": "not_connected"
+            },
+            "path": "input.mjs",
+            "source_sha256": null
+          }
+        ],
+        "new_blockers": 0,
+        "new_findings": 0,
+        "next": null,
+        "reason": "eslint_files_incomplete",
+        "status": "incomplete",
+        "unexecuted_files": []
+      },
+      "npm_cve": [
+        {
+          "backlog_status": "synced_partial",
+          "build_root": ".",
+          "feedback": {
+            "advisory_coverage": "not_evaluated",
+            "configuration": {
+              "build_root": ".",
+              "category": "cve",
+              "checker_id": "node.npm.audit",
+              "configuration": "missing",
+              "configuration_ref": "package.json",
+              "next_action": "核对项目原npm审计调用、工具版本、锁文件、配置及漏洞数据时效；不执行清单中的任意脚本、不用缺工具解释源码违规",
+              "reason": "npm_audit_script_not_observed"
+            },
+            "delivery_decision": "not_evaluated",
+            "dependency_total": null,
+            "execution_budget": {
+              "enforcement": "native_execution_only",
+              "source": "builtin_default",
+              "timeout_ms": 1800000
+            },
+            "findings": [],
+            "local_coherent": false,
+            "next_action": "运行codeguard next获取本构建根的稳定任务，先核验环境与漏洞源覆盖，再按原工具复检；零发现不自动关闭任务",
+            "reason": "npm_lock_missing",
+            "report_type": "npm_cve_feedback",
+            "schema_version": "0.3.0",
+            "status": "incomplete",
+            "tool_approval": "unverified",
+            "workbench": {
+              "failed_reports": 0,
+              "new_blockers": 0,
+              "status": "synced_partial"
+            },
+            "workbench_status": "synced_partial"
+          },
+          "observation": {
+            "advisories": [],
+            "authority": "local_unverified",
+            "build_root": ".",
+            "checker_id": "node.npm.audit",
+            "component_count": 0,
+            "coverage_proven": false,
+            "delivery_decision": "not_evaluated",
+            "diagnostic_reason": "npm_lock_missing",
+            "lock_sha256": null,
+            "lock_state": "missing",
+            "manifest_sha256": "6dc1b06d6b093e9cccb20bee06a93836eee0420ae26803ca2ce4065d82f070d1",
+            "report_type": "npm_cve_workbench_observation",
+            "run_id": "npm-66219-0-1791275865232903000",
+            "schema_version": "0.2.0",
+            "workspace_binding": "bound",
+            "workspace_id": "ws-9eb357e111ccf32e4e0a8f306a29d22f"
+          }
+        }
+      ],
+      "python_cve": [],
+      "python_lint": null,
+      "ruby_lint": null,
+      "rust_build": null,
+      "rust_comments": null,
+      "rust_cve": null,
+      "rust_lint": null,
+      "shell_lint": null,
+      "swift_lint": null,
+      "zig_lint": null
+    },
+    "next": {
+      "authority": "local_unverified",
+      "command_status": "complete",
+      "delivery_decision": "not_evaluated",
+      "disposition": "actionable",
+      "exit_code": 0,
+      "next_actions": [],
+      "operation": "next",
+      "reason": "local_task_selected",
+      "repair_brief": {
+        "action_id": "restore-checker-environment",
+        "affected_paths": [
+          "package.json",
+          "package-lock.json"
+        ],
+        "authority": "local_unverified",
+        "build_root": ".",
+        "checker_id": "node.npm.audit",
+        "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+        "constraints": [
+          "先恢复检查完整性",
+          "不得关闭检查器或修改无关源码"
+        ],
+        "disposition": "actionable",
+        "evidence_ref": {
+          "first_report_sha256": "cbf0868aab7f3263aa0364a6b34300edbd853093b2535f971c58f5d088e8ce94",
+          "first_run_id": "npm-66205-0-1791275864196944000"
+        },
+        "history": {
+          "attempt_count": 0,
+          "awaiting_verification": false,
+          "budget": 2,
+          "no_progress_count": 0,
+          "open_attempt_id": null,
+          "recent": []
+        },
+        "kind": "blocker",
+        "reason_code": "npm_audit_coverage_unverified",
+        "recheck_argv": [
+          "codeguard",
+          "cve",
+          "typescript",
+          ".",
+          "--workspace",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-js-module-workbench-66199",
+          "--node-tool",
+          "<原绝对路径>",
+          "--npm-entry",
+          "<原绝对路径>",
+          "--npm-version",
+          "<原具体版本>",
+          "--userconfig",
+          "<原绝对路径>",
+          "--globalconfig",
+          "<原绝对路径>",
+          "--registry",
+          "<已核验审计源>"
+        ],
+        "schema_version": "0.1.0",
+        "scope": ".",
+        "step": "先恢复package.json及锁文件的可读普通文件和物理路径，再核对语法、重复字段、scripts类型，修正配置后恢复原生npm审计；再核验锁节点和漏洞源覆盖及时效，按原报告修订依赖并复检，局部零发现不得关闭任务",
+        "task_id": "CG-B-cfc5eb25bceb4eba94142ec6fb505d01"
+      },
+      "report_type": "repair_brief_preview",
+      "schema_version": "0.1.0"
+    },
+    "obligation_status": "unresolved",
+    "operation": "check",
+    "reason": "full_project_obligations_and_trusted_policy_unavailable",
+    "report_type": "check_feedback",
+    "required_obligations": null,
+    "schema_version": "0.60.0",
+    "selection": "all",
+    "syntax_candidates": {
+      "authority": "candidate_unqualified",
+      "delivery_decision": "incomplete",
+      "execution_phase": "after_native",
+      "native_preferred_count": 0,
+      "next_action": "核对适用语言版本，使用原生 lint/编译器对原始源码确认；原生确认合法时调查 grammar 版本/兼容性或扫描预算，诊断成立时才按真实位置修复；零恢复不表示完整通过",
+      "observations": [
+        {
+          "byte_offset": 0,
+          "grammar_qualified": false,
+          "grammar_sha256": "7978e62bcc851ab1d1f6dcd4678f9eda79df2b3b3490e75f81dd819d9bccccfa",
+          "known_limitations": [
+            "Node 24.18.0 module syntax differential agrees on 13 narrow cases; script mode, other versions, systematic precision, complete native-first lint route and release remain unqualified"
+          ],
+          "language": "javascript",
+          "path": "input.cjs",
+          "reason": null,
+          "recoveries": [],
+          "recovery_count": 0,
+          "scope": "whole_file",
+          "source_sha256": "a4688a271f970bc9d4bd5ad3a736ff802730df3b5aa1024e49aa2b286ede3312",
+          "status": "candidate_observed"
+        },
+        {
+          "byte_offset": 0,
+          "grammar_qualified": false,
+          "grammar_sha256": "7978e62bcc851ab1d1f6dcd4678f9eda79df2b3b3490e75f81dd819d9bccccfa",
+          "javascript_mode_observation": {
+            "basis": "nearest_package_type",
+            "delivery_decision": "not_evaluated",
+            "mode": "module",
+            "native_execution": "not_run",
+            "package_path": "package.json",
+            "package_sha256": "6dc1b06d6b093e9cccb20bee06a93836eee0420ae26803ca2ce4065d82f070d1",
+            "reason": "explicit_package_type_native_confirmation_required",
+            "report_type": "javascript_mode_observation",
+            "schema_version": "0.1.0",
+            "searched_directories": [
+              "."
+            ],
+            "source_path": "input.js",
+            "source_sha256": "a4688a271f970bc9d4bd5ad3a736ff802730df3b5aa1024e49aa2b286ede3312"
+          },
+          "known_limitations": [
+            "Node 24.18.0 module syntax differential agrees on 13 narrow cases; script mode, other versions, systematic precision, complete native-first lint route and release remain unqualified"
+          ],
+          "language": "javascript",
+          "path": "input.js",
+          "reason": null,
+          "recoveries": [],
+          "recovery_count": 0,
+          "scope": "whole_file",
+          "source_sha256": "a4688a271f970bc9d4bd5ad3a736ff802730df3b5aa1024e49aa2b286ede3312",
+          "status": "candidate_observed",
+          "structural_observation_count": 1,
+          "structural_observations": [
+            {
+              "basis": "codeguard_structure_rule",
+              "end_byte": 9,
+              "end_column_byte": 9,
+              "end_row": 0,
+              "parent_syntax_kind": "return_statement",
+              "rule_id": "codeguard.javascript.module_return_outside_function",
+              "rule_sha256": "a87fb74d19d215148c8be5c1785f7e872873f38fcf5e35a53631351a85455295",
+              "rule_version": "1.0.0",
+              "start_byte": 0,
+              "start_column_byte": 0,
+              "start_row": 0
+            }
+          ]
+        },
+        {
+          "byte_offset": 0,
+          "grammar_qualified": false,
+          "grammar_sha256": "7978e62bcc851ab1d1f6dcd4678f9eda79df2b3b3490e75f81dd819d9bccccfa",
+          "javascript_mode_observation": {
+            "basis": "extension_mjs",
+            "delivery_decision": "not_evaluated",
+            "mode": "module",
+            "native_execution": "not_run",
+            "package_path": null,
+            "package_sha256": null,
+            "reason": "explicit_extension_mode_native_confirmation_required",
+            "report_type": "javascript_mode_observation",
+            "schema_version": "0.1.0",
+            "searched_directories": [],
+            "source_path": "input.mjs",
+            "source_sha256": "a4688a271f970bc9d4bd5ad3a736ff802730df3b5aa1024e49aa2b286ede3312"
+          },
+          "known_limitations": [
+            "Node 24.18.0 module syntax differential agrees on 13 narrow cases; script mode, other versions, systematic precision, complete native-first lint route and release remain unqualified"
+          ],
+          "language": "javascript",
+          "path": "input.mjs",
+          "reason": null,
+          "recoveries": [],
+          "recovery_count": 0,
+          "scope": "whole_file",
+          "source_sha256": "a4688a271f970bc9d4bd5ad3a736ff802730df3b5aa1024e49aa2b286ede3312",
+          "status": "candidate_observed",
+          "structural_observation_count": 1,
+          "structural_observations": [
+            {
+              "basis": "codeguard_structure_rule",
+              "end_byte": 9,
+              "end_column_byte": 9,
+              "end_row": 0,
+              "parent_syntax_kind": "return_statement",
+              "rule_id": "codeguard.javascript.module_return_outside_function",
+              "rule_sha256": "a87fb74d19d215148c8be5c1785f7e872873f38fcf5e35a53631351a85455295",
+              "rule_version": "1.0.0",
+              "start_byte": 0,
+              "start_column_byte": 0,
+              "start_row": 0
+            }
+          ]
+        }
+      ],
+      "reason": "candidate_unqualified",
+      "skipped_count": 0,
+      "source_file_count": 3,
+      "status": "observed_partial",
+      "unrouted_count": 0
+    },
+    "syntax_tasks": {
+      "failures": [],
+      "new_blockers": 0,
+      "status": "synced_partial",
+      "tasks": [
+        {
+          "language": "javascript",
+          "path": "input.js",
+          "task_id": "CG-B-02f60516b49589312be2e4e772650efa"
+        },
+        {
+          "language": "javascript",
+          "path": "input.mjs",
+          "task_id": "CG-B-ceaa3a1cd3b48850d86aca2bd51faed8"
+        }
+      ]
+    },
+    "unresolved_conditions": [
+      "build_model_not_evaluated",
+      "dialects_not_classified",
+      "node_lint_incomplete",
+      "npm_advisory_coverage_and_freshness_unverified",
+      "npm_cve_task_incomplete",
+      "required_obligations_unresolved",
+      "some_manifest_metadata_not_parsed",
+      "source_sets_not_fully_classified",
+      "tool_lock_unverified",
+      "trusted_policy_unavailable",
+      "version_not_declared:package.json"
+    ]
+  },
+  {
+    "coverage_proven": false,
+    "delivery_decision": "not_evaluated",
+    "findings": [],
+    "local_coherent": false,
+    "native": {
+      "reason": "explicit_context_missing",
+      "status": "not_run"
+    },
+    "next_action": "查看原报告中 JavaScript 结构规则的位置和摘要；核对声明的 module 模式（如有）、构建根及 package.json/ESLint 配置身份，恢复适用原生 lint 确认后才修复并复检。直接绑定与模块函数外 return 均只属待确认候选，CommonJS/未知模式不启用 module 规则；WASM 零恢复不能关闭任务",
+    "reason": "eslint_execution_context_missing",
+    "report_type": "eslint_local_feedback",
+    "schema_version": "0.7.0",
+    "setup": {
+      "reason": "native_confirmation_needed",
+      "requirement": "required",
+      "task_id": "CG-B-ceaa3a1cd3b48850d86aca2bd51faed8"
+    },
+    "status": "incomplete",
+    "suppressed_count": 0,
+    "syntax_candidates": {
+      "authority": "candidate_unqualified",
+      "delivery_decision": "incomplete",
+      "execution_phase": "after_native",
+      "native_preferred_count": 0,
+      "next_action": "核对适用语言版本，使用原生 lint/编译器对原始源码确认；原生确认合法时调查 grammar 版本/兼容性或扫描预算，诊断成立时才按真实位置修复；零恢复不表示完整通过",
+      "observations": [
+        {
+          "byte_offset": 0,
+          "grammar_qualified": false,
+          "grammar_sha256": "7978e62bcc851ab1d1f6dcd4678f9eda79df2b3b3490e75f81dd819d9bccccfa",
+          "javascript_mode_observation": {
+            "basis": "extension_mjs",
+            "delivery_decision": "not_evaluated",
+            "mode": "module",
+            "native_execution": "not_run",
+            "package_path": null,
+            "package_sha256": null,
+            "reason": "explicit_extension_mode_native_confirmation_required",
+            "report_type": "javascript_mode_observation",
+            "schema_version": "0.1.0",
+            "searched_directories": [],
+            "source_path": "input.mjs",
+            "source_sha256": "a4688a271f970bc9d4bd5ad3a736ff802730df3b5aa1024e49aa2b286ede3312"
+          },
+          "known_limitations": [
+            "Node 24.18.0 module syntax differential agrees on 13 narrow cases; script mode, other versions, systematic precision, complete native-first lint route and release remain unqualified"
+          ],
+          "language": "javascript",
+          "path": "input.mjs",
+          "reason": null,
+          "recoveries": [],
+          "recovery_count": 0,
+          "scope": "whole_file",
+          "source_sha256": "a4688a271f970bc9d4bd5ad3a736ff802730df3b5aa1024e49aa2b286ede3312",
+          "status": "candidate_observed",
+          "structural_observation_count": 1,
+          "structural_observations": [
+            {
+              "basis": "codeguard_structure_rule",
+              "end_byte": 9,
+              "end_column_byte": 9,
+              "end_row": 0,
+              "parent_syntax_kind": "return_statement",
+              "rule_id": "codeguard.javascript.module_return_outside_function",
+              "rule_sha256": "a87fb74d19d215148c8be5c1785f7e872873f38fcf5e35a53631351a85455295",
+              "rule_version": "1.0.0",
+              "start_byte": 0,
+              "start_column_byte": 0,
+              "start_row": 0
+            }
+          ]
+        }
+      ],
+      "reason": "candidate_unqualified",
+      "skipped_count": 0,
+      "source_file_count": 1,
+      "status": "observed_partial",
+      "unrouted_count": 0
+    },
+    "syntax_tasks": {
+      "failures": [],
+      "new_blockers": 0,
+      "status": "synced_partial",
+      "tasks": [
+        {
+          "language": "javascript",
+          "path": "input.mjs",
+          "task_id": "CG-B-ceaa3a1cd3b48850d86aca2bd51faed8"
+        }
+      ]
+    },
+    "workbench": {
+      "status": "synced_partial",
+      "task_id": "CG-B-ceaa3a1cd3b48850d86aca2bd51faed8"
+    },
+    "workbench_status": "synced_partial"
+  },
+  {
+    "authority": "local_unverified",
+    "category_candidates": [
+      {
+        "capability_status": "gap",
+        "category": "lint",
+        "checker_id": "node.eslint",
+        "language": "typescript",
+        "legacy_status": "stable",
+        "next_action": "读取逐文件 ESLint 原生发现与准备原因，按项目原配置复检；缺工具或配置的模块继续语法初检",
+        "reason": "eslint_project_coverage_unverified",
+        "status": "native_incomplete"
+      }
+    ],
+    "command_status": "incomplete",
+    "delivery_decision": "incomplete",
+    "discovery": {
+      "blocked_paths": [],
+      "build_roots": [
+        {
+          "manifests": [
+            "package.json"
+          ],
+          "path": "."
+        }
+      ],
+      "checker_configurations": [
+        {
+          "build_root": ".",
+          "category": "lint",
+          "checker_id": "node.eslint",
+          "configuration": "unknown",
+          "configuration_ref": "package.json",
+          "next_action": "确认项目原 ESLint 版本、调用参数及选中配置；用原生工具核验逐文件规则、parser/插件与导入闭包，不套用默认规则或自动迁移配置",
+          "reason": "eslint_configuration_not_observed"
+        },
+        {
+          "build_root": ".",
+          "category": "cve",
+          "checker_id": "node.npm.audit",
+          "configuration": "missing",
+          "configuration_ref": "package.json",
+          "next_action": "核对项目原npm审计调用、工具版本、锁文件、配置及漏洞数据时效；不执行清单中的任意脚本、不用缺工具解释源码违规",
+          "reason": "npm_audit_script_not_observed"
+        }
+      ],
+      "declared_versions": {},
+      "languages": [
+        {
+          "id": "typescript",
+          "manifests": [
+            "package.json"
+          ],
+          "source_files": [
+            "input.cjs",
+            "input.js",
+            "input.mjs"
+          ]
+        }
+      ],
+      "lockfiles": [],
+      "manifest_sha256": {
+        "package.json": "6dc1b06d6b093e9cccb20bee06a93836eee0420ae26803ca2ce4065d82f070d1"
+      },
+      "native_tool_candidates": [
+        {
+          "build_root": ".",
+          "checker_id": "node.eslint",
+          "declaration_observed": false,
+          "next_action": "确认项目是否要求 ESLint，以及其本地或显式原生工具位置与配置",
+          "observed_version": null,
+          "state": "unknown"
+        }
+      ],
+      "observation_complete": true,
+      "observed_entries": 5,
+      "report_type": "discovery",
+      "root": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-js-module-workbench-66199",
+      "schema_version": "0.4.0",
+      "scope_summary": {
+        "configuration_exception_files_observed": 0,
+        "dependency_roots_excluded": 0,
+        "dot_prefix_roots_excluded": 1,
+        "git_safety_status": "not_evaluated",
+        "ordinary_scan_policy": "project_sources_default_v2"
+      },
+      "source_set_candidates": [],
+      "unknown_conditions": [
+        "version_not_declared:package.json",
+        "build_model_not_evaluated",
+        "some_manifest_metadata_not_parsed",
+        "source_sets_not_fully_classified",
+        "dialects_not_classified"
+      ]
+    },
+    "execution_budget": {
+      "enforcement": "native_execution_only",
+      "jobs_limit": 4,
+      "jobs_source": "builtin_default",
+      "native_task_count": 1,
+      "source": "builtin_default",
+      "started_native_task_count": 1,
+      "timeout_ms": 1800000
+    },
+    "execution_tasks": [
+      {
+        "id": "node.lint",
+        "status": "native_incomplete"
+      }
+    ],
+    "exit_code": 3,
+    "export": {
+      "reason_code": null,
+      "status": "not_requested"
+    },
+    "native_results": {
+      "erlang_lint": null,
+      "go_lint": null,
+      "java_cve": null,
+      "java_dependencies": null,
+      "java_javadoc": null,
+      "java_p3c": null,
+      "kotlin_lint": null,
+      "node_lint": {
+        "backlog_status": "not_connected",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "files": [
+          {
+            "feedback": {
+              "coverage_proven": false,
+              "delivery_decision": "not_evaluated",
+              "findings": [],
+              "local_coherent": false,
+              "next_action": "提供显式 Node、原 ESLint JS 入口、具体版本、原工作目录与项目原 flat config 后复检；不安装或替换规则",
+              "reason": "eslint_execution_context_missing",
+              "report_type": "eslint_local_feedback",
+              "schema_version": "0.2.0",
+              "status": "incomplete",
+              "suppressed_count": 0,
+              "workbench": null,
+              "workbench_status": "not_connected"
+            },
+            "path": "input.cjs",
+            "source_sha256": null
+          },
+          {
+            "feedback": {
+              "coverage_proven": false,
+              "delivery_decision": "not_evaluated",
+              "findings": [],
+              "local_coherent": false,
+              "next_action": "提供显式 Node、原 ESLint JS 入口、具体版本、原工作目录与项目原 flat config 后复检；不安装或替换规则",
+              "reason": "eslint_execution_context_missing",
+              "report_type": "eslint_local_feedback",
+              "schema_version": "0.2.0",
+              "status": "incomplete",
+              "suppressed_count": 0,
+              "workbench": null,
+              "workbench_status": "not_connected"
+            },
+            "path": "input.js",
+            "source_sha256": null
+          },
+          {
+            "feedback": {
+              "coverage_proven": false,
+              "delivery_decision": "not_evaluated",
+              "findings": [],
+              "local_coherent": false,
+              "next_action": "提供显式 Node、原 ESLint JS 入口、具体版本、原工作目录与项目原 flat config 后复检；不安装或替换规则",
+              "reason": "eslint_execution_context_missing",
+              "report_type": "eslint_local_feedback",
+              "schema_version": "0.2.0",
+              "status": "incomplete",
+              "suppressed_count": 0,
+              "workbench": null,
+              "workbench_status": "not_connected"
+            },
+            "path": "input.mjs",
+            "source_sha256": null
+          }
+        ],
+        "new_blockers": 0,
+        "new_findings": 0,
+        "next": null,
+        "reason": "eslint_files_incomplete",
+        "status": "incomplete",
+        "unexecuted_files": []
+      },
+      "npm_cve": [],
+      "python_cve": [],
+      "python_lint": null,
+      "ruby_lint": null,
+      "rust_build": null,
+      "rust_comments": null,
+      "rust_cve": null,
+      "rust_lint": null,
+      "shell_lint": null,
+      "swift_lint": null,
+      "zig_lint": null
+    },
+    "next": {
+      "authority": "local_unverified",
+      "command_status": "complete",
+      "delivery_decision": "not_evaluated",
+      "disposition": "verification_required",
+      "exit_code": 0,
+      "next_actions": [],
+      "operation": "next",
+      "reason": "local_task_selected",
+      "repair_brief": {
+        "action_id": "restore-checker-environment",
+        "affected_paths": [
+          "input.js"
+        ],
+        "authority": "local_unverified",
+        "build_root": ".",
+        "checker_id": "node.eslint.preparation",
+        "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+        "constraints": [
+          "先恢复检查完整性",
+          "不得关闭检查器或修改无关源码"
+        ],
+        "disposition": "verification_required",
+        "evidence_ref": {
+          "first_report_sha256": "906faf0cedf74949a062805dfd44f2efcd59f1124def611f4cf353419e32f1d9",
+          "first_run_id": "syntax-confirm-66205-1791275864944554000"
+        },
+        "first_diagnostic_reason": "javascript_module_context_candidate",
+        "history": {
+          "attempt_count": 0,
+          "awaiting_verification": false,
+          "budget": 2,
+          "no_progress_count": 0,
+          "open_attempt_id": null,
+          "recent": []
+        },
+        "kind": "blocker",
+        "preparation_guidance": {
+          "disposition": "verification_required",
+          "step": "查看原报告中 JavaScript 结构规则的位置和摘要；核对声明的 module 模式（如有）、构建根及 package.json/ESLint 配置身份，恢复适用原生 lint 确认后才修复并复检。直接绑定与模块函数外 return 均只属待确认候选，CommonJS/未知模式不启用 module 规则；WASM 零恢复不能关闭任务"
+        },
+        "reason_code": "eslint_prerequisites_require_review",
+        "recheck_argv": [
+          "codeguard",
+          "lint",
+          "typescript",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-js-module-workbench-66199/input.js",
+          "--workspace",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-js-module-workbench-66199",
+          "--node-tool",
+          "<已核验绝对路径>",
+          "--eslint-entry",
+          "<已核验绝对路径>",
+          "--eslint-version",
+          "<已核验版本>",
+          "--config",
+          "<已核验原配置绝对路径>",
+          "--cwd",
+          "<已核验原工作目录绝对路径>"
+        ],
+        "schema_version": "0.21.0",
+        "scope": "input.js",
+        "step": "查看原报告中 JavaScript 结构规则的位置和摘要；核对声明的 module 模式（如有）、构建根及 package.json/ESLint 配置身份，恢复适用原生 lint 确认后才修复并复检。直接绑定与模块函数外 return 均只属待确认候选，CommonJS/未知模式不启用 module 规则；WASM 零恢复不能关闭任务",
+        "task_id": "CG-B-02f60516b49589312be2e4e772650efa"
+      },
+      "report_type": "repair_brief_preview",
+      "schema_version": "0.21.0"
+    },
+    "obligation_status": "unresolved",
+    "operation": "check",
+    "reason": "full_project_obligations_and_trusted_policy_unavailable",
+    "report_type": "check_feedback",
+    "requested_categories": [
+      "lint"
+    ],
+    "required_obligations": null,
+    "schema_version": "0.60.0",
+    "selection": "all",
+    "syntax_candidates": {
+      "authority": "candidate_unqualified",
+      "delivery_decision": "incomplete",
+      "execution_phase": "after_native",
+      "native_preferred_count": 0,
+      "next_action": "核对适用语言版本，使用原生 lint/编译器对原始源码确认；原生确认合法时调查 grammar 版本/兼容性或扫描预算，诊断成立时才按真实位置修复；零恢复不表示完整通过",
+      "observations": [
+        {
+          "byte_offset": 0,
+          "grammar_qualified": false,
+          "grammar_sha256": "7978e62bcc851ab1d1f6dcd4678f9eda79df2b3b3490e75f81dd819d9bccccfa",
+          "known_limitations": [
+            "Node 24.18.0 module syntax differential agrees on 13 narrow cases; script mode, other versions, systematic precision, complete native-first lint route and release remain unqualified"
+          ],
+          "language": "javascript",
+          "path": "input.cjs",
+          "reason": null,
+          "recoveries": [],
+          "recovery_count": 0,
+          "scope": "whole_file",
+          "source_sha256": "a4688a271f970bc9d4bd5ad3a736ff802730df3b5aa1024e49aa2b286ede3312",
+          "status": "candidate_observed"
+        },
+        {
+          "byte_offset": 0,
+          "grammar_qualified": false,
+          "grammar_sha256": "7978e62bcc851ab1d1f6dcd4678f9eda79df2b3b3490e75f81dd819d9bccccfa",
+          "javascript_mode_observation": {
+            "basis": "nearest_package_type",
+            "delivery_decision": "not_evaluated",
+            "mode": "module",
+            "native_execution": "not_run",
+            "package_path": "package.json",
+            "package_sha256": "6dc1b06d6b093e9cccb20bee06a93836eee0420ae26803ca2ce4065d82f070d1",
+            "reason": "explicit_package_type_native_confirmation_required",
+            "report_type": "javascript_mode_observation",
+            "schema_version": "0.1.0",
+            "searched_directories": [
+              "."
+            ],
+            "source_path": "input.js",
+            "source_sha256": "a4688a271f970bc9d4bd5ad3a736ff802730df3b5aa1024e49aa2b286ede3312"
+          },
+          "known_limitations": [
+            "Node 24.18.0 module syntax differential agrees on 13 narrow cases; script mode, other versions, systematic precision, complete native-first lint route and release remain unqualified"
+          ],
+          "language": "javascript",
+          "path": "input.js",
+          "reason": null,
+          "recoveries": [],
+          "recovery_count": 0,
+          "scope": "whole_file",
+          "source_sha256": "a4688a271f970bc9d4bd5ad3a736ff802730df3b5aa1024e49aa2b286ede3312",
+          "status": "candidate_observed",
+          "structural_observation_count": 1,
+          "structural_observations": [
+            {
+              "basis": "codeguard_structure_rule",
+              "end_byte": 9,
+              "end_column_byte": 9,
+              "end_row": 0,
+              "parent_syntax_kind": "return_statement",
+              "rule_id": "codeguard.javascript.module_return_outside_function",
+              "rule_sha256": "a87fb74d19d215148c8be5c1785f7e872873f38fcf5e35a53631351a85455295",
+              "rule_version": "1.0.0",
+              "start_byte": 0,
+              "start_column_byte": 0,
+              "start_row": 0
+            }
+          ]
+        },
+        {
+          "byte_offset": 0,
+          "grammar_qualified": false,
+          "grammar_sha256": "7978e62bcc851ab1d1f6dcd4678f9eda79df2b3b3490e75f81dd819d9bccccfa",
+          "javascript_mode_observation": {
+            "basis": "extension_mjs",
+            "delivery_decision": "not_evaluated",
+            "mode": "module",
+            "native_execution": "not_run",
+            "package_path": null,
+            "package_sha256": null,
+            "reason": "explicit_extension_mode_native_confirmation_required",
+            "report_type": "javascript_mode_observation",
+            "schema_version": "0.1.0",
+            "searched_directories": [],
+            "source_path": "input.mjs",
+            "source_sha256": "a4688a271f970bc9d4bd5ad3a736ff802730df3b5aa1024e49aa2b286ede3312"
+          },
+          "known_limitations": [
+            "Node 24.18.0 module syntax differential agrees on 13 narrow cases; script mode, other versions, systematic precision, complete native-first lint route and release remain unqualified"
+          ],
+          "language": "javascript",
+          "path": "input.mjs",
+          "reason": null,
+          "recoveries": [],
+          "recovery_count": 0,
+          "scope": "whole_file",
+          "source_sha256": "a4688a271f970bc9d4bd5ad3a736ff802730df3b5aa1024e49aa2b286ede3312",
+          "status": "candidate_observed",
+          "structural_observation_count": 1,
+          "structural_observations": [
+            {
+              "basis": "codeguard_structure_rule",
+              "end_byte": 9,
+              "end_column_byte": 9,
+              "end_row": 0,
+              "parent_syntax_kind": "return_statement",
+              "rule_id": "codeguard.javascript.module_return_outside_function",
+              "rule_sha256": "a87fb74d19d215148c8be5c1785f7e872873f38fcf5e35a53631351a85455295",
+              "rule_version": "1.0.0",
+              "start_byte": 0,
+              "start_column_byte": 0,
+              "start_row": 0
+            }
+          ]
+        }
+      ],
+      "reason": "candidate_unqualified",
+      "skipped_count": 0,
+      "source_file_count": 3,
+      "status": "observed_partial",
+      "unrouted_count": 0
+    },
+    "syntax_tasks": {
+      "failures": [],
+      "new_blockers": 0,
+      "status": "synced_partial",
+      "tasks": [
+        {
+          "language": "javascript",
+          "path": "input.js",
+          "task_id": "CG-B-02f60516b49589312be2e4e772650efa"
+        },
+        {
+          "language": "javascript",
+          "path": "input.mjs",
+          "task_id": "CG-B-ceaa3a1cd3b48850d86aca2bd51faed8"
+        }
+      ]
+    },
+    "unresolved_conditions": [
+      "build_model_not_evaluated",
+      "dialects_not_classified",
+      "node_lint_incomplete",
+      "required_obligations_unresolved",
+      "some_manifest_metadata_not_parsed",
+      "source_sets_not_fully_classified",
+      "tool_lock_unverified",
+      "trusted_policy_unavailable",
+      "version_not_declared:package.json"
+    ]
+  },
+  {
+    "delivery_decision": "not_evaluated",
+    "execution": "local_observation",
+    "host_blocking_verified": false,
+    "local_feedback": {
+      "candidate_recovery_count": 0,
+      "candidate_structure_count": 1,
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "erlang_lint": null,
+      "go_syntax": null,
+      "kotlin_lint": null,
+      "native_unwired_files": [],
+      "next_action": "require_native_lint_confirmation",
+      "node_lint": {
+        "backlog_status": "not_connected",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "files": [
+          {
+            "feedback": {
+              "coverage_proven": false,
+              "delivery_decision": "not_evaluated",
+              "findings": [],
+              "local_coherent": false,
+              "next_action": "提供显式 Node、原 ESLint JS 入口、具体版本、原工作目录与项目原 flat config 后复检；不安装或替换规则",
+              "reason": "eslint_execution_context_missing",
+              "report_type": "eslint_local_feedback",
+              "schema_version": "0.2.0",
+              "status": "incomplete",
+              "suppressed_count": 0,
+              "workbench": null,
+              "workbench_status": "not_connected"
+            },
+            "path": "input.mjs",
+            "source_sha256": null
+          }
+        ],
+        "new_blockers": 0,
+        "new_findings": 0,
+        "next": null,
+        "reason": "eslint_files_incomplete",
+        "status": "incomplete",
+        "unexecuted_files": []
+      },
+      "python_lint": null,
+      "report_type": "hook_fast_feedback",
+      "requested_paths": [
+        "input.mjs"
+      ],
+      "ruby_lint": null,
+      "rust_syntax": null,
+      "scan_scope": "selected_files",
+      "schema_version": "0.17.0",
+      "shell_lint": null,
+      "swift_lint": null,
+      "syntax_candidates": {
+        "authority": "candidate_unqualified",
+        "delivery_decision": "incomplete",
+        "execution_phase": "after_native",
+        "native_preferred_count": 0,
+        "next_action": "核对适用语言版本，使用原生 lint/编译器对原始源码确认；原生确认合法时调查 grammar 版本/兼容性或扫描预算，诊断成立时才按真实位置修复；零恢复不表示完整通过",
+        "observations": [
+          {
+            "byte_offset": 0,
+            "grammar_qualified": false,
+            "grammar_sha256": "7978e62bcc851ab1d1f6dcd4678f9eda79df2b3b3490e75f81dd819d9bccccfa",
+            "javascript_mode_observation": {
+              "basis": "extension_mjs",
+              "delivery_decision": "not_evaluated",
+              "mode": "module",
+              "native_execution": "not_run",
+              "package_path": null,
+              "package_sha256": null,
+              "reason": "explicit_extension_mode_native_confirmation_required",
+              "report_type": "javascript_mode_observation",
+              "schema_version": "0.1.0",
+              "searched_directories": [],
+              "source_path": "input.mjs",
+              "source_sha256": "a4688a271f970bc9d4bd5ad3a736ff802730df3b5aa1024e49aa2b286ede3312"
+            },
+            "known_limitations": [
+              "Node 24.18.0 module syntax differential agrees on 13 narrow cases; script mode, other versions, systematic precision, complete native-first lint route and release remain unqualified"
+            ],
+            "language": "javascript",
+            "path": "input.mjs",
+            "reason": null,
+            "recoveries": [],
+            "recovery_count": 0,
+            "scope": "whole_file",
+            "source_sha256": "a4688a271f970bc9d4bd5ad3a736ff802730df3b5aa1024e49aa2b286ede3312",
+            "status": "candidate_observed",
+            "structural_observation_count": 1,
+            "structural_observations": [
+              {
+                "basis": "codeguard_structure_rule",
+                "end_byte": 9,
+                "end_column_byte": 9,
+                "end_row": 0,
+                "parent_syntax_kind": "return_statement",
+                "rule_id": "codeguard.javascript.module_return_outside_function",
+                "rule_sha256": "a87fb74d19d215148c8be5c1785f7e872873f38fcf5e35a53631351a85455295",
+                "rule_version": "1.0.0",
+                "start_byte": 0,
+                "start_column_byte": 0,
+                "start_row": 0
+              }
+            ]
+          }
+        ],
+        "reason": "candidate_unqualified",
+        "skipped_count": 0,
+        "source_file_count": 1,
+        "status": "observed_partial",
+        "unrouted_count": 0
+      },
+      "syntax_tasks": {
+        "failures": [],
+        "new_blockers": 0,
+        "status": "synced_partial",
+        "tasks": [
+          {
+            "language": "javascript",
+            "path": "input.mjs",
+            "task_id": "CG-B-ceaa3a1cd3b48850d86aca2bd51faed8"
+          }
+        ]
+      },
+      "unavailable_files": [],
+      "zig_lint": null
+    },
+    "plan": {
+      "action": "fast_file_check",
+      "host_blocking_claimed": false,
+      "may_claim_delivery": false,
+      "requires_git_snapshot": false,
+      "scope_resolution_reason": null,
+      "soft_result_reuse_candidate": true,
+      "target_paths": [
+        "input.mjs"
+      ],
+      "task_id": null
+    },
+    "reason": null,
+    "report_type": "hook_execution_feedback",
+    "schema_version": "0.29.0",
+    "soft_result_reused": false
+  },
+  {
+    "authority": "local_unverified",
+    "category_candidates": [
+      {
+        "capability_status": "gap",
+        "category": "lint",
+        "checker_id": "node.eslint",
+        "language": "typescript",
+        "legacy_status": "stable",
+        "next_action": "读取逐文件 ESLint 原生发现与准备原因，按项目原配置复检；缺工具或配置的模块继续语法初检",
+        "reason": "eslint_project_coverage_unverified",
+        "status": "native_incomplete"
+      },
+      {
+        "capability_status": "gap",
+        "category": "comments",
+        "checker_id": null,
+        "language": "typescript",
+        "legacy_status": "stable",
+        "next_action": null,
+        "reason": "native_adapter_not_integrated",
+        "status": "not_integrated"
+      },
+      {
+        "capability_status": "gap",
+        "category": "dependencies",
+        "checker_id": null,
+        "language": "typescript",
+        "legacy_status": "stable",
+        "next_action": null,
+        "reason": "native_adapter_not_integrated",
+        "status": "not_integrated"
+      },
+      {
+        "capability_status": "gap",
+        "category": "cve",
+        "checker_id": "node.npm.audit",
+        "language": "typescript",
+        "legacy_status": "stable",
+        "next_action": "核对逐npm构建根的原生诊断、锁版本及漏洞源覆盖及时效，取得稳定任务并用原工具复检",
+        "reason": "npm_advisory_coverage_and_freshness_unverified",
+        "status": "native_incomplete"
+      },
+      {
+        "capability_status": "gap",
+        "category": "security",
+        "checker_id": null,
+        "language": "typescript",
+        "legacy_status": "stable",
+        "next_action": null,
+        "reason": "native_adapter_not_integrated",
+        "status": "not_integrated"
+      },
+      {
+        "capability_status": "gap",
+        "category": "build",
+        "checker_id": null,
+        "language": "typescript",
+        "legacy_status": "stable",
+        "next_action": null,
+        "reason": "native_adapter_not_integrated",
+        "status": "not_integrated"
+      }
+    ],
+    "command_status": "incomplete",
+    "delivery_decision": "incomplete",
+    "discovery": {
+      "blocked_paths": [],
+      "build_roots": [
+        {
+          "manifests": [
+            "package.json"
+          ],
+          "path": "."
+        }
+      ],
+      "checker_configurations": [
+        {
+          "build_root": ".",
+          "category": "lint",
+          "checker_id": "node.eslint",
+          "configuration": "unknown",
+          "configuration_ref": "package.json",
+          "next_action": "确认项目原 ESLint 版本、调用参数及选中配置；用原生工具核验逐文件规则、parser/插件与导入闭包，不套用默认规则或自动迁移配置",
+          "reason": "eslint_configuration_not_observed"
+        },
+        {
+          "build_root": ".",
+          "category": "cve",
+          "checker_id": "node.npm.audit",
+          "configuration": "missing",
+          "configuration_ref": "package.json",
+          "next_action": "核对项目原npm审计调用、工具版本、锁文件、配置及漏洞数据时效；不执行清单中的任意脚本、不用缺工具解释源码违规",
+          "reason": "npm_audit_script_not_observed"
+        }
+      ],
+      "declared_versions": {},
+      "languages": [
+        {
+          "id": "typescript",
+          "manifests": [
+            "package.json"
+          ],
+          "source_files": [
+            "input.cjs",
+            "input.js",
+            "input.mjs"
+          ]
+        }
+      ],
+      "lockfiles": [],
+      "manifest_sha256": {
+        "package.json": "6dc1b06d6b093e9cccb20bee06a93836eee0420ae26803ca2ce4065d82f070d1"
+      },
+      "native_tool_candidates": [
+        {
+          "build_root": ".",
+          "checker_id": "node.eslint",
+          "declaration_observed": false,
+          "next_action": "确认项目是否要求 ESLint，以及其本地或显式原生工具位置与配置",
+          "observed_version": null,
+          "state": "unknown"
+        }
+      ],
+      "observation_complete": true,
+      "observed_entries": 5,
+      "report_type": "discovery",
+      "root": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-js-module-workbench-66199",
+      "schema_version": "0.4.0",
+      "scope_summary": {
+        "configuration_exception_files_observed": 0,
+        "dependency_roots_excluded": 0,
+        "dot_prefix_roots_excluded": 1,
+        "git_safety_status": "not_evaluated",
+        "ordinary_scan_policy": "project_sources_default_v2"
+      },
+      "source_set_candidates": [],
+      "unknown_conditions": [
+        "version_not_declared:package.json",
+        "build_model_not_evaluated",
+        "some_manifest_metadata_not_parsed",
+        "source_sets_not_fully_classified",
+        "dialects_not_classified"
+      ]
+    },
+    "execution_budget": {
+      "enforcement": "native_execution_only",
+      "jobs_limit": 4,
+      "jobs_source": "builtin_default",
+      "native_task_count": 2,
+      "source": "builtin_default",
+      "started_native_task_count": 2,
+      "timeout_ms": 1800000
+    },
+    "execution_tasks": [
+      {
+        "id": "node.lint",
+        "status": "native_incomplete"
+      },
+      {
+        "id": "npm.cve.0",
+        "status": "native_incomplete"
+      }
+    ],
+    "exit_code": 3,
+    "export": {
+      "reason_code": null,
+      "status": "not_requested"
+    },
+    "native_results": {
+      "erlang_lint": null,
+      "go_lint": null,
+      "java_cve": null,
+      "java_dependencies": null,
+      "java_javadoc": null,
+      "java_p3c": null,
+      "kotlin_lint": null,
+      "node_lint": {
+        "backlog_status": "not_connected",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "files": [
+          {
+            "feedback": {
+              "coverage_proven": false,
+              "delivery_decision": "not_evaluated",
+              "findings": [],
+              "local_coherent": false,
+              "next_action": "提供显式 Node、原 ESLint JS 入口、具体版本、原工作目录与项目原 flat config 后复检；不安装或替换规则",
+              "reason": "eslint_execution_context_missing",
+              "report_type": "eslint_local_feedback",
+              "schema_version": "0.2.0",
+              "status": "incomplete",
+              "suppressed_count": 0,
+              "workbench": null,
+              "workbench_status": "not_connected"
+            },
+            "path": "input.cjs",
+            "source_sha256": null
+          },
+          {
+            "feedback": {
+              "coverage_proven": false,
+              "delivery_decision": "not_evaluated",
+              "findings": [],
+              "local_coherent": false,
+              "next_action": "提供显式 Node、原 ESLint JS 入口、具体版本、原工作目录与项目原 flat config 后复检；不安装或替换规则",
+              "reason": "eslint_execution_context_missing",
+              "report_type": "eslint_local_feedback",
+              "schema_version": "0.2.0",
+              "status": "incomplete",
+              "suppressed_count": 0,
+              "workbench": null,
+              "workbench_status": "not_connected"
+            },
+            "path": "input.js",
+            "source_sha256": null
+          },
+          {
+            "feedback": {
+              "coverage_proven": false,
+              "delivery_decision": "not_evaluated",
+              "findings": [],
+              "local_coherent": false,
+              "next_action": "提供显式 Node、原 ESLint JS 入口、具体版本、原工作目录与项目原 flat config 后复检；不安装或替换规则",
+              "reason": "eslint_execution_context_missing",
+              "report_type": "eslint_local_feedback",
+              "schema_version": "0.2.0",
+              "status": "incomplete",
+              "suppressed_count": 0,
+              "workbench": null,
+              "workbench_status": "not_connected"
+            },
+            "path": "input.mjs",
+            "source_sha256": null
+          }
+        ],
+        "new_blockers": 0,
+        "new_findings": 0,
+        "next": null,
+        "reason": "eslint_files_incomplete",
+        "status": "incomplete",
+        "unexecuted_files": []
+      },
+      "npm_cve": [
+        {
+          "backlog_status": "synced_partial",
+          "build_root": ".",
+          "feedback": {
+            "advisory_coverage": "not_evaluated",
+            "configuration": {
+              "build_root": ".",
+              "category": "cve",
+              "checker_id": "node.npm.audit",
+              "configuration": "missing",
+              "configuration_ref": "package.json",
+              "next_action": "核对项目原npm审计调用、工具版本、锁文件、配置及漏洞数据时效；不执行清单中的任意脚本、不用缺工具解释源码违规",
+              "reason": "npm_audit_script_not_observed"
+            },
+            "delivery_decision": "not_evaluated",
+            "dependency_total": null,
+            "execution_budget": {
+              "enforcement": "native_execution_only",
+              "source": "builtin_default",
+              "timeout_ms": 1800000
+            },
+            "findings": [],
+            "local_coherent": false,
+            "next_action": "运行codeguard next获取本构建根的稳定任务，先核验环境与漏洞源覆盖，再按原工具复检；零发现不自动关闭任务",
+            "reason": "npm_lock_missing",
+            "report_type": "npm_cve_feedback",
+            "schema_version": "0.3.0",
+            "status": "incomplete",
+            "tool_approval": "unverified",
+            "workbench": {
+              "failed_reports": 0,
+              "new_blockers": 0,
+              "status": "synced_partial"
+            },
+            "workbench_status": "synced_partial"
+          },
+          "observation": {
+            "advisories": [],
+            "authority": "local_unverified",
+            "build_root": ".",
+            "checker_id": "node.npm.audit",
+            "component_count": 0,
+            "coverage_proven": false,
+            "delivery_decision": "not_evaluated",
+            "diagnostic_reason": "npm_lock_missing",
+            "lock_sha256": null,
+            "lock_state": "missing",
+            "manifest_sha256": "6dc1b06d6b093e9cccb20bee06a93836eee0420ae26803ca2ce4065d82f070d1",
+            "report_type": "npm_cve_workbench_observation",
+            "run_id": "npm-66268-0-1791275868552158000",
+            "schema_version": "0.2.0",
+            "workspace_binding": "bound",
+            "workspace_id": "ws-9eb357e111ccf32e4e0a8f306a29d22f"
+          }
+        }
+      ],
+      "python_cve": [],
+      "python_lint": null,
+      "ruby_lint": null,
+      "rust_build": null,
+      "rust_comments": null,
+      "rust_cve": null,
+      "rust_lint": null,
+      "shell_lint": null,
+      "swift_lint": null,
+      "zig_lint": null
+    },
+    "next": {
+      "authority": "local_unverified",
+      "command_status": "complete",
+      "delivery_decision": "not_evaluated",
+      "disposition": "actionable",
+      "exit_code": 0,
+      "next_actions": [],
+      "operation": "next",
+      "reason": "local_task_selected",
+      "repair_brief": {
+        "action_id": "restore-checker-environment",
+        "affected_paths": [
+          "package.json",
+          "package-lock.json"
+        ],
+        "authority": "local_unverified",
+        "build_root": ".",
+        "checker_id": "node.npm.audit",
+        "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+        "constraints": [
+          "先恢复检查完整性",
+          "不得关闭检查器或修改无关源码"
+        ],
+        "disposition": "actionable",
+        "evidence_ref": {
+          "first_report_sha256": "cbf0868aab7f3263aa0364a6b34300edbd853093b2535f971c58f5d088e8ce94",
+          "first_run_id": "npm-66205-0-1791275864196944000"
+        },
+        "history": {
+          "attempt_count": 0,
+          "awaiting_verification": false,
+          "budget": 2,
+          "no_progress_count": 0,
+          "open_attempt_id": null,
+          "recent": []
+        },
+        "kind": "blocker",
+        "reason_code": "npm_audit_coverage_unverified",
+        "recheck_argv": [
+          "codeguard",
+          "cve",
+          "typescript",
+          ".",
+          "--workspace",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-js-module-workbench-66199",
+          "--node-tool",
+          "<原绝对路径>",
+          "--npm-entry",
+          "<原绝对路径>",
+          "--npm-version",
+          "<原具体版本>",
+          "--userconfig",
+          "<原绝对路径>",
+          "--globalconfig",
+          "<原绝对路径>",
+          "--registry",
+          "<已核验审计源>"
+        ],
+        "schema_version": "0.1.0",
+        "scope": ".",
+        "step": "先恢复package.json及锁文件的可读普通文件和物理路径，再核对语法、重复字段、scripts类型，修正配置后恢复原生npm审计；再核验锁节点和漏洞源覆盖及时效，按原报告修订依赖并复检，局部零发现不得关闭任务",
+        "task_id": "CG-B-cfc5eb25bceb4eba94142ec6fb505d01"
+      },
+      "report_type": "repair_brief_preview",
+      "schema_version": "0.1.0"
+    },
+    "obligation_status": "unresolved",
+    "operation": "check",
+    "reason": "full_project_obligations_and_trusted_policy_unavailable",
+    "report_type": "check_feedback",
+    "required_obligations": null,
+    "schema_version": "0.60.0",
+    "selection": "all",
+    "syntax_candidates": {
+      "authority": "candidate_unqualified",
+      "delivery_decision": "incomplete",
+      "execution_phase": "after_native",
+      "native_preferred_count": 0,
+      "next_action": "核对适用语言版本，使用原生 lint/编译器对原始源码确认；原生确认合法时调查 grammar 版本/兼容性或扫描预算，诊断成立时才按真实位置修复；零恢复不表示完整通过",
+      "observations": [
+        {
+          "byte_offset": 0,
+          "grammar_qualified": false,
+          "grammar_sha256": "7978e62bcc851ab1d1f6dcd4678f9eda79df2b3b3490e75f81dd819d9bccccfa",
+          "known_limitations": [
+            "Node 24.18.0 module syntax differential agrees on 13 narrow cases; script mode, other versions, systematic precision, complete native-first lint route and release remain unqualified"
+          ],
+          "language": "javascript",
+          "path": "input.cjs",
+          "reason": null,
+          "recoveries": [],
+          "recovery_count": 0,
+          "scope": "whole_file",
+          "source_sha256": "a4688a271f970bc9d4bd5ad3a736ff802730df3b5aa1024e49aa2b286ede3312",
+          "status": "candidate_observed"
+        },
+        {
+          "byte_offset": 0,
+          "grammar_qualified": false,
+          "grammar_sha256": "7978e62bcc851ab1d1f6dcd4678f9eda79df2b3b3490e75f81dd819d9bccccfa",
+          "javascript_mode_observation": {
+            "basis": "nearest_package_type",
+            "delivery_decision": "not_evaluated",
+            "mode": "module",
+            "native_execution": "not_run",
+            "package_path": "package.json",
+            "package_sha256": "6dc1b06d6b093e9cccb20bee06a93836eee0420ae26803ca2ce4065d82f070d1",
+            "reason": "explicit_package_type_native_confirmation_required",
+            "report_type": "javascript_mode_observation",
+            "schema_version": "0.1.0",
+            "searched_directories": [
+              "."
+            ],
+            "source_path": "input.js",
+            "source_sha256": "a4688a271f970bc9d4bd5ad3a736ff802730df3b5aa1024e49aa2b286ede3312"
+          },
+          "known_limitations": [
+            "Node 24.18.0 module syntax differential agrees on 13 narrow cases; script mode, other versions, systematic precision, complete native-first lint route and release remain unqualified"
+          ],
+          "language": "javascript",
+          "path": "input.js",
+          "reason": null,
+          "recoveries": [],
+          "recovery_count": 0,
+          "scope": "whole_file",
+          "source_sha256": "a4688a271f970bc9d4bd5ad3a736ff802730df3b5aa1024e49aa2b286ede3312",
+          "status": "candidate_observed",
+          "structural_observation_count": 1,
+          "structural_observations": [
+            {
+              "basis": "codeguard_structure_rule",
+              "end_byte": 9,
+              "end_column_byte": 9,
+              "end_row": 0,
+              "parent_syntax_kind": "return_statement",
+              "rule_id": "codeguard.javascript.module_return_outside_function",
+              "rule_sha256": "a87fb74d19d215148c8be5c1785f7e872873f38fcf5e35a53631351a85455295",
+              "rule_version": "1.0.0",
+              "start_byte": 0,
+              "start_column_byte": 0,
+              "start_row": 0
+            }
+          ]
+        },
+        {
+          "byte_offset": 0,
+          "grammar_qualified": false,
+          "grammar_sha256": "7978e62bcc851ab1d1f6dcd4678f9eda79df2b3b3490e75f81dd819d9bccccfa",
+          "javascript_mode_observation": {
+            "basis": "extension_mjs",
+            "delivery_decision": "not_evaluated",
+            "mode": "module",
+            "native_execution": "not_run",
+            "package_path": null,
+            "package_sha256": null,
+            "reason": "explicit_extension_mode_native_confirmation_required",
+            "report_type": "javascript_mode_observation",
+            "schema_version": "0.1.0",
+            "searched_directories": [],
+            "source_path": "input.mjs",
+            "source_sha256": "4024d7ea4d290329795f394094dd3b25b3780bcf618ec8a227048ab84c8d9c27"
+          },
+          "known_limitations": [
+            "Node 24.18.0 module syntax differential agrees on 13 narrow cases; script mode, other versions, systematic precision, complete native-first lint route and release remain unqualified"
+          ],
+          "language": "javascript",
+          "path": "input.mjs",
+          "reason": null,
+          "recoveries": [],
+          "recovery_count": 0,
+          "scope": "whole_file",
+          "source_sha256": "4024d7ea4d290329795f394094dd3b25b3780bcf618ec8a227048ab84c8d9c27",
+          "status": "candidate_observed",
+          "structural_observation_count": 0,
+          "structural_observations": []
+        }
+      ],
+      "reason": "candidate_unqualified",
+      "skipped_count": 0,
+      "source_file_count": 3,
+      "status": "observed_partial",
+      "unrouted_count": 0
+    },
+    "syntax_tasks": {
+      "failures": [],
+      "new_blockers": 0,
+      "status": "synced_partial",
+      "tasks": [
+        {
+          "language": "javascript",
+          "path": "input.js",
+          "task_id": "CG-B-02f60516b49589312be2e4e772650efa"
+        }
+      ]
+    },
+    "unresolved_conditions": [
+      "build_model_not_evaluated",
+      "dialects_not_classified",
+      "node_lint_incomplete",
+      "npm_advisory_coverage_and_freshness_unverified",
+      "npm_cve_task_incomplete",
+      "required_obligations_unresolved",
+      "some_manifest_metadata_not_parsed",
+      "source_sets_not_fully_classified",
+      "tool_lock_unverified",
+      "trusted_policy_unavailable",
+      "version_not_declared:package.json"
+    ]
+  },
+  {
+    "affected_paths": [
+      "input.js"
+    ],
+    "authority": "local_unverified",
+    "blocker_id": "CG-B-02f60516b49589312be2e4e772650efa",
+    "build_root": ".",
+    "checker_id": "node.eslint.preparation",
+    "coverage_proven": false,
+    "delivery_decision": "not_evaluated",
+    "execution": "incomplete",
+    "fingerprint": "02f60516b49589312be2e4e772650efac48e720de97000d4647a4ad534c8b5f8",
+    "language": "javascript",
+    "observations": [
+      {
+        "byte_offset": 0,
+        "grammar_qualified": false,
+        "grammar_sha256": "7978e62bcc851ab1d1f6dcd4678f9eda79df2b3b3490e75f81dd819d9bccccfa",
+        "javascript_mode_observation": {
+          "basis": "nearest_package_type",
+          "delivery_decision": "not_evaluated",
+          "mode": "module",
+          "native_execution": "not_run",
+          "package_path": "package.json",
+          "package_sha256": "6dc1b06d6b093e9cccb20bee06a93836eee0420ae26803ca2ce4065d82f070d1",
+          "reason": "explicit_package_type_native_confirmation_required",
+          "report_type": "javascript_mode_observation",
+          "schema_version": "0.1.0",
+          "searched_directories": [
+            "."
+          ],
+          "source_path": "input.js",
+          "source_sha256": "a4688a271f970bc9d4bd5ad3a736ff802730df3b5aa1024e49aa2b286ede3312"
+        },
+        "known_limitations": [
+          "Node 24.18.0 module syntax differential agrees on 13 narrow cases; script mode, other versions, systematic precision, complete native-first lint route and release remain unqualified"
+        ],
+        "language": "javascript",
+        "path": "input.js",
+        "reason": null,
+        "recoveries": [],
+        "recovery_count": 0,
+        "scope": "whole_file",
+        "source_sha256": "a4688a271f970bc9d4bd5ad3a736ff802730df3b5aa1024e49aa2b286ede3312",
+        "status": "candidate_observed",
+        "structural_observation_count": 1,
+        "structural_observations": [
+          {
+            "basis": "codeguard_structure_rule",
+            "end_byte": 9,
+            "end_column_byte": 9,
+            "end_row": 0,
+            "parent_syntax_kind": "return_statement",
+            "rule_id": "codeguard.javascript.module_return_outside_function",
+            "rule_sha256": "a87fb74d19d215148c8be5c1785f7e872873f38fcf5e35a53631351a85455295",
+            "rule_version": "1.0.0",
+            "start_byte": 0,
+            "start_column_byte": 0,
+            "start_row": 0
+          }
+        ]
+      }
+    ],
+    "reason_code": "eslint_prerequisites_require_review",
+    "report_type": "syntax_confirmation_observation",
+    "run_id": "syntax-confirm-66205-1791275864944554000",
+    "schema_version": "0.15.0",
+    "scope": "input.js",
+    "workspace_binding": "bound",
+    "workspace_id": "ws-9eb357e111ccf32e4e0a8f306a29d22f"
+  }
+]

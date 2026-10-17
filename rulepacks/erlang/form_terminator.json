@@ -1,0 +1,11 @@
+{
+  "rule_id": "codeguard.erlang.form_terminator",
+  "version": "1.0.0",
+  "language": "erlang",
+  "root_kind": "source_file",
+  "form_kind": "fun_decl",
+  "scope": "direct_function_forms",
+  "terminator": ".",
+  "possible_continuation": ";",
+  "authority": "native_confirmation_required"
+}

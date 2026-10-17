@@ -94,9 +94,16 @@ fn invalid_identity_scope_version_and_stale_slot_are_rejected_before_node() {
 #[test]
 #[ignore = "requires explicit Node; controlled JSON fixture, not native ESLint"]
 fn real_node_controlled_reports_bind_version_inputs_and_native_exit_contract() {
-    for mode in 0..7 {
+    for mode in 0..8 {
         let (_fixture, mut req) = fixture();
         req.command.node = std::env::var_os("CODEGUARD_NODE_BIN").unwrap().into();
+        // 模式7：TS 方言源码加包根 tsconfig.json，真实 Node 写完报告后篡改 tsconfig。
+        if mode == 7 {
+            let source = req.cwd.join("app.ts");
+            fs::write(&source, "const value: number = 1;\n").unwrap();
+            fs::write(req.cwd.join("tsconfig.json"), "{\"compilerOptions\":{}}\n").unwrap();
+            req.command.sources = vec![source];
+        }
         let version = if mode == 4 {
             "v10.1.0\\n"
         } else {
@@ -115,11 +122,17 @@ fn real_node_controlled_reports_bind_version_inputs_and_native_exit_contract() {
                 "fs.writeFileSync({},'changed');",
                 serde_json::to_string(req.command.config.to_str().unwrap()).unwrap()
             )
+        } else if mode == 7 {
+            format!(
+                "fs.writeFileSync({},JSON.stringify({{changed:true}}));",
+                serde_json::to_string(req.cwd.join("tsconfig.json").to_str().unwrap()).unwrap()
+            )
         } else {
             String::new()
         };
         let early_exit = if mode == 6 { "process.exit(2);" } else { "" };
         fs::write(&req.command.entry,format!("const fs=require('node:fs'); const args=process.argv.slice(2); if(args.includes('--version')){{process.stdout.write('{version}');process.exit(0);}} {early_exit} const target=args[args.indexOf('--output-file')+1]; fs.writeFileSync(target,{}); {mutation} process.exit({});",serde_json::to_string(&output).unwrap(),if mode==2 {1}else{0})).unwrap();
+        let tsconfig = req.cwd.join("tsconfig.json");
         req.expected_sha256 = BTreeMap::from_iter(
             [
                 &req.command.node,
@@ -128,6 +141,7 @@ fn real_node_controlled_reports_bind_version_inputs_and_native_exit_contract() {
                 &req.command.sources[0],
             ]
             .into_iter()
+            .chain((mode == 7).then_some(&tsconfig))
             .map(|p| (p.clone(), Sha256::digest(fs::read(p).unwrap()).into())),
         );
         req.deadline = Instant::now() + Duration::from_secs(60);
@@ -136,6 +150,11 @@ fn real_node_controlled_reports_bind_version_inputs_and_native_exit_contract() {
             0..=2 => {
                 assert!(observed.local_coherent, "{:?}", observed.reason);
                 assert_eq!(observed.parsed.unwrap().findings.len(), count);
+            }
+            7 => {
+                assert!(!observed.local_coherent, "{:?}", observed.reason);
+                assert_eq!(observed.reason, Some("eslint_input_changed"));
+                assert!(observed.parsed.is_some());
             }
             3 => {
                 assert!(!observed.local_coherent);

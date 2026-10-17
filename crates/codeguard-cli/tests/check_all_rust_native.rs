@@ -75,6 +75,82 @@ impl Drop for Fixture {
 }
 
 #[test]
+fn clippy_documentation_keeps_both_native_comment_obligations() {
+    for (rule, exit, doc_failed) in [
+        ("missing_errors_doc", 0, false),
+        ("missing_panics_doc", 0, false),
+        ("missing_safety_doc", 0, false),
+        ("missing_errors_doc", 101, false),
+        ("missing_errors_doc", 0, true),
+    ] {
+        let f = Fixture::new();
+        let warning = serde_json::json!({"reason":"compiler-message","message":{"level":"warning","code":{"code":format!("clippy::{rule}")},"spans":[{"file_name":"src/lib.rs","line_start":1,"column_start":1,"is_primary":true}]}});
+        let tool = f.tool(&format!(
+            "printf '%s\\n' '{}' '{{\"reason\":\"build-finished\",\"success\":{}}}'; exit {exit}",
+            warning,
+            exit == 0
+        ));
+        if doc_failed {
+            let script =
+                fs::read_to_string(&tool)
+                    .unwrap()
+                    .replacen("exit 0 ;; esac", "exit 1 ;; esac", 1);
+            fs::write(&tool, script).unwrap();
+        }
+        let (_, r) = f.check(&["--cargo-tool", tool.to_str().unwrap()]);
+        let rows: Vec<&Value> = r["category_candidates"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter(|c| c["language"] == "rust" && c["category"] == "comments")
+            .collect();
+        assert!(
+            rows.iter().any(|c| c["checker_id"] == "rust.cargo_rustdoc"),
+            "{r}"
+        );
+        let clippy = rows
+            .iter()
+            .find(|c| c["checker_id"] == "rust.cargo_clippy")
+            .expect("Clippy comments obligation");
+        assert_eq!(
+            clippy["status"],
+            if exit == 0 {
+                "observed_unverified"
+            } else {
+                "native_incomplete"
+            }
+        );
+        if doc_failed {
+            let rustdoc = rows
+                .iter()
+                .find(|c| c["checker_id"] == "rust.cargo_rustdoc")
+                .unwrap();
+            assert_eq!(rustdoc["status"], "native_incomplete");
+        }
+        assert!(clippy["next_action"].as_str().unwrap().contains("空章节"));
+        assert_eq!(r["delivery_decision"], "incomplete");
+    }
+    for rule in ["missing_errors_doc_unknown", "needless_return"] {
+        let f = Fixture::new();
+        let warning = serde_json::json!({"reason":"compiler-message","message":{"level":"warning","code":{"code":format!("clippy::{rule}")},"spans":[{"file_name":"src/lib.rs","line_start":1,"column_start":1,"is_primary":true}]}});
+        let tool = f.tool(&format!(
+            "printf '%s\\n' '{}' '{{\"reason\":\"build-finished\",\"success\":true}}'",
+            warning
+        ));
+        let (_, r) = f.check(&["--cargo-tool", tool.to_str().unwrap()]);
+        assert!(
+            !r["category_candidates"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .any(|c| c["language"] == "rust"
+                    && c["category"] == "comments"
+                    && c["checker_id"] == "rust.cargo_clippy")
+        );
+    }
+}
+
+#[test]
 fn check_all_schedules_native_cargo_type_check_and_keeps_compiler_error_separate() {
     let fixture = Fixture::new();
     fs::write(

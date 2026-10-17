@@ -58,7 +58,7 @@ test('离线npm Ruby编辑、项目检查和原工具复检复用任务，不猜
     assert.match(id ?? '', /^CG-B-[a-f0-9]{32}$/);
     assert.equal(edit().local_feedback.ruby_lint.files[0].task_id, id);
     const aggregate = invoke(['check', 'ruby', project, '--ruby-tool', tool, '--timeout', '30s']);
-    assert.equal(aggregate.schema_version, '0.51.0');
+    assert.equal(aggregate.schema_version, '0.73.0');
     assert.equal(aggregate.native_results.ruby_lint.files.find(f => f.path === 'app.rb').task_id, id);
     assert.deepEqual(aggregate.syntax_candidates.observations, []);
     const lint = invoke(['lint', 'ruby', source, '--ruby-tool', tool, '--timeout', '30s']);

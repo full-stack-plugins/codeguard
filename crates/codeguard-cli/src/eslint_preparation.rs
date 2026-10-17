@@ -196,6 +196,7 @@ pub(crate) fn valid_reason(reason: &str) -> bool {
             | "eslint_version_evidence_failed"
             | "eslint_version_execution_incomplete"
             | "eslint_version_mismatch"
+            | "eslint_tsconfig_untrusted"
             | "eslint_execution_evidence_failed"
             | "eslint_report_read_failed"
             | "eslint_native_execution_incomplete"
@@ -354,6 +355,9 @@ pub(crate) fn guidance(root: &Path, fact: &Value) -> Value {
         }
         Some("eslint_config_selection_unresolved" | "eslint_config_untrusted") => {
             "项目本地 ESLint 已发现；核对原项目实际选中的 flat config、文件类型与来源，恢复配置后原生复检，不修改无依据源码"
+        }
+        Some("eslint_tsconfig_untrusted") => {
+            "TypeScript 方言检查需绑定包内 tsconfig.json，当前它是链接或特殊文件；恢复普通文件后用同一入口和配置复检，不修改无依据源码"
         }
         Some("eslint_local_entry_untrusted" | "eslint_local_dependency_path_untrusted") => {
             "项目本地 ESLint 路径不可信；核对链接、文件类型和来源后原生复检，不重复安装或修改无依据源码"

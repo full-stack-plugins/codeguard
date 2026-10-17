@@ -426,7 +426,7 @@ fn initialized_eslint_workbench_reuses_task_and_preserves_manual_notes() {
 }
 
 #[test]
-fn eslint_missing_context_creates_one_environment_task_and_never_source_finding() {
+fn eslint_partial_explicit_context_creates_one_environment_task_and_never_source_finding() {
     let project = project();
     let initialized = Command::new(env!("CARGO_BIN_EXE_codeguard"))
         .args([
@@ -445,6 +445,9 @@ fn eslint_missing_context_creates_one_environment_task_and_never_source_finding(
                 "lint",
                 "typescript",
                 project.0.join("app.js").to_str().unwrap(),
+                // 显式部分原生上下文不能走WASM候选分支；缺其余参数生成环境任务。
+                "--node-tool",
+                project.0.join("missing-node").to_str().unwrap(),
                 "--workspace",
                 project.0.to_str().unwrap(),
                 "--format",
@@ -561,6 +564,14 @@ fn eslint_external_preparation_target_cannot_enter_workspace_tasks() {
         .unwrap();
     let result: Value = serde_json::from_slice(&result.stdout).unwrap();
     assert_eq!(result["workbench_status"], "source_outside_workspace");
+    if let Ok(path) = std::env::var("CODEGUARD_ESLINT_BOUNDARY_REPORT") {
+        std::fs::write(path, serde_json::to_vec_pretty(&result).unwrap()).unwrap();
+    }
+    #[cfg(feature = "wasm-precheck")]
+    {
+        assert_eq!(result["syntax_candidates"]["status"], "not_run");
+        assert!(result["setup"]["task_id"].is_null());
+    }
     assert_eq!(
         std::fs::read_dir(workspace.0.join(".codeguard/findings"))
             .unwrap()

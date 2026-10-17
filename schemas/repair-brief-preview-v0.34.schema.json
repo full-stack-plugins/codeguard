@@ -1,0 +1,329 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:repair-brief-preview:0.34.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "operation",
+    "command_status",
+    "exit_code",
+    "disposition",
+    "reason",
+    "repair_brief",
+    "next_actions",
+    "authority",
+    "delivery_decision"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.34.0"
+    },
+    "report_type": {
+      "const": "repair_brief_preview"
+    },
+    "operation": {
+      "const": "next"
+    },
+    "command_status": {
+      "enum": [
+        "complete",
+        "incomplete"
+      ]
+    },
+    "exit_code": {
+      "enum": [
+        0,
+        3
+      ]
+    },
+    "disposition": {
+      "const": "needs_decision"
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1
+    },
+    "repair_brief": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "0.34.0"
+        },
+        "kind": {
+          "const": "finding"
+        },
+        "placeholder_rule_id": {
+          "const": "codeguard.documentation.placeholder_description"
+        },
+        "rule_source": {
+          "const": "codeguard_structural_policy"
+        },
+        "disposition": {
+          "const": "needs_decision"
+        },
+        "attempt_history_status": {
+          "const": "not_integrated"
+        },
+        "authority": {
+          "const": "local_unverified"
+        },
+        "delivery_decision": {
+          "const": "not_evaluated"
+        },
+        "task_id": {
+          "type": "string",
+          "pattern": "^CG-[a-f0-9]{32}$"
+        },
+        "checker_id": {
+          "enum": [
+            "c.clang.documentation_placeholder",
+            "cpp.clang.documentation_placeholder"
+          ]
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "source_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "evidence_ref": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "first_run_id",
+            "first_report_sha256"
+          ],
+          "properties": {
+            "first_run_id": {
+              "type": "string",
+              "pattern": "^clangdocplaceholder-[0-9]+-[0-9]+-[0-9]+$"
+            },
+            "first_report_sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          }
+        },
+        "current_run_id": {
+          "type": "string",
+          "pattern": "^clangdocplaceholder-[0-9]+-[0-9]+-[0-9]+$"
+        },
+        "observation_status": {
+          "enum": [
+            "original_context_changed",
+            "input_changed",
+            "candidate_absent_unverified_policy",
+            "placeholder_descriptions_observed"
+          ]
+        },
+        "placeholder_positions": {
+          "$ref": "clang-documentation-placeholder-v0.1.schema.json#/properties/positions"
+        },
+        "allowed_paths": {
+          "const": []
+        },
+        "affected_paths": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "reason_code": {
+          "enum": [
+            "clang_placeholder_task_workflow_not_integrated",
+            "original_context_changed",
+            "input_changed",
+            "candidate_absent_unverified_policy"
+          ]
+        },
+        "rule_basis": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
+        },
+        "closure_condition": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
+        },
+        "constraints": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048
+          }
+        },
+        "step": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048
+          }
+        },
+        "recheck_argv": {
+          "type": "array",
+          "minItems": 11,
+          "maxItems": 11,
+          "prefixItems": [
+            {
+              "const": "codeguard"
+            },
+            {
+              "const": "comments"
+            },
+            {
+              "enum": [
+                "c",
+                "cpp"
+              ]
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "const": "--clang-tool"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "const": "--standard"
+            },
+            {
+              "enum": [
+                "c11",
+                "c++17"
+              ]
+            },
+            {
+              "const": "--workspace"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "const": "--format=json"
+            }
+          ],
+          "items": false
+        }
+      },
+      "required": [
+        "schema_version",
+        "kind",
+        "placeholder_rule_id",
+        "rule_source",
+        "disposition",
+        "attempt_history_status",
+        "authority",
+        "delivery_decision",
+        "task_id",
+        "checker_id",
+        "scope",
+        "source_sha256",
+        "evidence_ref",
+        "current_run_id",
+        "observation_status",
+        "placeholder_positions",
+        "allowed_paths",
+        "affected_paths",
+        "reason_code",
+        "rule_basis",
+        "closure_condition",
+        "constraints",
+        "step",
+        "recheck_argv"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "observation_status": {
+                "const": "placeholder_descriptions_observed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "reason_code": {
+                "const": "clang_placeholder_task_workflow_not_integrated"
+              },
+              "placeholder_positions": {
+                "minItems": 1
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "placeholder_positions": {
+                "const": []
+              }
+            }
+          }
+        }
+      ]
+    },
+    "next_actions": {
+      "type": "array",
+      "items": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "failed_reports": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "run_id",
+          "reason",
+          "report_ref"
+        ],
+        "properties": {
+          "run_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,120}$"
+          },
+          "reason": {
+            "type": "string",
+            "pattern": "^[a-z0-9_]{1,80}$"
+          },
+          "report_ref": {
+            "type": "string",
+            "pattern": "^\\.codeguard/reports/[A-Za-z0-9_-]{1,120}\\.json$"
+          }
+        }
+      }
+    },
+    "authority": {
+      "const": "local_unverified"
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    }
+  }
+}

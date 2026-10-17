@@ -1,0 +1,41 @@
+{
+  "change": "introduce-rust-codeguard-cli",
+  "scope": "lint all category selection",
+  "date": "2026-10-06",
+  "default": {
+    "passed": 86,
+    "failed": 0,
+    "ignored": 15
+  },
+  "wasm_scope": {
+    "passed": 4,
+    "failed": 0,
+    "ignored": 0
+  },
+  "schema_negative_cases": 4,
+  "native_accuracy_qualified": false,
+  "project_delivery_qualified": false,
+  "logs": [
+    {
+      "path": "/private/tmp/cg-lint-all-red.log",
+      "sha256": "9861c1f5ab20d30c53aeee1e72400124b82d4ce36ed97564dfcda4b6e8149333"
+    },
+    {
+      "path": "/private/tmp/cg-lint-all-final-current.log",
+      "sha256": "36b5d58963450ad8db20540dc522285ad97b8c99ee713697ce8835e5e3c7a059"
+    },
+    {
+      "path": "/private/tmp/cg-lint-all-wasm-current.log",
+      "sha256": "6912b67079195a61b50f90d4a341a9572ddcbfa82737bbfa14ab917b38111d86"
+    },
+    {
+      "path": "/private/tmp/cg-lint-all-clippy-final.log",
+      "sha256": "111e4eaf9248dbae85c2cd0c8a5116324b240e7d92977f19e45bb493d9fef0d4"
+    },
+    {
+      "path": "/private/tmp/cg-lint-all-report.json",
+      "sha256": "ec43482e421e4073d23b874e8ade4d12ee8e94782fd7a1e8c90d92adc22b2d10"
+    }
+  ],
+  "protected_erlang_sha256": "2e3a296072e6a3aa34b561799c18c7d8b621d00f8786301d2612cee8cdab85b6"
+}

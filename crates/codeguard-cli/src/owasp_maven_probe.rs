@@ -17,7 +17,10 @@ use sha2::{Digest, Sha256};
 
 use crate::tool_identity::hash_bundle_tree;
 
-const SETTINGS: &str = include_str!("../resources/isolated_maven_settings.xml");
+/// 真实 dependency-check 插件的 goal 声明 `requiresOnline`，Maven `-o` 会让每次执行
+/// 在 goal 启动前直接失败。因此本探针以在线模式调用 Maven，但隔离 settings 的镜像
+/// 指向不可路由地址：离线仓库闭包完整时零联网，缺件时确定性解析失败，绝不静默下载。
+const SETTINGS: &str = "<settings xmlns=\"http://maven.apache.org/SETTINGS/1.2.0\"><mirrors><mirror><id>nexus-aliyun</id><url>http://127.0.0.1:9/</url><mirrorOf>*</mirrorOf></mirror></mirrors></settings>";
 
 /// 原生检查请求；离线数据库和 Maven 闭包须有调用方提供的当前字节摘要。
 pub(crate) struct Request<'a> {
@@ -147,7 +150,6 @@ pub(crate) fn observe(request: &Request<'_>) -> Value {
         args: vec![
             "-B".into(),
             "-ntp".into(),
-            "-o".into(),
             "-s".into(),
             project.join("settings.xml").into_os_string(),
             "-gs".into(),

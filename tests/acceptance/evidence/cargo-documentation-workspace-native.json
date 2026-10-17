@@ -1,0 +1,527 @@
+{
+  "cases": [
+    {
+      "discovery": {
+        "blocked_paths": [],
+        "build_roots": [
+          {
+            "manifests": [
+              "Cargo.toml"
+            ],
+            "path": "."
+          },
+          {
+            "manifests": [
+              "independent/Cargo.toml"
+            ],
+            "path": "independent"
+          },
+          {
+            "manifests": [
+              "member/Cargo.toml"
+            ],
+            "path": "member"
+          }
+        ],
+        "checker_configurations": [
+          {
+            "build_root": ".",
+            "category": "comments",
+            "checker_id": "rust.cargo_rustdoc",
+            "configuration": "unknown",
+            "configuration_ref": "Cargo.toml",
+            "next_action": "原清单精确声明：未解析；按原Cargo核验工作区继承、源码属性、lint组/priority与目标范围；未声明不等于未启用，不添加规则或修改无关源码，不把空章节或零诊断当详细文档合格",
+            "reason": "cargo_doc_lints_virtual_workspace_unresolved"
+          },
+          {
+            "build_root": ".",
+            "category": "comments",
+            "checker_id": "rust.cargo_clippy",
+            "configuration": "unknown",
+            "configuration_ref": "Cargo.toml",
+            "next_action": "原清单精确声明：未解析；按原Cargo核验工作区继承、源码属性、lint组/priority与目标范围；未声明不等于未启用，不添加规则或修改无关源码，不把空章节或零诊断当详细文档合格",
+            "reason": "cargo_doc_lints_virtual_workspace_unresolved"
+          },
+          {
+            "build_root": "independent",
+            "category": "comments",
+            "checker_id": "rust.cargo_rustdoc",
+            "configuration": "unknown",
+            "configuration_ref": "independent/Cargo.toml",
+            "next_action": "原清单精确声明：未解析；按原Cargo核验工作区继承、源码属性、lint组/priority与目标范围；未声明不等于未启用，不添加规则或修改无关源码，不把空章节或零诊断当详细文档合格",
+            "reason": "cargo_doc_lints_not_declared_in_manifest"
+          },
+          {
+            "build_root": "independent",
+            "category": "comments",
+            "checker_id": "rust.cargo_clippy",
+            "configuration": "unknown",
+            "configuration_ref": "independent/Cargo.toml",
+            "next_action": "原清单精确声明：未解析；按原Cargo核验工作区继承、源码属性、lint组/priority与目标范围；未声明不等于未启用，不添加规则或修改无关源码，不把空章节或零诊断当详细文档合格",
+            "reason": "cargo_doc_lints_not_declared_in_manifest"
+          },
+          {
+            "build_root": "member",
+            "category": "comments",
+            "checker_id": "rust.cargo_rustdoc",
+            "configuration": "unknown",
+            "configuration_ref": "member/Cargo.toml",
+            "next_action": "候选workspace清单：Cargo.toml；成员继承声明：member/Cargo.toml；成员归属/排除/通配及完整生效范围待原Cargo核验；原清单精确声明：未解析；按原Cargo核验工作区继承、源码属性、lint组/priority与目标范围；未声明不等于未启用，不添加规则或修改无关源码，不把空章节或零诊断当详细文档合格",
+            "reason": "cargo_doc_lints_group_or_default_unresolved"
+          },
+          {
+            "build_root": "member",
+            "category": "comments",
+            "checker_id": "rust.cargo_clippy",
+            "configuration": "unknown",
+            "configuration_ref": "member/Cargo.toml",
+            "next_action": "候选workspace清单：Cargo.toml；成员继承声明：member/Cargo.toml；成员归属/排除/通配及完整生效范围待原Cargo核验；原清单精确声明：missing_errors_doc=warn；按原Cargo核验工作区继承、源码属性、lint组/priority与目标范围；未声明不等于未启用，不添加规则或修改无关源码，不把空章节或零诊断当详细文档合格",
+            "reason": "cargo_doc_lints_workspace_declared_scope_unverified"
+          }
+        ],
+        "declared_versions": {
+          "independent/Cargo.toml": "0.1.0",
+          "member/Cargo.toml": "0.1.0"
+        },
+        "languages": [
+          {
+            "id": "rust",
+            "manifests": [
+              "Cargo.toml",
+              "independent/Cargo.toml",
+              "member/Cargo.toml"
+            ],
+            "source_files": [
+              "independent/src/lib.rs",
+              "member/src/lib.rs",
+              "src/lib.rs"
+            ]
+          },
+          {
+            "id": "toml",
+            "manifests": [],
+            "source_files": [
+              "Cargo.toml",
+              "independent/Cargo.toml",
+              "member/Cargo.toml"
+            ]
+          }
+        ],
+        "lockfiles": [
+          "Cargo.lock"
+        ],
+        "manifest_sha256": {
+          "Cargo.toml": "f12fbdf03e73e604ff5f0a466b54b2179e0f2560b66bc90e4489df1959dbcb32",
+          "independent/Cargo.toml": "63bc7ba56b8ff571407330967548674ff1e30aaeccf55b66071d9a6a27adf439",
+          "member/Cargo.toml": "7ecae0b3c6cd478637d5974927e77e40d3bcce883ee185e5a5521da54dc730a2"
+        },
+        "native_tool_candidates": [],
+        "observation_complete": true,
+        "observed_entries": 12,
+        "report_type": "discovery",
+        "root": "/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-doc-config-31853-0",
+        "schema_version": "0.4.0",
+        "scope_summary": {
+          "configuration_exception_files_observed": 0,
+          "dependency_roots_excluded": 0,
+          "dot_prefix_roots_excluded": 0,
+          "git_safety_status": "not_evaluated",
+          "ordinary_scan_policy": "project_sources_default_v2"
+        },
+        "source_set_candidates": [],
+        "unknown_conditions": [
+          "build_model_not_evaluated",
+          "some_manifest_metadata_not_parsed",
+          "source_sets_not_fully_classified",
+          "dialects_not_classified",
+          "lock_contents_not_evaluated"
+        ]
+      },
+      "level": "warn",
+      "oracle": [
+        {
+          "count": 1,
+          "original_cargo_events": [
+            {
+              "manifest_path": "/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-doc-config-31853-0/member/Cargo.toml",
+              "message": {
+                "$message_type": "diagnostic",
+                "children": [
+                  {
+                    "children": [],
+                    "code": null,
+                    "level": "help",
+                    "message": "for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#missing_errors_doc",
+                    "rendered": null,
+                    "spans": []
+                  },
+                  {
+                    "children": [],
+                    "code": null,
+                    "level": "note",
+                    "message": "requested on the command line with `-W clippy::missing-errors-doc`",
+                    "rendered": null,
+                    "spans": []
+                  }
+                ],
+                "code": {
+                  "code": "clippy::missing_errors_doc",
+                  "explanation": null
+                },
+                "level": "warning",
+                "message": "docs for function returning `Result` missing `# Errors` section",
+                "rendered": "warning: docs for function returning `Result` missing `# Errors` section\n --> member/src/lib.rs:2:1\n  |\n2 | pub fn failure() -> Result<(), &'static str> { Err(\"unavailable\") }\n  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  |\n  = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#missing_errors_doc\n  = note: requested on the command line with `-W clippy::missing-errors-doc`\n\n",
+                "spans": [
+                  {
+                    "byte_end": 70,
+                    "byte_start": 26,
+                    "column_end": 45,
+                    "column_start": 1,
+                    "expansion": null,
+                    "file_name": "member/src/lib.rs",
+                    "is_primary": true,
+                    "label": null,
+                    "line_end": 2,
+                    "line_start": 2,
+                    "suggested_replacement": null,
+                    "suggestion_applicability": null,
+                    "text": [
+                      {
+                        "highlight_end": 45,
+                        "highlight_start": 1,
+                        "text": "pub fn failure() -> Result<(), &'static str> { Err(\"unavailable\") }"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "package_id": "path+file:///var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-doc-config-31853-0/member#0.1.0",
+              "reason": "compiler-message",
+              "target": {
+                "crate_types": [
+                  "lib"
+                ],
+                "doc": true,
+                "doctest": true,
+                "edition": "2021",
+                "kind": [
+                  "lib"
+                ],
+                "name": "member",
+                "src_path": "/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-doc-config-31853-0/member/src/lib.rs",
+                "test": true
+              }
+            },
+            {
+              "executable": null,
+              "features": [],
+              "filenames": [
+                "/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-doc-config-31853-0/.native-target/debug/deps/libmember-2086ad1231af8c56.rmeta"
+              ],
+              "fresh": false,
+              "manifest_path": "/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-doc-config-31853-0/member/Cargo.toml",
+              "package_id": "path+file:///var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-doc-config-31853-0/member#0.1.0",
+              "profile": {
+                "debug_assertions": true,
+                "debuginfo": 2,
+                "opt_level": "0",
+                "overflow_checks": true,
+                "test": false
+              },
+              "reason": "compiler-artifact",
+              "target": {
+                "crate_types": [
+                  "lib"
+                ],
+                "doc": true,
+                "doctest": true,
+                "edition": "2021",
+                "kind": [
+                  "lib"
+                ],
+                "name": "member",
+                "src_path": "/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-doc-config-31853-0/member/src/lib.rs",
+                "test": true
+              }
+            },
+            {
+              "reason": "build-finished",
+              "success": true
+            }
+          ],
+          "package": "member"
+        },
+        {
+          "count": 0,
+          "original_cargo_events": [
+            {
+              "executable": null,
+              "features": [],
+              "filenames": [
+                "/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-doc-config-31853-0/.native-target/debug/deps/libindependent-97aef8e49705a6c7.rmeta"
+              ],
+              "fresh": false,
+              "manifest_path": "/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-doc-config-31853-0/independent/Cargo.toml",
+              "package_id": "path+file:///var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-doc-config-31853-0/independent#0.1.0",
+              "profile": {
+                "debug_assertions": true,
+                "debuginfo": 2,
+                "opt_level": "0",
+                "overflow_checks": true,
+                "test": false
+              },
+              "reason": "compiler-artifact",
+              "target": {
+                "crate_types": [
+                  "lib"
+                ],
+                "doc": true,
+                "doctest": true,
+                "edition": "2021",
+                "kind": [
+                  "lib"
+                ],
+                "name": "independent",
+                "src_path": "/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-doc-config-31853-0/independent/src/lib.rs",
+                "test": true
+              }
+            },
+            {
+              "reason": "build-finished",
+              "success": true
+            }
+          ],
+          "package": "independent"
+        }
+      ]
+    },
+    {
+      "discovery": {
+        "blocked_paths": [],
+        "build_roots": [
+          {
+            "manifests": [
+              "Cargo.toml"
+            ],
+            "path": "."
+          },
+          {
+            "manifests": [
+              "independent/Cargo.toml"
+            ],
+            "path": "independent"
+          },
+          {
+            "manifests": [
+              "member/Cargo.toml"
+            ],
+            "path": "member"
+          }
+        ],
+        "checker_configurations": [
+          {
+            "build_root": ".",
+            "category": "comments",
+            "checker_id": "rust.cargo_rustdoc",
+            "configuration": "unknown",
+            "configuration_ref": "Cargo.toml",
+            "next_action": "原清单精确声明：未解析；按原Cargo核验工作区继承、源码属性、lint组/priority与目标范围；未声明不等于未启用，不添加规则或修改无关源码，不把空章节或零诊断当详细文档合格",
+            "reason": "cargo_doc_lints_virtual_workspace_unresolved"
+          },
+          {
+            "build_root": ".",
+            "category": "comments",
+            "checker_id": "rust.cargo_clippy",
+            "configuration": "unknown",
+            "configuration_ref": "Cargo.toml",
+            "next_action": "原清单精确声明：未解析；按原Cargo核验工作区继承、源码属性、lint组/priority与目标范围；未声明不等于未启用，不添加规则或修改无关源码，不把空章节或零诊断当详细文档合格",
+            "reason": "cargo_doc_lints_virtual_workspace_unresolved"
+          },
+          {
+            "build_root": "independent",
+            "category": "comments",
+            "checker_id": "rust.cargo_rustdoc",
+            "configuration": "unknown",
+            "configuration_ref": "independent/Cargo.toml",
+            "next_action": "原清单精确声明：未解析；按原Cargo核验工作区继承、源码属性、lint组/priority与目标范围；未声明不等于未启用，不添加规则或修改无关源码，不把空章节或零诊断当详细文档合格",
+            "reason": "cargo_doc_lints_not_declared_in_manifest"
+          },
+          {
+            "build_root": "independent",
+            "category": "comments",
+            "checker_id": "rust.cargo_clippy",
+            "configuration": "unknown",
+            "configuration_ref": "independent/Cargo.toml",
+            "next_action": "原清单精确声明：未解析；按原Cargo核验工作区继承、源码属性、lint组/priority与目标范围；未声明不等于未启用，不添加规则或修改无关源码，不把空章节或零诊断当详细文档合格",
+            "reason": "cargo_doc_lints_not_declared_in_manifest"
+          },
+          {
+            "build_root": "member",
+            "category": "comments",
+            "checker_id": "rust.cargo_rustdoc",
+            "configuration": "unknown",
+            "configuration_ref": "member/Cargo.toml",
+            "next_action": "候选workspace清单：Cargo.toml；成员继承声明：member/Cargo.toml；成员归属/排除/通配及完整生效范围待原Cargo核验；原清单精确声明：未解析；按原Cargo核验工作区继承、源码属性、lint组/priority与目标范围；未声明不等于未启用，不添加规则或修改无关源码，不把空章节或零诊断当详细文档合格",
+            "reason": "cargo_doc_lints_group_or_default_unresolved"
+          },
+          {
+            "build_root": "member",
+            "category": "comments",
+            "checker_id": "rust.cargo_clippy",
+            "configuration": "unknown",
+            "configuration_ref": "member/Cargo.toml",
+            "next_action": "候选workspace清单：Cargo.toml；成员继承声明：member/Cargo.toml；成员归属/排除/通配及完整生效范围待原Cargo核验；原清单精确声明：missing_errors_doc=allow；按原Cargo核验工作区继承、源码属性、lint组/priority与目标范围；未声明不等于未启用，不添加规则或修改无关源码，不把空章节或零诊断当详细文档合格",
+            "reason": "cargo_doc_lints_workspace_declared_scope_unverified"
+          }
+        ],
+        "declared_versions": {
+          "independent/Cargo.toml": "0.1.0",
+          "member/Cargo.toml": "0.1.0"
+        },
+        "languages": [
+          {
+            "id": "rust",
+            "manifests": [
+              "Cargo.toml",
+              "independent/Cargo.toml",
+              "member/Cargo.toml"
+            ],
+            "source_files": [
+              "independent/src/lib.rs",
+              "member/src/lib.rs",
+              "src/lib.rs"
+            ]
+          },
+          {
+            "id": "toml",
+            "manifests": [],
+            "source_files": [
+              "Cargo.toml",
+              "independent/Cargo.toml",
+              "member/Cargo.toml"
+            ]
+          }
+        ],
+        "lockfiles": [
+          "Cargo.lock"
+        ],
+        "manifest_sha256": {
+          "Cargo.toml": "245508020c6676055d8b2f1222b9eb12f3e9131646c5bab7cd06fd00ea46815e",
+          "independent/Cargo.toml": "63bc7ba56b8ff571407330967548674ff1e30aaeccf55b66071d9a6a27adf439",
+          "member/Cargo.toml": "7ecae0b3c6cd478637d5974927e77e40d3bcce883ee185e5a5521da54dc730a2"
+        },
+        "native_tool_candidates": [],
+        "observation_complete": true,
+        "observed_entries": 12,
+        "report_type": "discovery",
+        "root": "/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-doc-config-31853-0",
+        "schema_version": "0.4.0",
+        "scope_summary": {
+          "configuration_exception_files_observed": 0,
+          "dependency_roots_excluded": 0,
+          "dot_prefix_roots_excluded": 1,
+          "git_safety_status": "not_evaluated",
+          "ordinary_scan_policy": "project_sources_default_v2"
+        },
+        "source_set_candidates": [],
+        "unknown_conditions": [
+          "build_model_not_evaluated",
+          "some_manifest_metadata_not_parsed",
+          "source_sets_not_fully_classified",
+          "dialects_not_classified",
+          "lock_contents_not_evaluated"
+        ]
+      },
+      "level": "allow",
+      "oracle": [
+        {
+          "count": 0,
+          "original_cargo_events": [
+            {
+              "executable": null,
+              "features": [],
+              "filenames": [
+                "/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-doc-config-31853-0/.native-target/debug/deps/libmember-2086ad1231af8c56.rmeta"
+              ],
+              "fresh": false,
+              "manifest_path": "/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-doc-config-31853-0/member/Cargo.toml",
+              "package_id": "path+file:///var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-doc-config-31853-0/member#0.1.0",
+              "profile": {
+                "debug_assertions": true,
+                "debuginfo": 2,
+                "opt_level": "0",
+                "overflow_checks": true,
+                "test": false
+              },
+              "reason": "compiler-artifact",
+              "target": {
+                "crate_types": [
+                  "lib"
+                ],
+                "doc": true,
+                "doctest": true,
+                "edition": "2021",
+                "kind": [
+                  "lib"
+                ],
+                "name": "member",
+                "src_path": "/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-doc-config-31853-0/member/src/lib.rs",
+                "test": true
+              }
+            },
+            {
+              "reason": "build-finished",
+              "success": true
+            }
+          ],
+          "package": "member"
+        },
+        {
+          "count": 0,
+          "original_cargo_events": [
+            {
+              "executable": null,
+              "features": [],
+              "filenames": [
+                "/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-doc-config-31853-0/.native-target/debug/deps/libindependent-97aef8e49705a6c7.rmeta"
+              ],
+              "fresh": false,
+              "manifest_path": "/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-doc-config-31853-0/independent/Cargo.toml",
+              "package_id": "path+file:///var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-doc-config-31853-0/independent#0.1.0",
+              "profile": {
+                "debug_assertions": true,
+                "debuginfo": 2,
+                "opt_level": "0",
+                "overflow_checks": true,
+                "test": false
+              },
+              "reason": "compiler-artifact",
+              "target": {
+                "crate_types": [
+                  "lib"
+                ],
+                "doc": true,
+                "doctest": true,
+                "edition": "2021",
+                "kind": [
+                  "lib"
+                ],
+                "name": "independent",
+                "src_path": "/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-doc-config-31853-0/independent/src/lib.rs",
+                "test": true
+              }
+            },
+            {
+              "reason": "build-finished",
+              "success": true
+            }
+          ],
+          "package": "independent"
+        }
+      ]
+    }
+  ],
+  "cli_sha256": "d42318c84b6b12e12490d9abe3f118fe9b27a76a979b2db3b77e2a0041982082",
+  "clippy_version": "clippy 0.1.98 (48a229ceae 2026-09-01)",
+  "qualification": "not_granted"
+}

@@ -1,0 +1,13 @@
+{
+  "attempt_id": "CG-A-a74640eac947f764363057c856417d9d",
+  "authority": "local_unverified",
+  "event": "verification_observed",
+  "kind": "finding",
+  "observation": "still_present",
+  "report_sha256": "9b3aef1cf9fd289437631ea00f27d7a112eac8b15801f9ef9c53cba006b75b8e",
+  "run_id": "shellcheck-1791220785281289000-43016-0",
+  "schema_version": "0.3.0",
+  "state_after": "open",
+  "task_id": "CG-9e3be727dbf76c8e55a5ca543cc21506",
+  "workspace_id": "ws-4513e658e990d3991087e3644f2c7a35"
+}

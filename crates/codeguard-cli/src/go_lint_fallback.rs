@@ -10,6 +10,25 @@ pub(crate) fn run(
     deadline: Instant,
     json_output: bool,
 ) -> ExitCode {
+    // 取消后不得继续启动 WASM 候选初检；保留取消语义并按契约返回 130。
+    if native["reason"] == "request_cancelled" || codeguard_runtime::sigint_cancellation_requested()
+    {
+        let report = json!({"schema_version":"0.7.0","report_type":"go_lint_fallback_feedback","operation":"lint","language":"go",
+            "command_status":"cancelled","exit_code":130,"authority":"local_unverified","coverage_proven":false,"delivery_decision":"not_evaluated",
+            "tool_selection":selection,"native_report":native,
+            "syntax_candidates":{"status":"not_run","reason":"request_cancelled","execution_phase":"after_native","authority":"candidate_unqualified","delivery_decision":"incomplete",
+                "source_file_count":0,"skipped_count":0,"unrouted_count":0,"native_preferred_count":0,"observations":[],
+                "next_action":"请求已取消；不缓存也不签发 clean，需要时重新执行原检查"},
+            "syntax_tasks":{"status":"not_attempted"},
+            "preliminary_result":"incomplete","native_tool_requirement":"required",
+            "next_actions":["request_cancelled_rerun_after_review"]});
+        if json_output {
+            println!("{report}");
+        } else {
+            println!("Go 检查已取消（退出 130）；候选初检未运行，不签发任何通过结论");
+        }
+        return ExitCode::from(130);
+    }
     let syntax = observe(root, deadline);
     let tasks = crate::syntax_confirmation::persist(root, &syntax, deadline);
     let result = preliminary_result(&syntax);
@@ -18,11 +37,14 @@ pub(crate) fn run(
     } else {
         "required"
     };
-    let report = json!({"schema_version":"0.7.0","report_type":"go_lint_fallback_feedback","operation":"lint","language":"go",
+    let mut report = json!({"schema_version":"0.7.0","report_type":"go_lint_fallback_feedback","operation":"lint","language":"go",
         "command_status":"incomplete","exit_code":3,"authority":"local_unverified","coverage_proven":false,"delivery_decision":"not_evaluated",
         "tool_selection":selection,"native_report":native,"syntax_candidates":syntax,"syntax_tasks":tasks,
         "preliminary_result":result,"native_tool_requirement":requirement,
         "next_actions":if requirement == "required" {json!(["prepare_project_native_go_then_confirm_candidates","preserve_source_until_native_confirmation"])}else {json!(["recommend_project_native_go_for_complete_lint","retain_unfinished_project_obligations"])}});
+    // 候选初检期间的取消同样保留取消语义；已取得的候选观察不撤回也不升级为通过。
+    crate::go_lint_command::mark_request_cancellation(&mut report);
+    let exit = report["exit_code"].as_u64().unwrap_or(3) as u8;
     if json_output {
         println!("{report}");
     } else {
@@ -57,7 +79,7 @@ pub(crate) fn run(
             report["syntax_tasks"]["status"]
         );
     }
-    ExitCode::from(3)
+    ExitCode::from(exit)
 }
 
 #[cfg(feature = "wasm-precheck")]

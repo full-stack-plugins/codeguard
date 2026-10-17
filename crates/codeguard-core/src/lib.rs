@@ -24,6 +24,7 @@ mod observation_port;
 mod repository_path_safety;
 mod syntax_file_observation;
 mod syntax_file_state;
+mod syntax_incomplete_reason;
 mod syntax_precheck;
 mod syntax_precheck_outcome;
 mod syntax_precheck_status;
@@ -69,6 +70,10 @@ pub use observation_port::{ObservationPort, ObservedPathKind};
 pub use repository_path_safety::{RepositoryPathViolation, check_repository_paths};
 pub use syntax_file_observation::SyntaxFileObservation;
 pub use syntax_file_state::SyntaxFileState;
+pub use syntax_incomplete_reason::{
+    INCOMPLETE_REASON, REASON_PARSER_ERROR_UNLOCATED, REASON_SCAN_TRUNCATED,
+    is_incomplete_syntax_reason,
+};
 pub use syntax_precheck::assess_syntax_precheck;
 pub use syntax_precheck_outcome::SyntaxPrecheckOutcome;
 pub use syntax_precheck_status::SyntaxPrecheckStatus;
@@ -134,3 +139,13 @@ mod task_resolution_policy;
 pub use task_resolution_policy::TaskResolutionPolicy;
 mod task_lifecycle_record;
 pub use task_lifecycle_record::TaskLifecycleRecord;
+
+/// 稳定问题身份的纯领域契约。
+pub mod finding_identity;
+/// 批准策略和运行配置的纯合并规则。
+pub mod run_config;
+/// 带完整性状态的纯模块图。
+pub mod typed_module_graph;
+
+mod unbound_native_diagnostic;
+pub use unbound_native_diagnostic::UnboundNativeDiagnostic;

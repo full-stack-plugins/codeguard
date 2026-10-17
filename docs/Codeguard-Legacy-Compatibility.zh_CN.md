@@ -56,3 +56,5 @@ Rust `crates/codeguard-cli/src/legacy_v1_protocol.rs` 只承接**已经归类**�
 | `scripts/bump-plugin.mjs`：Claude 版本路径写后核对 | **保留发布正确性**；新二进制与插件锁/市场仍需分层验收。见 binary-distribution | `tests/test_plugin_manifests.py`；新发布验收 13.4 待实现 |
 
 旧源码中仍存在新规范明确纠偏的共性行为：通用 `rc=1` 推断 finding、最多 50 文件时的 delta/基线豁免、缺工具旧 Hook 放行、Java Maven verify 代替多项质量义务。它们分别由 native-tool-adapters、verdict-integrity、execution-kernel、hook-protocol 和 language-gate-commands 的新要求替换；当时仅有领域聚合测试，真实新适配器和完整对照 fixture 尚未落地，因此 OpenSpec 1.1 **仍未完成**。
+
+57语言逐字段核对：[Codeguard-Legacy-Registry-Audit.zh_CN.md](Codeguard-Legacy-Registry-Audit.zh_CN.md)

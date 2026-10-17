@@ -1,0 +1,701 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:c-family-comments-feedback:0.6.0",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "0.6.0"
+    },
+    "report_type": {
+      "const": "c_family_comments_feedback"
+    },
+    "operation": {
+      "const": "comments"
+    },
+    "language": {
+      "enum": [
+        "c",
+        "cpp"
+      ]
+    },
+    "command_status": {
+      "enum": [
+        "incomplete",
+        "cancelled"
+      ]
+    },
+    "exit_code": {
+      "enum": [
+        3,
+        130
+      ]
+    },
+    "authority": {
+      "const": "local_unverified"
+    },
+    "coverage_proven": {
+      "const": false
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    },
+    "local_scan_complete": {
+      "type": "boolean"
+    },
+    "detailed_contract_qualification": {
+      "const": "not_granted"
+    },
+    "workspace_binding": {
+      "enum": [
+        "bound",
+        "not_bound"
+      ]
+    },
+    "next": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "urn:codeguard:schema:repair-brief-preview:0.30.0"
+        }
+      ]
+    },
+    "reason": {
+      "enum": [
+        "native_syntax_errors_limit_documentation",
+        "native_documentation_coverage_unverified"
+      ]
+    },
+    "path": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_sha256": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      ]
+    },
+    "verification_command": {
+      "type": "array",
+      "minItems": 13,
+      "maxItems": 13,
+      "prefixItems": [
+        {
+          "const": "codeguard"
+        },
+        {
+          "const": "comments"
+        },
+        {
+          "enum": [
+            "c",
+            "cpp"
+          ]
+        },
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "const": "--clang-tool"
+        },
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "const": "--standard"
+        },
+        {
+          "enum": [
+            "c11",
+            "c++17"
+          ]
+        },
+        {
+          "const": "--timeout"
+        },
+        {
+          "type": "string",
+          "pattern": "^[0-9]+ms$"
+        },
+        {
+          "const": "--workspace"
+        },
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "const": "--format=json"
+        }
+      ],
+      "items": false
+    },
+    "documentation_configuration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "origin": {
+          "const": "explicit_probe_profile"
+        },
+        "profile": {
+          "const": "clang-documentation-v1"
+        },
+        "standard": {
+          "enum": [
+            "c11",
+            "c++17"
+          ]
+        },
+        "project_configuration": {
+          "const": "unknown"
+        },
+        "comment_scope": {
+          "const": "recognized_documentation_comments_only"
+        },
+        "rule_coverage": {
+          "const": "limited"
+        }
+      },
+      "required": [
+        "origin",
+        "profile",
+        "standard",
+        "project_configuration",
+        "comment_scope",
+        "rule_coverage"
+      ]
+    },
+    "native": {
+      "$ref": "urn:codeguard:syntax-lint-feedback:0.2#/properties/native"
+    },
+    "documentation_findings": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "$ref": "#/$defs/documentation_finding"
+      }
+    },
+    "unclassified_native_diagnostics": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "rule_id",
+          "line",
+          "column_byte",
+          "level"
+        ],
+        "properties": {
+          "rule_id": {
+            "type": "string",
+            "pattern": "^clang\\.[A-Za-z0-9_]+$",
+            "maxLength": 134
+          },
+          "line": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "column_byte": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "level": {
+            "enum": [
+              "error",
+              "warning"
+            ]
+          }
+        }
+      }
+    },
+    "next_actions": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 1024
+      }
+    },
+    "task_workflow_status": {
+      "const": "partial"
+    },
+    "workbench": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "reason",
+        "workspace_id",
+        "run_id",
+        "task_ids",
+        "sync"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "incomplete",
+            "synced_partial"
+          ]
+        },
+        "reason": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "workspace_id": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "run_id": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "pattern": "^clangdoc-[0-9]+-[0-9]+-[0-9]+$"
+            }
+          ]
+        },
+        "task_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^CG-(B-)?[a-f0-9]{32}$"
+          }
+        },
+        "sync": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "new_findings",
+                "new_blockers",
+                "imported_reports",
+                "already_consumed_reports",
+                "historical_findings"
+              ],
+              "properties": {
+                "new_findings": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "new_blockers": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "imported_reports": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "already_consumed_reports": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "historical_findings": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "documentation_structure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "reason",
+        "observation",
+        "native_raw_diagnostic_count"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "observed",
+            "incomplete"
+          ]
+        },
+        "reason": {
+          "enum": [
+            "clang_structure_observed",
+            "clang_structure_report_invalid",
+            "clang_structure_unavailable",
+            "clang_source_changed",
+            "request_cancelled",
+            "clang_execution_incomplete"
+          ]
+        },
+        "observation": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "clang-function-documentation-structure-v0.1.schema.json"
+            }
+          ]
+        },
+        "native_raw_diagnostic_count": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "observed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "reason": {
+                "const": "clang_structure_observed"
+              },
+              "observation": {
+                "$ref": "clang-function-documentation-structure-v0.1.schema.json"
+              },
+              "native_raw_diagnostic_count": {
+                "type": "integer"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "observation": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "structural_task_workflow_status": {
+      "const": "not_integrated"
+    }
+  },
+  "required": [
+    "schema_version",
+    "report_type",
+    "operation",
+    "language",
+    "command_status",
+    "exit_code",
+    "authority",
+    "coverage_proven",
+    "delivery_decision",
+    "local_scan_complete",
+    "detailed_contract_qualification",
+    "workspace_binding",
+    "next",
+    "reason",
+    "path",
+    "source_sha256",
+    "verification_command",
+    "documentation_configuration",
+    "native",
+    "documentation_findings",
+    "unclassified_native_diagnostics",
+    "next_actions",
+    "task_workflow_status",
+    "workbench",
+    "documentation_structure",
+    "structural_task_workflow_status"
+  ],
+  "$defs": {
+    "documentation_finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rule_id",
+        "line",
+        "column_byte",
+        "level",
+        "path",
+        "rule_summary",
+        "repair_steps",
+        "allowed_changes",
+        "closing_condition"
+      ],
+      "properties": {
+        "rule_id": {
+          "enum": [
+            "clang.warn_doc_block_command_empty_paragraph",
+            "clang.warn_doc_param_not_found",
+            "clang.warn_doc_returns_attached_to_a_void_function"
+          ]
+        },
+        "line": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "column_byte": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "level": {
+          "enum": [
+            "error",
+            "warning"
+          ]
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "rule_summary": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "repair_steps": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024
+          }
+        },
+        "allowed_changes": {
+          "const": "documentation_comment_only"
+        },
+        "closing_condition": {
+          "const": "original_native_recheck_and_approved_complete_coverage_required"
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "language": {
+            "const": "c"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "documentation_configuration": {
+            "properties": {
+              "standard": {
+                "const": "c11"
+              }
+            }
+          },
+          "verification_command": {
+            "prefixItems": [
+              {},
+              {},
+              {
+                "const": "c"
+              },
+              {},
+              {},
+              {},
+              {},
+              {
+                "const": "c11"
+              }
+            ]
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "documentation_configuration": {
+            "properties": {
+              "standard": {
+                "const": "c++17"
+              }
+            }
+          },
+          "verification_command": {
+            "prefixItems": [
+              {},
+              {},
+              {
+                "const": "cpp"
+              },
+              {},
+              {},
+              {},
+              {},
+              {
+                "const": "c++17"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "command_status": {
+            "const": "cancelled"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "exit_code": {
+            "const": 130
+          },
+          "local_scan_complete": {
+            "const": false
+          },
+          "native": {
+            "properties": {
+              "status": {
+                "const": "incomplete"
+              },
+              "reason": {
+                "const": "request_cancelled"
+              }
+            }
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "exit_code": {
+            "const": 3
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "native": {
+            "properties": {
+              "status": {
+                "const": "incomplete"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "local_scan_complete": {
+            "const": false
+          },
+          "documentation_findings": {
+            "const": []
+          },
+          "unclassified_native_diagnostics": {
+            "const": []
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "local_scan_complete": {
+            "const": true
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "source_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "native": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "completed",
+                  "diagnostics_observed"
+                ]
+              },
+              "diagnostics": {
+                "items": {
+                  "properties": {
+                    "level": {
+                      "const": "warning"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "reason": {
+            "const": "native_syntax_errors_limit_documentation"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "local_scan_complete": {
+            "const": false
+          },
+          "native": {
+            "properties": {
+              "diagnostics": {
+                "contains": {
+                  "properties": {
+                    "level": {
+                      "const": "error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

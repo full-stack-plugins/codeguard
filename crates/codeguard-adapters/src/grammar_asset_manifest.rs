@@ -40,7 +40,7 @@ const SWIFT_COMMIT: &str = "31d17fe7e818a2048c808b5c6fdc2dc792f4f5b5";
 const VBNET_COMMIT: &str = "538b7087bf80e86004531b392fe1186379c0a2b5";
 
 /// 代码来源、许可和每份候选 grammar 的固定身份。
-#[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
+#[derive(Clone, Debug, Deserialize, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub struct GrammarAssetManifest {
     /// 本清单格式。
@@ -66,7 +66,7 @@ pub struct GrammarAssetManifest {
 }
 
 /// 单份 grammar 的来源、编译制品及尚未验证的语言范围。
-#[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
+#[derive(Clone, Debug, Deserialize, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub struct GrammarAsset {
     /// 语言规范 ID。
@@ -103,12 +103,44 @@ pub struct GrammarAsset {
     pub codegraph_runtime: String,
     /// CodeGuard Rust 加载状态，尚不能由静态清单升格为通过。
     pub codeguard_runtime_validation: String,
-    /// 已在 CodeGuard 验收的语言版本；当前必须为空。
+    /// 已在 CodeGuard 验收的语言版本。
+    /// `candidate_unvalidated` 时必须为空（尚未验收任何版本）；
+    /// `validated` 时记录已验收的具体版本。
     pub language_versions: Vec<String>,
     /// 本候选的已知缺口。
     pub known_limitations: Vec<String>,
     /// 发行状态；候选字节不能等同已发行可用。
+    /// `candidate_unvalidated` = 候选，未完成精度验收。
+    /// `validated` = 精度验收通过，允许在 `release_status` 为 `validated` 时使用。
     pub release_status: String,
+    /// 精度验证证据。`release_status` 为 `validated` 时必须存在且完整。
+    pub precision_validation: Option<PrecisionValidation>,
+}
+
+/// 语法精度验证证据。`release_status: validated` 的必要条件。
+#[derive(Clone, Debug, Deserialize, PartialEq)]
+pub struct PrecisionValidation {
+    /// 验证日期（ISO 8601）。
+    pub validated_at: String,
+    /// 语料样本总数。
+    pub total_samples: u32,
+    /// 真阳性（正确检出违规）。
+    pub true_positives: u32,
+    /// 假阳性（误报合法代码为违规）。
+    pub false_positives: u32,
+    /// 假阴性（漏检真实违规）。
+    pub false_negatives: u32,
+    /// 真阴性（正确判定合法）。
+    pub true_negatives: u32,
+    /// 未知/无法判定的样本数。
+    pub unknown: u32,
+    /// 95% Wilson 精度下界（precision lower bound）。
+    /// 有效样本 >= 1 时必须 >= 0.98 才能判为 validated。
+    pub precision_wilson_lower_bound: f64,
+    /// 证据文件路径（tests/acceptance/ 下）。
+    pub evidence_path: String,
+    /// 原生工具对照版本（如有）。
+    pub native_oracle_version: Option<String>,
 }
 
 /// 读取仓内固定清单，并检查来源、许可证及候选资产字节。
@@ -830,17 +862,52 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
                 }
             || asset.codegraph_runtime != "web-tree-sitter 0.25.3"
             || asset.codeguard_runtime_validation != "rust_loader_smoke_passed"
-            || !asset.language_versions.is_empty()
-            || asset.known_limitations.is_empty()
+            // candidate 阶段 language_versions 必须为空；validated 允许非空（记录已验收版本）
+            || (asset.release_status == "candidate_unvalidated"
+                && !asset.language_versions.is_empty())
+            // candidate 阶段必须有已知缺口；validated 允许无缺口（意味着全面验收通过）
+            || (asset.release_status == "candidate_unvalidated"
+                && asset.known_limitations.is_empty())
             || asset.known_limitations.len() > 8
             || asset.known_limitations.iter().any(|limitation| {
                 limitation.is_empty()
                     || limitation.len() > 1024
                     || limitation.chars().any(char::is_control)
             })
-            || asset.release_status != "candidate_unvalidated"
+            || (!matches!(
+                asset.release_status.as_str(),
+                "candidate_unvalidated" | "validated"
+            ) || (asset.release_status == "validated" && asset.precision_validation.is_none()))
         {
             return Err(format!("{} grammar 来源或验收状态不符", asset.language));
+        }
+        // validated 需要完整的精度证据；缺失或数据矛盾的证据不能授予资格。
+        if asset.release_status == "validated" {
+            let pv = asset
+                .precision_validation
+                .as_ref()
+                .ok_or(format!("{} grammar 缺精度验证证据", asset.language))?;
+            if pv.validated_at.is_empty()
+                || pv.total_samples == 0
+                || pv
+                    .true_positives
+                    .saturating_add(pv.false_positives)
+                    .saturating_add(pv.false_negatives)
+                    .saturating_add(pv.true_negatives)
+                    .saturating_add(pv.unknown)
+                    == 0
+                || pv.evidence_path.is_empty()
+            {
+                return Err(format!("{} grammar 精度验证证据不完整", asset.language));
+            }
+            // 有效样本（可判精度的样本）的 95% Wilson 下界必须 >= 0.98。
+            let valid_samples = pv.true_positives + pv.false_positives;
+            if valid_samples > 0 && pv.precision_wilson_lower_bound < 0.98 {
+                return Err(format!(
+                    "{} grammar 精度 Wilson 下界 {:.4} < 0.98，不满足资格",
+                    asset.language, pv.precision_wilson_lower_bound
+                ));
+            }
         }
     }
     Ok(manifest)

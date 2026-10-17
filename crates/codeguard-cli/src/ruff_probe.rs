@@ -292,7 +292,7 @@ pub fn run_ruff_probe(request: &RuffProbeRequest, cancelled: &AtomicBool) -> Ruf
     if settings.as_ref().is_some_and(|settings| {
         parsed.diagnostics.iter().any(|diagnostic| {
             (matches!(diagnostic.code.as_str(), "F401" | "E501")
-                || codeguard_adapters::is_ruff_pydocstyle_rule(&diagnostic.code))
+                || codeguard_adapters::is_ruff_documentation_rule(&diagnostic.code))
                 && !settings.native_rule_enabled(&diagnostic.code)
         })
     }) {

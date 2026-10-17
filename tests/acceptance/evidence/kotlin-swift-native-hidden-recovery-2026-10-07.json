@@ -1,0 +1,33 @@
+{
+  "evidence_kind": "development_hidden_recovery_native_recheck",
+  "qualification": "not_granted",
+  "independent_holdout": false,
+  "source_hashes": {
+    "crates/codeguard-cli/tests/kotlin_native_differential.rs": "58feb13a4d08856562779511446b0987c103830f3ec8aac6c353eec4d1249654",
+    "crates/codeguard-cli/tests/swift_native_differential.rs": "c93afaf633d821eaf969f3507c9bd5119b3b2441bef478490bea44fb5be14494",
+    "grammars/manifest.json": "9fe2fa77181aedd74755a2ac5b8fe694b2d4f2d33f03518d814476a911b2a610"
+  },
+  "kotlin": {
+    "tool": "/opt/homebrew/bin/kotlinc",
+    "version_assertion": "kotlinc-jvm 2.4.10",
+    "tests_passed": 3,
+    "tests_ignored": 0,
+    "elapsed_seconds": 44.72,
+    "unresolved_wasm": [
+      "object",
+      "missing_parameter_type"
+    ]
+  },
+  "swift": {
+    "tool": "/usr/bin/swiftc",
+    "version_assertion": "Apple Swift version 6.4",
+    "candidate_tests_passed": 1,
+    "initial_native_failure": "invocation_env_missing_CODEGUARD_SWIFTC_BIN",
+    "native_recheck_passed": 1,
+    "native_recheck_elapsed_seconds": 49.73,
+    "unresolved_wasm": [
+      "bad_param"
+    ]
+  },
+  "delivery_decision": "not_evaluated"
+}

@@ -148,6 +148,9 @@ pub(super) fn parse(
             && !matches!(
                 reason,
                 "cargo_audit_execution_incomplete"
+                    | "cargo_audit_database_changed"
+                    | "cargo_audit_database_snapshot_unavailable"
+                    | "cargo_audit_database_snapshot_limit_exceeded"
                     | "cargo_audit_output_limit"
                     | "request_deadline_exceeded"
             ))

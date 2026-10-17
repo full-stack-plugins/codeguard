@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://codeguard.dev/schemas/clang-documentation-placeholder-v0.1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "observation_type",
+    "rule",
+    "policy_version",
+    "authority",
+    "qualification",
+    "coverage_proven",
+    "semantic_accuracy",
+    "positions"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.1.0"
+    },
+    "observation_type": {
+      "const": "clang_documentation_placeholder_observation"
+    },
+    "rule": {
+      "const": "codeguard.documentation.placeholder_description"
+    },
+    "policy_version": {
+      "const": "1"
+    },
+    "authority": {
+      "const": "codeguard_structural_policy"
+    },
+    "qualification": {
+      "const": "not_granted"
+    },
+    "coverage_proven": {
+      "const": false
+    },
+    "semantic_accuracy": {
+      "const": "not_evaluated"
+    },
+    "positions": {
+      "type": "array",
+      "maxItems": 516000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "offset_byte",
+          "line",
+          "column_byte",
+          "component"
+        ],
+        "properties": {
+          "offset_byte": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1048576
+          },
+          "line": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "column_byte": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "component": {
+            "type": "string",
+            "maxLength": 266,
+            "pattern": "^(purpose|return|parameter:.+)$"
+          }
+        }
+      }
+    }
+  }
+}

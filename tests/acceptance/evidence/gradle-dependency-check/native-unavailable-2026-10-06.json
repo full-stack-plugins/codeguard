@@ -1,0 +1,158 @@
+[
+  {
+    "case": "ordinary_imitation",
+    "public_feedback": {
+      "authority": "local_unverified",
+      "budget": {
+        "enforcement": "native_execution_only",
+        "source": "cli",
+        "timeout_ms": 90000
+      },
+      "delivery_decision": "not_evaluated",
+      "language": "java",
+      "mode": "gradle",
+      "native": {
+        "authority": "local_unverified",
+        "checker_id": "java.gradle.dependency_check",
+        "coverage_proven": false,
+        "database_freshness_verified": false,
+        "delivery_decision": "not_evaluated",
+        "dependency_attribution_verified": false,
+        "dependency_cache_sha256": null,
+        "gradle_bundle_sha256": "915f28e8fd4f7133e51321c688bf59dbc4c18da8748a297913010d245ddd3651",
+        "init_scripts_sha256": "384b54fad544562d01b2931612ae38cdf3bb60a30bb6dbf41d18bcd7581ad6df",
+        "java_entry_sha256": "e820b09ad7e80bf14ec6803d9ade8abc02dfbfe9d0540f9b0e8c6d334706bc5e",
+        "jdk_release_sha256": "9e5f483cd7a0b0bd3524139fb7e08dae750bd9b60336004fa70cd2d00bcc0583",
+        "model_report_sha256": null,
+        "native_exit_code": 1,
+        "native_status": "incomplete",
+        "native_stderr_sha256": "81a2259cd84960b8abfe38d4cb55bdf991fd69da4c53a52cafa2971b03c23688",
+        "native_stdout_sha256": "fd71b8e8747616f37392d80258f58df1bf8201e9989f837e76f983a00b63f3c3",
+        "ownership_report_sha256": null,
+        "reason": "gradle_owasp_task_unavailable",
+        "report_type": "gradle_dependency_check_probe",
+        "reports": [],
+        "schema_version": "0.1.0",
+        "source_snapshot_sha256": "19e71be441993c1867387c779c022f3000510974ebd05aedfb984783ad2be960",
+        "task_paths": []
+      },
+      "next_action": "读取原生reason恢复已有Gradle/JDK、原OWASP任务、原JSON配置和选定输入；缺插件或漏洞库属于环境阻塞，不修改无关源码。恢复后使用相同原任务复检",
+      "operation": "cve",
+      "report_type": "java_gradle_cve_feedback",
+      "requested_task_paths": [
+        ":dependencyCheckAnalyze"
+      ],
+      "schema_version": "0.1.0",
+      "selected_inputs": [
+        "build.gradle",
+        "settings.gradle"
+      ],
+      "task_sync": "not_integrated"
+    },
+    "report": {
+      "authority": "local_unverified",
+      "checker_id": "java.gradle.dependency_check",
+      "coverage_proven": false,
+      "database_freshness_verified": false,
+      "delivery_decision": "not_evaluated",
+      "dependency_attribution_verified": false,
+      "dependency_cache_sha256": null,
+      "gradle_bundle_sha256": "915f28e8fd4f7133e51321c688bf59dbc4c18da8748a297913010d245ddd3651",
+      "init_scripts_sha256": "384b54fad544562d01b2931612ae38cdf3bb60a30bb6dbf41d18bcd7581ad6df",
+      "java_entry_sha256": "e820b09ad7e80bf14ec6803d9ade8abc02dfbfe9d0540f9b0e8c6d334706bc5e",
+      "jdk_release_sha256": "9e5f483cd7a0b0bd3524139fb7e08dae750bd9b60336004fa70cd2d00bcc0583",
+      "model_report_sha256": null,
+      "native_exit_code": 1,
+      "native_status": "incomplete",
+      "native_stderr_sha256": "567e86e4cc7ad2f59af081dd99080a7ef549c66de5d92203d56701b9abb40096",
+      "native_stdout_sha256": "fd71b8e8747616f37392d80258f58df1bf8201e9989f837e76f983a00b63f3c3",
+      "ownership_report_sha256": null,
+      "reason": "gradle_owasp_task_unavailable",
+      "report_type": "gradle_dependency_check_probe",
+      "reports": [],
+      "schema_version": "0.1.0",
+      "source_snapshot_sha256": "19e71be441993c1867387c779c022f3000510974ebd05aedfb984783ad2be960",
+      "task_paths": []
+    },
+    "source_build": "plugins { id 'java' }\ntasks.register('dependencyCheckAnalyze') { doLast { throw new GradleException('ordinary_task_must_not_run') } }\n",
+    "source_settings": "rootProject.name='sample'\n"
+  },
+  {
+    "case": "missing_offline_plugin",
+    "public_feedback": {
+      "authority": "local_unverified",
+      "budget": {
+        "enforcement": "native_execution_only",
+        "source": "cli",
+        "timeout_ms": 90000
+      },
+      "delivery_decision": "not_evaluated",
+      "language": "java",
+      "mode": "gradle",
+      "native": {
+        "authority": "local_unverified",
+        "checker_id": "java.gradle.dependency_check",
+        "coverage_proven": false,
+        "database_freshness_verified": false,
+        "delivery_decision": "not_evaluated",
+        "dependency_attribution_verified": false,
+        "dependency_cache_sha256": null,
+        "gradle_bundle_sha256": "915f28e8fd4f7133e51321c688bf59dbc4c18da8748a297913010d245ddd3651",
+        "init_scripts_sha256": "384b54fad544562d01b2931612ae38cdf3bb60a30bb6dbf41d18bcd7581ad6df",
+        "java_entry_sha256": "e820b09ad7e80bf14ec6803d9ade8abc02dfbfe9d0540f9b0e8c6d334706bc5e",
+        "jdk_release_sha256": "9e5f483cd7a0b0bd3524139fb7e08dae750bd9b60336004fa70cd2d00bcc0583",
+        "model_report_sha256": null,
+        "native_exit_code": 1,
+        "native_status": "incomplete",
+        "native_stderr_sha256": "0faac37826c0a19f2e4958afa4f81d2922ab66a0d1d7abce75003705a3bfe71b",
+        "native_stdout_sha256": "fd71b8e8747616f37392d80258f58df1bf8201e9989f837e76f983a00b63f3c3",
+        "ownership_report_sha256": null,
+        "reason": "gradle_native_model_incomplete",
+        "report_type": "gradle_dependency_check_probe",
+        "reports": [],
+        "schema_version": "0.1.0",
+        "source_snapshot_sha256": "a73bfab3d01d3f5b1ea5620097c2474ee850ee2fc3f79e254e4aa23af4e2358e",
+        "task_paths": []
+      },
+      "next_action": "读取原生reason恢复已有Gradle/JDK、原OWASP任务、原JSON配置和选定输入；缺插件或漏洞库属于环境阻塞，不修改无关源码。恢复后使用相同原任务复检",
+      "operation": "cve",
+      "report_type": "java_gradle_cve_feedback",
+      "requested_task_paths": [
+        ":dependencyCheckAnalyze"
+      ],
+      "schema_version": "0.1.0",
+      "selected_inputs": [
+        "build.gradle",
+        "settings.gradle"
+      ],
+      "task_sync": "not_integrated"
+    },
+    "report": {
+      "authority": "local_unverified",
+      "checker_id": "java.gradle.dependency_check",
+      "coverage_proven": false,
+      "database_freshness_verified": false,
+      "delivery_decision": "not_evaluated",
+      "dependency_attribution_verified": false,
+      "dependency_cache_sha256": null,
+      "gradle_bundle_sha256": "915f28e8fd4f7133e51321c688bf59dbc4c18da8748a297913010d245ddd3651",
+      "init_scripts_sha256": "384b54fad544562d01b2931612ae38cdf3bb60a30bb6dbf41d18bcd7581ad6df",
+      "java_entry_sha256": "e820b09ad7e80bf14ec6803d9ade8abc02dfbfe9d0540f9b0e8c6d334706bc5e",
+      "jdk_release_sha256": "9e5f483cd7a0b0bd3524139fb7e08dae750bd9b60336004fa70cd2d00bcc0583",
+      "model_report_sha256": null,
+      "native_exit_code": 1,
+      "native_status": "incomplete",
+      "native_stderr_sha256": "5627f9db474284725753a0d695ad075316041dfa78da8012eca05bab8f44dd30",
+      "native_stdout_sha256": "fd71b8e8747616f37392d80258f58df1bf8201e9989f837e76f983a00b63f3c3",
+      "ownership_report_sha256": null,
+      "reason": "gradle_native_model_incomplete",
+      "report_type": "gradle_dependency_check_probe",
+      "reports": [],
+      "schema_version": "0.1.0",
+      "source_snapshot_sha256": "a73bfab3d01d3f5b1ea5620097c2474ee850ee2fc3f79e254e4aa23af4e2358e",
+      "task_paths": []
+    },
+    "source_build": "plugins { id 'org.owasp.dependencycheck' version '12.1.0' }\n",
+    "source_settings": "rootProject.name='sample'\n"
+  }
+]

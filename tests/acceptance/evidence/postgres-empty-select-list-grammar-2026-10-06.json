@@ -1,0 +1,29 @@
+{
+  "delivery_decision": "not_evaluated",
+  "grammar_qualified": false,
+  "grammar_sha256": "9d4eaaec46eec7e6400d4b8d6c85fac7dfe33867ed5b4e5c218dfa7851c32558",
+  "language": "cfquery",
+  "native": {
+    "reason": "explicit_candidate_probe",
+    "status": "not_run"
+  },
+  "next_action": "run_or_configure_applicable_native_lint_before_delivery",
+  "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-cfquery-probe-nd_jix6b/postgres-empty-select-list.sql",
+  "precheck": {
+    "cancelled": false,
+    "checked_files": 1,
+    "incomplete_files": 0,
+    "scope_complete": true,
+    "selected_files": 1,
+    "status": "incomplete",
+    "suspected_recoveries": 0,
+    "truncated_files": 0,
+    "unqualified_files": 1,
+    "unsupported_files": 0
+  },
+  "recoveries": [],
+  "report_type": "grammar_candidate_probe",
+  "schema_version": "0.1.0",
+  "source_sha256": "40cfe2fef3dbbdb052f013c95d5601fabbf774ce3cf6a2df615c4e1e9529d409",
+  "status": "incomplete"
+}

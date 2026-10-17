@@ -1,0 +1,7 @@
+{
+  "evidence_kind": "development_ast_schema_regression",
+  "qualification": "not_granted",
+  "historical_schemas_unchanged": 488,
+  "native_observations_valid": 60,
+  "negative_cases_rejected": 9
+}
