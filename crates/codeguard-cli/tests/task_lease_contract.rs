@@ -465,13 +465,17 @@ fn unresolved_prerequisite_blocker_prevents_independent_source_bypass() {
     );
     add_local_finding(&project, "other.py");
     fs::write(project.root.join("ruff.toml"), "[lint]\nselect=['F401']\n").unwrap();
+    // Exercise unavailable-tool handling, not invalid drive-relative syntax on Windows.
+    let missing_tool = project.root.join("nonexistent-codeguard-ruff.exe");
+    assert!(missing_tool.is_absolute());
+    assert!(!missing_tool.exists());
     let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
         .args([
             "lint",
             "python",
             project.root.to_str().unwrap(),
             "--ruff-tool",
-            "/nonexistent/codeguard-ruff",
+            missing_tool.to_str().unwrap(),
             "--format=json",
         ])
         .output()
