@@ -221,11 +221,21 @@ fn run_prepared(
         .and_then(|_| nonblocking(&stderr))
         .and_then(|_| stdin.as_ref().map_or(Ok(()), nonblocking));
     let assigned = unsafe { AssignProcessToJobObject(job.0, child.as_raw_handle()) } != 0;
-    let ready = configured.is_ok()
-        && assigned
-        && before_resume()
-        && resume_initial_thread(child.id()).is_ok();
-    if !ready {
+    let assignment_error = (!assigned).then(io::Error::last_os_error);
+    #[cfg(test)]
+    eprintln!(
+        "suspended process setup: pipe_configuration={configured:?}; job_assignment={assignment_error:?}"
+    );
+    let setup = configured.and_then(|_| match assignment_error {
+        Some(error) => Err(error),
+        None if !before_resume() => Err(io::Error::other("injected pre-resume setup failure")),
+        None => resume_initial_thread(child.id()),
+    });
+    if let Err(setup_error) = setup {
+        // Preserve the native failure before cleanup changes GetLastError.
+        let setup_os_error = setup_error.raw_os_error();
+        #[cfg(test)]
+        eprintln!("suspended process setup failed: {setup_error:?}; job_assigned={assigned}");
         // Child is still suspended unless ResumeThread returned an unexpected
         // state. Kill explicitly even if assignment failed; never let it run.
         let killed = child.kill().is_ok();
@@ -243,7 +253,7 @@ fn run_prepared(
                 Ok(None) => thread::sleep(Duration::from_millis(2)),
             }
         };
-        return ProcessOutcome::empty(
+        let mut result = ProcessOutcome::empty(
             if killed && waited && (!assigned || empty_job(&job)) {
                 Termination::SpawnFailure
             } else {
@@ -251,6 +261,8 @@ fn run_prepared(
             },
             started,
         );
+        result.spawn_os_error = setup_os_error;
+        return result;
     }
     let mut out = Drain::new();
     let mut err = Drain::new();

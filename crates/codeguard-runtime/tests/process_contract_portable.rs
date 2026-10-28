@@ -9,9 +9,11 @@ use std::io::{Read, Write};
 use std::path::PathBuf;
 use std::process::Command;
 use std::sync::Arc;
-use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::thread;
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
+
+static FIXTURE_SEQUENCE: AtomicU64 = AtomicU64::new(0);
 
 struct Fixture(PathBuf);
 
@@ -21,12 +23,25 @@ impl Fixture {
             .duration_since(UNIX_EPOCH)
             .unwrap()
             .as_nanos();
-        let root = std::env::temp_dir().join(format!(
-            "codeguard portable space {} {nonce}",
-            std::process::id()
-        ));
-        fs::create_dir(&root).unwrap();
-        Self(fs::canonicalize(root).unwrap())
+        Self::with_clock_nonce(nonce)
+    }
+
+    fn with_clock_nonce(nonce: u128) -> Self {
+        // Wall clocks may return identical values to parallel tests (observed
+        // on macOS CI). Each creation is exclusive; never reuse a stale path.
+        for _ in 0..128 {
+            let sequence = FIXTURE_SEQUENCE.fetch_add(1, Ordering::Relaxed);
+            let root = std::env::temp_dir().join(format!(
+                "codeguard portable space {} {nonce} {sequence}",
+                std::process::id()
+            ));
+            match fs::create_dir(&root) {
+                Ok(()) => return Self(fs::canonicalize(root).unwrap()),
+                Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => continue,
+                Err(error) => panic!("cannot create isolated process fixture: {error}"),
+            }
+        }
+        panic!("cannot allocate unique isolated process fixture after 128 attempts")
     }
 
     fn request(&self, mode: &str) -> ProcessSpec {
@@ -218,4 +233,20 @@ fn normally_exited_parent_does_not_leave_a_live_descendant() {
     assert!(fixture.0.join("descendant-started").exists());
     thread::sleep(Duration::from_millis(900));
     assert!(!fixture.0.join("descendant-marker").exists());
+}
+
+#[test]
+fn concurrent_fixtures_remain_distinct_when_clock_values_collide() {
+    let workers: Vec<_> = (0..16)
+        .map(|_| thread::spawn(|| Fixture::with_clock_nonce(0)))
+        .collect();
+    let fixtures: Vec<_> = workers
+        .into_iter()
+        .map(|worker| worker.join().unwrap())
+        .collect();
+    let paths: std::collections::HashSet<_> = fixtures.iter().map(|fixture| &fixture.0).collect();
+    assert_eq!(paths.len(), fixtures.len());
+    for fixture in &fixtures {
+        assert!(fixture.0.is_dir());
+    }
 }

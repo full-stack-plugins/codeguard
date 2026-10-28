@@ -13,7 +13,7 @@ use std::time::{Duration, Instant};
 pub struct ProcessOutcome {
     /// 真实终止原因。
     pub termination: Termination,
-    /// 启动失败的操作系统错误码；其余结果为空，不能冒充原生输出。
+    /// 最初启动或配置失败的操作系统错误码；清理失败时仍保留原始错误，不能冒充原生输出。
     pub spawn_os_error: Option<i32>,
     /// 截断到共同预算的原始 stdout。
     pub stdout: Vec<u8>,
