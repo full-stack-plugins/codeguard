@@ -77,6 +77,10 @@ jobs:
           pathlib.Path("candidate-evidence").mkdir(exist_ok=True)
           pathlib.Path("candidate-evidence/identity.json").write_text(
               json.dumps(evidence, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+      - name: Require native process safety contracts on each platform
+        # Intentionally fails on Windows until the Job Object runtime exists.
+        # Do not skip, ignore, or convert UnsupportedPlatform to a passing result.
+        run: cargo test --locked -p codeguard-runtime --test process_contract_portable
       - name: Pack private Unix candidate and probe real WASM worker
         if: matrix.package
         run: node scripts/pack-npm-local.mjs --require-wasm ${{ matrix.binary }}
