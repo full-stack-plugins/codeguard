@@ -90,6 +90,26 @@ fn fresh_report_rejects_old_files_and_hardlinks_and_pins_root() {
     );
     fs::hard_link(root.0.join("old.json"), root.0.join("report.json")).unwrap();
     assert!(slot.read().is_err());
+    drop(slot);
+    fs::rename(&root.0, &moved).expect("dropping all guard handles releases rename protection");
+    fs::rename(&moved, &root.0).unwrap();
+}
+#[test]
+fn fresh_report_pins_ancestor_not_just_leaf_directory() {
+    let root = Root::new();
+    let child = root.0.join("evidence");
+    platform_fs::create_private_dir(&child).unwrap();
+    let slot = prepare_fresh_report(&child, "report.json", 32).unwrap();
+    let moved = root.0.with_extension("moved");
+    assert!(
+        fs::rename(&root.0, &moved).is_err(),
+        "ancestor replacement must be blocked too"
+    );
+    fs::write(child.join("report.json"), b"ok").unwrap();
+    assert_eq!(slot.read().unwrap(), b"ok");
+    drop(slot);
+    fs::rename(&root.0, &moved).expect("ancestor guard handles must be released");
+    fs::rename(&moved, &root.0).unwrap();
 }
 #[test]
 fn fresh_report_reads_bounded_real_file() {

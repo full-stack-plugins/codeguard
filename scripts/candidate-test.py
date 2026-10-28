@@ -4,6 +4,11 @@ import pathlib
 import subprocess
 import sys
 
+# GitHub annotations and captured Rust diagnostics are UTF-8 even when the
+# Windows console defaults to a legacy code page. Do not mask the test status.
+sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
 if len(sys.argv) < 3 or not sys.argv[1].replace('-', '').isalnum():
     raise SystemExit('usage: candidate-test.py evidence-name command [args...]')
 evidence = pathlib.Path('candidate-evidence')
@@ -19,5 +24,5 @@ with log_path.open('rb') as log:
 print(tail, flush=True)
 if result.returncode:
     escaped = tail.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
-    print('::error title=Candidate test failed::' + escaped, flush=True)
+    print('::error title=Candidate ' + sys.argv[1] + ' failed::' + escaped, flush=True)
 sys.exit(result.returncode)

@@ -1,2 +1,6 @@
 # 来源补丁保留原始字节与固定摘要，不自动调整上下文空白。
 grammars/*/source.patch -whitespace
+# Pinned license SHA-256 values cover exact upstream bytes on every checkout.
+# Disable text conversion instead of accepting platform-specific hashes.
+/grammars/LICENSE* -text
+/grammars/*/LICENSE -text

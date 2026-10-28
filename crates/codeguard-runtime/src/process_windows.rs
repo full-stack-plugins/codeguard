@@ -1,5 +1,5 @@
 //! Windows process containment. No child code runs before Job Object assignment.
-//! PIPE_NOWAIT applies to anonymous pipes too (SetNamedPipeHandleState contract).
+//! Writes use PIPE_NOWAIT; read handles are probed with PeekNamedPipe before reading.
 //! All I/O is polled on the controller thread; there are no blocking drain threads.
 use super::*;
 use std::mem::{size_of, zeroed};
@@ -12,7 +12,7 @@ use windows_sys::Win32::{
     System::{
         Diagnostics::ToolHelp::*,
         JobObjects::*,
-        Pipes::{PIPE_NOWAIT, SetNamedPipeHandleState},
+        Pipes::{PIPE_NOWAIT, PeekNamedPipe, SetNamedPipeHandleState},
         Threading::{
             CREATE_SUSPENDED, GetProcessIdOfThread, OpenThread, ResumeThread,
             THREAD_QUERY_LIMITED_INFORMATION, THREAD_SUSPEND_RESUME,
@@ -146,12 +146,40 @@ impl Drain {
         }
     }
     // One bounded read per iteration, so a flooding child cannot starve deadline checks.
-    fn poll(&mut self, pipe: &mut impl Read, budget: &mut usize, over: &mut bool) {
+    fn poll(&mut self, pipe: &mut (impl Read + AsRawHandle), budget: &mut usize, over: &mut bool) {
         if self.eof || self.failed {
             return;
         }
+        // Rust's ChildStdout/ChildStderr handles have GENERIC_READ but not
+        // FILE_WRITE_ATTRIBUTES, so changing their wait mode is access denied.
+        // PeekNamedPipe is non-consuming. This controller is their sole reader;
+        // bytes observed here cannot be consumed by a concurrent reader before
+        // our read. Limit the read to that count, never wait for future output.
+        let mut available = 0u32;
+        if unsafe {
+            PeekNamedPipe(
+                pipe.as_raw_handle(),
+                std::ptr::null_mut(),
+                0,
+                std::ptr::null_mut(),
+                &mut available,
+                std::ptr::null_mut(),
+            )
+        } == 0
+        {
+            if io::Error::last_os_error().raw_os_error() == Some(ERROR_BROKEN_PIPE as i32) {
+                self.eof = true;
+            } else {
+                self.failed = true;
+            }
+            return;
+        }
+        if available == 0 {
+            return;
+        }
         let mut bytes = [0; 4096];
-        match pipe.read(&mut bytes) {
+        let requested = (available as usize).min(bytes.len());
+        match pipe.read(&mut bytes[..requested]) {
             Ok(0) => self.eof = true,
             Ok(count) => {
                 let retained = count.min(*budget);
@@ -217,9 +245,9 @@ fn run_prepared(
     let mut stdout = child.stdout.take().expect("configured stdout");
     let mut stderr = child.stderr.take().expect("configured stderr");
     let mut stdin = child.stdin.take();
-    let configured = nonblocking(&stdout)
-        .and_then(|_| nonblocking(&stderr))
-        .and_then(|_| stdin.as_ref().map_or(Ok(()), nonblocking));
+    // Only the writable parent stdin handle has the rights needed to set
+    // PIPE_NOWAIT. Read handles use non-consuming availability probes instead.
+    let configured = stdin.as_ref().map_or(Ok(()), nonblocking);
     let assigned = unsafe { AssignProcessToJobObject(job.0, child.as_raw_handle()) } != 0;
     let assignment_error = (!assigned).then(io::Error::last_os_error);
     #[cfg(test)]

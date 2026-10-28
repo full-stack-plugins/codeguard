@@ -54,11 +54,14 @@ impl PinnedDirectory {
 fn open_directory(path: &Path) -> io::Result<File> {
     let path = wide(path)?;
     // SAFETY: NUL-terminated UTF-16 path, no inherited handle. Omitting write/delete
-    // sharing pins both directory identity and reparse metadata. OPEN_REPARSE_POINT observes the link itself.
+    // sharing pins both directory identity and reparse metadata. A real directory
+    // data-read right (FILE_LIST_DIRECTORY) is essential: attribute-only handles
+    // do not participate in Windows sharing checks and would permit rename.
+    // OPEN_REPARSE_POINT observes the link itself.
     let handle = unsafe {
         CreateFileW(
             path.as_ptr(),
-            FILE_READ_ATTRIBUTES,
+            FILE_LIST_DIRECTORY | FILE_READ_ATTRIBUTES,
             FILE_SHARE_READ,
             ptr::null(),
             OPEN_EXISTING,

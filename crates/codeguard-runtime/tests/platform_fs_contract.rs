@@ -133,10 +133,13 @@ fn junction_ancestors_and_locked_parent_rename_are_rejected() {
     let guard = TaskFileLock::acquire(&lock).unwrap();
     assert!(std::fs::rename(&real, t.0.join("moved")).is_err());
     drop(guard);
+    std::fs::rename(&real, t.0.join("moved")).unwrap();
+    std::fs::rename(t.0.join("moved"), &real).unwrap();
     let alias = t.0.join("alias");
-    let command = format!("mklink /J \"{}\" \"{}\"", alias.display(), real.display());
     let status = std::process::Command::new("cmd.exe")
-        .args(["/D", "/C", &command])
+        .args(["/D", "/C", "mklink", "/J"])
+        .arg(&alias)
+        .arg(&real)
         .status()
         .unwrap();
     assert!(status.success());

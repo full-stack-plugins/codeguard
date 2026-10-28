@@ -52,6 +52,10 @@ jobs:
           cargo -V
           cmake --version
           node -p 'JSON.stringify({platform:process.platform,arch:process.arch})'
+      - name: Verify diagnostic encoding
+        run: python tests/candidate_diagnostics_test.py
+      - name: Verify private packaging contracts
+        run: node --test tests/npm_pack_windows.test.mjs tests/npm_license_checkout.test.mjs
       - name: Build native candidate with WASM feature
         id: native_build
         shell: python
