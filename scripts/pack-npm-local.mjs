@@ -10,14 +10,34 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const targetByHost = new Map([
+export function packageTarget(host) {
+  return new Map([
   ['darwin-arm64', 'macos_arm64'],
   ['darwin-x64', 'macos_x86_64'],
   ['linux-x64', 'linux_x86_64'],
   ['linux-arm64', 'linux_aarch64'],
-]);
+  ['win32-x64', 'windows_x86_64'],
+  ]).get(host);
+}
+
+// npm.cmd requires shell parsing. Execute the installed npm JS entry with Node
+// instead; all package paths remain literal argv, including spaces/metacharacters.
+export function npmCommand({platform = process.platform, nodeExecutable = process.execPath, searchPath = process.env.PATH ?? ''} = {}) {
+  if (platform !== 'win32') return {command: 'npm', args: []};
+  const directories = [path.dirname(nodeExecutable), ...searchPath.split(path.delimiter).filter(p => path.isAbsolute(p))];
+  for (const directory of directories) {
+    const cli = path.join(directory, 'node_modules', 'npm', 'bin', 'npm-cli.js');
+    try {
+      const pkg = JSON.parse(readFileSync(path.join(directory, 'node_modules', 'npm', 'package.json'), 'utf8'));
+      if (pkg.name === 'npm' && existsSync(cli)) return {command: nodeExecutable, args: [realpathSync(cli)]};
+    } catch { /* Check the next installed npm location; never fall back to a shell. */ }
+  }
+  throw new Error('Installed npm-cli.js unavailable; refusing implicit npm.cmd shell execution');
+}
+
+function main() {
 const host = `${process.platform}-${process.arch}`;
-const expectedTarget = targetByHost.get(host);
+const expectedTarget = packageTarget(host);
 if (!expectedTarget) {
   throw new Error(`No verified Codeguard package target for ${host}`);
 }
@@ -172,7 +192,8 @@ try {
   }, null, 2) + '\n');
   chmodSync(path.join(stage, 'codeguard.cjs'), 0o755);
   mkdirSync(outDir, { recursive: true });
-  const pack = spawnSync('npm', ['pack', stage, '--json', '--ignore-scripts', '--pack-destination', outDir], {
+  const npm = npmCommand();
+  const pack = spawnSync(npm.command, [...npm.args, 'pack', stage, '--json', '--ignore-scripts', '--pack-destination', outDir], {
     cwd: root,
     encoding: 'utf8',
     timeout: 120_000,
@@ -199,3 +220,6 @@ try {
 } finally {
   rmSync(stage, { recursive: true, force: true });
 }
+
+}
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) main();

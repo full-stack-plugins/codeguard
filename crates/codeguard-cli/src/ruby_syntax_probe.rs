@@ -32,12 +32,15 @@ pub(crate) fn observe(
             && read_bounded_regular_file(&executable, 64 * 1024 * 1024)
                 .is_ok_and(|bytes| digest(&bytes) == sha)
     };
+    let Some(isolated_cwd) = crate::tool_platform::isolated_native_cwd(&executable) else {
+        return report;
+    };
     let invoke = |args: &[&str], stdin| {
         run_process(
             &ProcessSpec {
                 executable: executable.clone(),
                 args: args.iter().map(OsString::from).collect(),
-                cwd: Path::new("/").to_path_buf(),
+                cwd: isolated_cwd.clone(),
                 env: BTreeMap::new(),
                 stdin,
                 deadline,

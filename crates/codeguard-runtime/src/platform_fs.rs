@@ -379,7 +379,8 @@ mod windows {
     }
     pub fn sync_parent(path: &Path) -> io::Result<()> {
         // Windows does not support FlushFileBuffers on directory handles. Re-open
-        // the committed file for write-through flush; rename uses WRITE_THROUGH.
+        // the committed file for write-through flush. Handle-bound replacement
+        // separately flushes its file; neither claims POSIX directory durability.
         open(path, GENERIC_WRITE)?.sync_all()
     }
     pub fn atomic_replace(from: &Path, to: &Path) -> io::Result<()> {

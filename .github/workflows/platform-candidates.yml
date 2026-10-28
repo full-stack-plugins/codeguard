@@ -26,7 +26,7 @@ jobs:
           - runner: windows-2022
             target: windows_x86_64
             binary: target/debug/codeguard.exe
-            package: false
+            package: true
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 40
     env:
@@ -106,22 +106,23 @@ jobs:
               json.dumps(evidence, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
       - name: Require native process safety contracts on each platform
         # Native execution is required; UnsupportedPlatform is not success.
-        run: cargo test --locked -p codeguard-runtime --test process_contract_portable
+        run: python scripts/candidate-test.py process-contract cargo test --locked -p codeguard-runtime --test process_contract_portable
       - name: Require platform filesystem safety contracts
-        run: cargo test --locked -p codeguard-runtime --test platform_fs_contract
+        run: python scripts/candidate-test.py filesystem-contract cargo test --locked -p codeguard-runtime --test platform_fs_contract
       - name: Require native CLI adapter path contracts
-        run: cargo test --locked -p codeguard-cli --features wasm-precheck --test platform_adapter_contract --test task_lease_contract
+        run: python scripts/candidate-test.py cli-platform-contract cargo test --locked -p codeguard-cli --features wasm-precheck --test platform_adapter_contract --test task_lease_contract
       - name: Require Windows process cleanup and handle contracts
         if: runner.os == 'Windows'
-        run: cargo test --locked -p codeguard-runtime --test process_windows_contract --test private_log_windows_contract
-      - name: Require Windows setup failure and console cancellation contracts
+        run: python scripts/candidate-test.py windows-process-log cargo test --locked -p codeguard-runtime --test process_windows_contract --test private_log_windows_contract
+      - name: Require Windows console cancellation contract
         if: runner.os == 'Windows'
-        run: |
-          cargo test --locked -p codeguard-runtime --lib interrupt::windows_tests -- --test-threads=1
-          cargo test --locked -p codeguard-runtime --lib process_runner::windows::tests -- --test-threads=1
-      - name: Pack private Unix candidate and probe real WASM worker
+        run: python scripts/candidate-test.py windows-console cargo test --locked -p codeguard-runtime --lib interrupt::windows_tests -- --test-threads=1
+      - name: Require Windows setup failure contract
+        if: runner.os == 'Windows'
+        run: python scripts/candidate-test.py windows-setup-failure cargo test --locked -p codeguard-runtime --lib process_runner::windows::tests -- --test-threads=1
+      - name: Install private candidate and probe real WASM worker
         if: matrix.package
-        run: node scripts/pack-npm-local.mjs --require-wasm ${{ matrix.binary }}
+        run: python scripts/candidate-test.py package-install node tests/npm_candidate_install.mjs ${{ matrix.binary }}
       - name: Retain evidence without publishing a release
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

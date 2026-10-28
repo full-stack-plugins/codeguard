@@ -77,6 +77,9 @@ pub(crate) fn observe_with_cancellation(
             && read_bounded_regular_file(&executable, 64 * 1024 * 1024)
                 .is_ok_and(|bytes| format!("{:x}", Sha256::digest(bytes)) == tool_sha)
     };
+    let Some(isolated_cwd) = crate::tool_platform::isolated_native_cwd(&executable) else {
+        return report;
+    };
     let invoke = |eval: &str, stdin| {
         run_process(
             &ProcessSpec {
@@ -93,7 +96,7 @@ pub(crate) fn observe_with_cancellation(
                 ]
                 .map(OsString::from)
                 .to_vec(),
-                cwd: Path::new("/").to_path_buf(),
+                cwd: isolated_cwd.clone(),
                 env: BTreeMap::new(),
                 stdin,
                 deadline,

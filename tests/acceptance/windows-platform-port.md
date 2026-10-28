@@ -22,3 +22,9 @@ The previous exact commit `4681e7e120a315f901aebc47d0a882f242567643` failed with
 - Windows file flush and write-through replacement do not claim POSIX parent-directory durability equivalence.
 - Runtime safety tests are not validation of every native language tool, full workflow policy, a signed release, or installed Codex Hook execution.
 - Existing public macOS-only runtime lock is unchanged. Portable manifest Hook discovery and any trust approval remain separate host acceptance work.
+
+## First native candidate result and package follow-up
+
+Candidate `7af093f99771ca189b7f168e79797957199e3c03`, run `40688039166`, built on all three native runners and preserved version/57-language identity. Linux completed successfully. Windows and macOS failed the process-contract step; available annotations contained exit codes only, and the job-log object requests returned HTTP 403. No failure cause is inferred from that limited evidence. A bounded diagnostic runner now preserves exact test commands and exit status while attaching the final 4 KiB of fresh test output to the next candidate check.
+
+Private Windows x64 npm packaging now uses Node to invoke the installed npm JavaScript entry, never implicit `npm.cmd` shell parsing. The public darwin-arm64 release gate remains unchanged. The native candidate install test requires the original WASM/license/worker assertions, installs the tarball offline into a temporary profile, invokes its actual manifest entry, and checks identity and native bytes. This does not publish, globally install, or update the plugin runtime lock. Worker/probe working directories use the executable's absolute volume root on Windows rather than the invalid drive-relative `/` path.

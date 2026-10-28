@@ -92,12 +92,15 @@ pub(crate) fn observe(
         (OsString::from("GOPROXY"), OsString::from("off")),
         (OsString::from("GOSUMDB"), OsString::from("off")),
     ]);
+    let Some(isolated_cwd) = crate::tool_platform::isolated_native_cwd(&executable) else {
+        return report;
+    };
     let invoke = |executable: &Path, args: Vec<OsString>, stdin| {
         run_process(
             &ProcessSpec {
                 executable: executable.to_path_buf(),
                 args,
-                cwd: PathBuf::from("/"),
+                cwd: isolated_cwd.clone(),
                 env: env.clone(),
                 stdin,
                 deadline,

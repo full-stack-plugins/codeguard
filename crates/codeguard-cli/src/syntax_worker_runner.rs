@@ -12,7 +12,7 @@ use codeguard_runtime::{ProcessSpec, Termination};
 use sha2::{Digest, Sha256};
 use std::collections::BTreeMap;
 use std::ffi::OsString;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use std::sync::atomic::AtomicBool;
 use std::time::Instant;
 
@@ -38,13 +38,14 @@ pub fn run_syntax_worker_candidate(
     let spec = ProcessSpec {
         executable: executable.to_path_buf(),
         args: vec![OsString::from("__syntax-worker"), OsString::from(language)],
-        cwd: PathBuf::from("/"),
+        cwd: crate::tool_platform::isolated_native_cwd(executable)
+            .ok_or("syntax_worker_cwd_invalid")?,
         env: BTreeMap::new(),
         stdin: Some(source.to_vec()),
         deadline,
         output_limit_bytes: 64 * 1024,
     };
-    // Linux 为整个私有进程设置地址空间硬上限；其它 Unix 平台尚无实测硬限制。
+    // Linux 为整个私有进程设置地址空间硬上限；macOS/Windows 尚无实测地址空间硬限制。
     #[cfg(target_os = "linux")]
     let process = run_process_with_address_space_limit(&spec, cancelled, 2 * 1024 * 1024 * 1024);
     #[cfg(not(target_os = "linux"))]
