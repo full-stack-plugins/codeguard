@@ -88,7 +88,8 @@ mod windows {
         ptr,
     };
     use windows_sys::Wdk::Storage::FileSystem::{
-        FILE_CREATE, FILE_DIRECTORY_FILE, FILE_NON_DIRECTORY_FILE, FILE_OPEN, FILE_WRITE_THROUGH,
+        FILE_CREATE, FILE_DIRECTORY_FILE, FILE_NON_DIRECTORY_FILE, FILE_OPEN,
+        FILE_RENAME_INFORMATION, FILE_WRITE_THROUGH, FileRenameInformation, NtSetInformationFile,
     };
     use windows_sys::Win32::{
         Foundation::*,
@@ -418,23 +419,31 @@ mod windows {
         let bytes = (name.len() - 1) * 2;
         // Keep a complete fixed header plus the variable UTF-16 name. Keep
         // the trailing NUL in allocated storage while FileNameLength excludes it.
-        let size = std::mem::size_of::<FILE_RENAME_INFO>() + name.len() * 2;
+        let size = std::mem::size_of::<FILE_RENAME_INFORMATION>() + name.len() * 2;
         let mut buffer =
             vec![0usize; (size + std::mem::size_of::<usize>() - 1) / std::mem::size_of::<usize>()];
         unsafe {
-            let rename = buffer.as_mut_ptr().cast::<FILE_RENAME_INFO>();
+            let rename = buffer.as_mut_ptr().cast::<FILE_RENAME_INFORMATION>();
             (*rename).Anonymous.ReplaceIfExists = replace;
             (*rename).RootDirectory = target_parent.handle();
             (*rename).FileNameLength = bytes as u32;
             ptr::copy_nonoverlapping(name.as_ptr(), (*rename).FileName.as_mut_ptr(), name.len());
-            if SetFileInformationByHandle(
+            let mut status_block = windows_sys::Win32::System::IO::IO_STATUS_BLOCK::default();
+            let status = NtSetInformationFile(
                 source.as_raw_handle(),
-                FileRenameInfo,
+                &mut status_block,
                 rename.cast(),
                 size as u32,
-            ) == 0
-            {
-                return Err(io::Error::last_os_error());
+                FileRenameInformation,
+            );
+            if status < 0 {
+                let code = RtlNtStatusToDosError(status);
+                // Numeric API diagnostics only: no filenames, content or tokens.
+                eprintln!(
+                    "rooted native rename failed: ntstatus=0x{:08x} win32={} replace={}",
+                    status as u32, code, replace
+                );
+                return Err(io::Error::from_raw_os_error(code as i32));
             }
         }
         Ok(())
