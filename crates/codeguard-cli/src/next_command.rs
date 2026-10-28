@@ -327,9 +327,8 @@ fn independent_source_task_index(root: &Path, candidates: &[Candidate]) -> Optio
     {
         return None;
     }
-    #[cfg(unix)]
+    #[cfg(any(unix, windows))]
     {
-        use std::os::unix::fs::MetadataExt;
         // 每个范围只读取一次；规范路径和 dev/ino 同时排除目录重叠、链接及硬链接别名。
         let scopes: Vec<_> = candidates
             .iter()
@@ -340,9 +339,8 @@ fn independent_source_task_index(root: &Path, candidates: &[Candidate]) -> Optio
                     return None;
                 }
                 let metadata = fs::metadata(&path).ok()?;
-                metadata
-                    .is_file()
-                    .then_some((path, metadata.dev(), metadata.ino()))
+                let (volume, identity) = crate::platform_fs::file_identity(&path).ok()?;
+                metadata.is_file().then_some((path, volume, identity))
             })
             .collect();
         candidates
@@ -373,7 +371,7 @@ fn independent_source_task_index(root: &Path, candidates: &[Candidate]) -> Optio
                 independent.then_some(index)
             })
     }
-    #[cfg(not(unix))]
+    #[cfg(not(any(unix, windows)))]
     {
         let _ = root;
         None
@@ -850,7 +848,7 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
         );
         priority = 3;
     }
-    #[cfg(unix)]
+    #[cfg(any(unix, windows))]
     if checker_id == "node.eslint.preparation" {
         let guidance = crate::eslint_preparation::guidance(root, fact);
         brief["disposition"] = guidance["disposition"].clone();
@@ -1266,7 +1264,7 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
         );
         priority = 0;
     }
-    #[cfg(unix)]
+    #[cfg(any(unix, windows))]
     if checker_id == "node.eslint" {
         let guidance = crate::eslint_workbench::guidance(root, fact);
         brief["disposition"] = guidance["disposition"].clone();
@@ -1334,7 +1332,7 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
             };
         }
     }
-    #[cfg(unix)]
+    #[cfg(any(unix, windows))]
     if checker_id == "syntax.native_confirmation"
         || (checker_id == "python.ruff"
             && brief["reason_code"] == "python_syntax_confirmation_needed"
@@ -1357,7 +1355,7 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
     }
     let action_id = canonical_action_id(&brief)?;
     brief["action_id"] = json!(action_id);
-    #[cfg(unix)]
+    #[cfg(any(unix, windows))]
     {
         let history = crate::task_attempt_command::attempt_history(root, id, &brief)?;
         if history["open_attempt_id"].is_string() {

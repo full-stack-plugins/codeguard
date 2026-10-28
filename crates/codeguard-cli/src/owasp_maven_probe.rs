@@ -3,7 +3,6 @@
 use std::collections::BTreeMap;
 use std::ffi::OsString;
 use std::fs;
-use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::{Instant, SystemTime, UNIX_EPOCH};
@@ -121,8 +120,7 @@ pub(crate) fn observe(request: &Request<'_>) -> Value {
     let database = scratch.0.join("database");
     if snapshot.materialize_new(&project).is_err()
         || fs::write(project.join("settings.xml"), SETTINGS).is_err()
-        || fs::create_dir(&evidence).is_err()
-        || fs::set_permissions(&evidence, fs::Permissions::from_mode(0o700)).is_err()
+        || crate::platform_fs::create_private_dir(&evidence).is_err()
         || copy_bounded_tree(&data, &database, request.deadline).is_err()
         || hash_bundle_tree(&database).ok().as_deref() != Some(data_sha)
         || hash_bundle_tree(&data).ok().as_deref() != Some(data_sha)
@@ -387,15 +385,12 @@ fn private_scratch() -> Result<Scratch, &'static str> {
         .map_err(|_| "clock_unavailable")?
         .as_nanos();
     let path = root.join(format!("codeguard-owasp-{}-{nonce}", std::process::id()));
-    fs::create_dir(&path).map_err(|_| "scratch_create_failed")?;
-    fs::set_permissions(&path, fs::Permissions::from_mode(0o700))
-        .map_err(|_| "scratch_permission_failed")?;
+    crate::platform_fs::create_private_dir(&path).map_err(|_| "scratch_create_failed")?;
     Ok(Scratch(path))
 }
 
 fn copy_bounded_tree(source: &Path, target: &Path, deadline: Instant) -> Result<(), ()> {
-    fs::create_dir(target).map_err(|_| ())?;
-    fs::set_permissions(target, fs::Permissions::from_mode(0o700)).map_err(|_| ())?;
+    crate::platform_fs::create_private_dir(target).map_err(|_| ())?;
     let mut pending = vec![(source.to_path_buf(), target.to_path_buf())];
     let (mut entries, mut bytes_seen) = (0usize, 0u64);
     while let Some((from, to)) = pending.pop() {
@@ -412,9 +407,7 @@ fn copy_bounded_tree(source: &Path, target: &Path, deadline: Instant) -> Result<
                 .map_err(|_| ())?
                 .file_type();
             if kind.is_dir() {
-                fs::create_dir(&target_child).map_err(|_| ())?;
-                fs::set_permissions(&target_child, fs::Permissions::from_mode(0o700))
-                    .map_err(|_| ())?;
+                crate::platform_fs::create_private_dir(&target_child).map_err(|_| ())?;
                 pending.push((source_child, target_child));
             } else if kind.is_file() {
                 let content =
@@ -424,7 +417,7 @@ fn copy_bounded_tree(source: &Path, target: &Path, deadline: Instant) -> Result<
                     return Err(());
                 }
                 fs::write(&target_child, content).map_err(|_| ())?;
-                fs::set_permissions(&target_child, fs::Permissions::from_mode(0o600))
+                crate::platform_fs::set_private_permissions(&target_child, 0o600)
                     .map_err(|_| ())?;
             } else {
                 return Err(());

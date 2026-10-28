@@ -1,7 +1,7 @@
 //! 本地 Ruff 报告到脱敏修复记录的初步同步；不参与质量门禁。
 
 use std::collections::{BTreeMap, BTreeSet};
-use std::fs::{self, OpenOptions};
+use std::fs;
 use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
@@ -2487,7 +2487,7 @@ fn write_once_with_counter(
             std::process::id(),
             counter.fetch_add(1, Ordering::Relaxed)
         ));
-        match OpenOptions::new().write(true).create_new(true).open(&temp) {
+        match crate::platform_fs::secure_create_new(&temp) {
             Ok(file) => {
                 staging = Some((temp, file));
                 break;
@@ -2500,11 +2500,12 @@ fn write_once_with_counter(
     let outcome = (|| {
         file.write_all(bytes).map_err(|_| "staging_write_failed")?;
         file.sync_all().map_err(|_| "staging_sync_failed")?;
+        // Close the writer before reopening its hard-linked identity for a flush.
+        // Windows denies a second write handle while secure_create_new is live.
+        drop(file);
         match fs::hard_link(&temp, path) {
             Ok(()) => {
-                fs::File::open(path.parent().ok_or("target_parent_missing")?)
-                    .and_then(|directory| directory.sync_all())
-                    .map_err(|_| "target_sync_failed")?;
+                crate::platform_fs::sync_parent(path).map_err(|_| "target_sync_failed")?;
                 Ok(())
             }
             Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => {
@@ -2517,7 +2518,6 @@ fn write_once_with_counter(
             Err(_) => Err("target_create_failed"),
         }
     })();
-    drop(file);
     let _ = fs::remove_file(&temp);
     outcome
 }

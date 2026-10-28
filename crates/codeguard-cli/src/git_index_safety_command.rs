@@ -170,7 +170,7 @@ fn resolve_git() -> Option<PathBuf> {
     let path = env::var_os("PATH")?;
     env::split_paths(&path)
         .filter(|directory| directory.is_absolute())
-        .map(|directory| directory.join("git"))
+        .map(|directory| directory.join(crate::tool_platform::native_tool_name("git")))
         .find_map(|candidate| {
             candidate
                 .canonicalize()
@@ -180,7 +180,5 @@ fn resolve_git() -> Option<PathBuf> {
 }
 
 fn executable(path: &Path) -> bool {
-    use std::os::unix::fs::PermissionsExt;
-    std::fs::metadata(path)
-        .is_ok_and(|metadata| metadata.is_file() && metadata.permissions().mode() & 0o111 != 0)
+    crate::platform_fs::is_executable(path)
 }

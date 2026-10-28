@@ -79,10 +79,14 @@ fn run_process_with_limit(
     if memory_limit_bytes.is_some() {
         return ProcessOutcome::empty(Termination::UnsupportedPlatform, started);
     }
-    #[cfg(not(unix))]
+    #[cfg(not(any(unix, windows)))]
     {
         let _ = spec;
         return ProcessOutcome::empty(Termination::UnsupportedPlatform, started);
+    }
+    #[cfg(windows)]
+    {
+        return windows::run(spec, cancelled, started);
     }
     #[cfg(unix)]
     run_unix(spec, cancelled, started, memory_limit_bytes)
@@ -236,17 +240,17 @@ fn cancellation_requested(cancelled: &AtomicBool) -> bool {
     if cancelled.load(Ordering::Relaxed) {
         return true;
     }
-    #[cfg(unix)]
+    #[cfg(any(unix, windows))]
     {
         crate::interrupt::sigint_cancelled()
     }
-    #[cfg(not(unix))]
+    #[cfg(not(any(unix, windows)))]
     {
         false
     }
 }
 
-#[cfg(unix)]
+#[cfg(any(unix, windows))]
 #[allow(clippy::too_many_arguments)]
 fn finalize_termination(
     initial: Termination,
@@ -439,3 +443,7 @@ mod tests {
         );
     }
 }
+
+#[cfg(windows)]
+#[path = "process_windows.rs"]
+mod windows;

@@ -1,8 +1,7 @@
 //! 检查报告的同目录暂存与原子替换；导出失败不删除内存中的原生发现。
 
-use std::fs::{self, OpenOptions};
+use std::fs;
 use std::io::{Read, Write};
-use std::os::unix::fs::OpenOptionsExt;
 use std::path::Path;
 use std::sync::atomic::{AtomicU64, Ordering};
 
@@ -34,12 +33,8 @@ pub fn export_report(path: &Path, bytes: &[u8]) -> Result<(), &'static str> {
         std::process::id(),
         NEXT_EXPORT.fetch_add(1, Ordering::Relaxed)
     ));
-    let mut file = OpenOptions::new()
-        .write(true)
-        .create_new(true)
-        .mode(0o600)
-        .open(&temp)
-        .map_err(|_| "output_temp_create_failed")?;
+    let mut file =
+        crate::platform_fs::secure_create_new(&temp).map_err(|_| "output_temp_create_failed")?;
     let written = file.write_all(bytes).and_then(|()| file.sync_all());
     drop(file);
     if written.is_err() {

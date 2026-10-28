@@ -9,7 +9,6 @@ use codeguard_runtime::read_bounded_regular_file;
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 use std::{
-    os::unix::fs::PermissionsExt,
     path::{Path, PathBuf},
     process::ExitCode,
     sync::atomic::AtomicBool,
@@ -160,10 +159,8 @@ fn discover_tool() -> Option<PathBuf> {
     let path = std::env::var_os("PATH")?;
     std::env::split_paths(&path)
         .filter(|p| p.is_absolute())
-        .map(|p| p.join("shellcheck"))
-        .find(|p| {
-            std::fs::metadata(p).is_ok_and(|m| m.is_file() && m.permissions().mode() & 0o111 != 0)
-        })
+        .map(|p| p.join(crate::tool_platform::native_tool_name("shellcheck")))
+        .find(|p| crate::platform_fs::is_executable(p))
 }
 fn supported_shebang(source: &[u8]) -> bool {
     let text = std::str::from_utf8(source).unwrap_or("");

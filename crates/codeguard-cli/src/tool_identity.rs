@@ -277,15 +277,8 @@ fn verify_artifact(path: &Path, expected: &str) -> ArtifactVerification {
     }
 }
 
-#[cfg(unix)]
 fn executable(path: &Path) -> bool {
-    use std::os::unix::fs::PermissionsExt;
-    fs::metadata(path).is_ok_and(|metadata| metadata.permissions().mode() & 0o111 != 0)
-}
-
-#[cfg(not(unix))]
-fn executable(path: &Path) -> bool {
-    fs::metadata(path).is_ok_and(|metadata| metadata.is_file())
+    crate::platform_fs::is_executable(path)
 }
 
 fn failed(issue: &'static str) -> ArtifactVerification {

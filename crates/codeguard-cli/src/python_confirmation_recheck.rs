@@ -99,7 +99,7 @@ pub(crate) fn original_reference(root: &Path, brief: &Value) -> Result<Value, &'
 /// 核对指定Python任务的首次报告、消费收据与宿主保留的原始源码。
 /// 参数为初始化工作区、稳定任务ID及原始字节；返回首次引用，不执行原生工具、不批准关闭。
 /// 宿主须另外固定目标版本、工具和签名策略，不能把本地收据当作可信批准。
-#[cfg(unix)]
+#[cfg(any(unix, windows))]
 pub fn validate_python_task_original_source(
     root: &Path,
     task_id: &str,

@@ -7,7 +7,6 @@ use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 use std::{
     collections::BTreeMap,
-    os::unix::fs::PermissionsExt,
     path::{Path, PathBuf},
     sync::atomic::{AtomicBool, Ordering},
     time::Instant,
@@ -56,7 +55,7 @@ pub fn replay_native_corpus(
             .canonicalize()
             .map_err(|_| "native_grammar_tool_unavailable")?;
         let metadata = std::fs::metadata(&path).map_err(|_| "native_grammar_tool_unavailable")?;
-        if !metadata.is_file() || metadata.permissions().mode() & 0o111 == 0 {
+        if !metadata.is_file() || !crate::platform_fs::is_executable(&path) {
             return Err("native_grammar_tool_unavailable".into());
         }
         let sha = artifact_hash(&path, checker.artifact_budget())?;

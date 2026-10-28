@@ -1,13 +1,21 @@
-//! Unix 私有原始证据日志；只在调用者预先创建的受管目录中写入。
+//! 私有原始证据日志；只在调用者预先创建的受管目录中写入。
 
 use crate::{ProcessOutcome, ProcessSpec, Termination, run_process};
+#[cfg(unix)]
 use std::ffi::CString;
 use std::fs::File;
-use std::io::{self, Read, Write};
+#[cfg(unix)]
+use std::io::Read;
+use std::io::{self, Write};
+#[cfg(unix)]
 use std::os::fd::{AsRawFd, FromRawFd};
+#[cfg(unix)]
 use std::os::unix::ffi::OsStrExt;
+#[cfg(unix)]
 use std::os::unix::fs::MetadataExt;
-use std::path::{Component, Path, PathBuf};
+#[cfg(unix)]
+use std::path::Component;
+use std::path::{Path, PathBuf};
 use std::sync::atomic::AtomicBool;
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::Instant;
@@ -15,12 +23,14 @@ use std::time::Instant;
 static NEXT_TEMP: AtomicU64 = AtomicU64::new(0);
 
 /// 本轮原生执行独占的报告槽位；仅证明指定路径在准备时不存在及读取时为有界普通文件。
+#[cfg(unix)]
 pub struct FreshReportSlot {
     directory: File,
     name: CString,
     max_bytes: u64,
 }
 
+#[cfg(unix)]
 impl FreshReportSlot {
     /// 读取本轮执行后创建的报告；缺失、链接、特殊文件和过大报告均为错误。
     pub fn read(&self) -> io::Result<Vec<u8>> {
@@ -61,6 +71,7 @@ impl FreshReportSlot {
 }
 
 /// 在已存在的私有目录准备原生报告输出，旧报告一律拒绝，绝不清理用户文件。
+#[cfg(unix)]
 pub fn prepare_fresh_report(
     root: &Path,
     name: &str,
@@ -240,6 +251,7 @@ pub fn run_process_recorded(
 
 /// 将原始结果写入已有的私有目录，目标不能存在且不能经符号链接重定向。
 /// `root` 必须由调用者创建并拥有；`name` 只能是一个普通文件名。
+#[cfg(unix)]
 pub fn write_private_log(root: &Path, name: &str, outcome: &ProcessOutcome) -> io::Result<PathBuf> {
     let name = checked_name(name)?;
     let root_dir = open_root_without_symlinks(root)?;
@@ -298,6 +310,7 @@ pub fn write_private_log(root: &Path, name: &str, outcome: &ProcessOutcome) -> i
     Ok(root.join(name.to_str().expect("输入文件名为 UTF-8")))
 }
 
+#[cfg(unix)]
 fn open_root_without_symlinks(root: &Path) -> io::Result<File> {
     let mut components = root.components();
     if !matches!(components.next(), Some(Component::RootDir)) {
@@ -343,6 +356,7 @@ fn open_root_without_symlinks(root: &Path) -> io::Result<File> {
     Ok(current)
 }
 
+#[cfg(unix)]
 fn checked_name(name: &str) -> io::Result<CString> {
     let path = Path::new(name);
     if name.is_empty()
@@ -358,10 +372,12 @@ fn checked_name(name: &str) -> io::Result<CString> {
     CString::new(name).map_err(invalid_path)
 }
 
+#[cfg(unix)]
 fn invalid_path(_: std::ffi::NulError) -> io::Error {
     io::Error::new(io::ErrorKind::InvalidInput, "路径包含 NUL")
 }
 
+#[cfg(unix)]
 fn verify_private_root(dir: &File) -> io::Result<()> {
     let mut info = std::mem::MaybeUninit::<libc::stat>::uninit();
     // SAFETY: fd 有效，fstat 成功时会完整初始化 stat。
@@ -419,6 +435,7 @@ fn termination_code(termination: Termination) -> (u8, i32) {
     }
 }
 
+#[cfg(unix)]
 fn unlink_temporary(dir: &File, name: &CString) -> io::Result<()> {
     // SAFETY: 只删除本次创建的同目录临时名称；清理失败不允许清理其它路径。
     if unsafe { libc::unlinkat(dir.as_raw_fd(), name.as_ptr(), 0) } == -1 {
@@ -427,3 +444,9 @@ fn unlink_temporary(dir: &File, name: &CString) -> io::Result<()> {
         Ok(())
     }
 }
+
+#[cfg(windows)]
+#[path = "private_log_windows.rs"]
+mod windows;
+#[cfg(windows)]
+pub use windows::{FreshReportSlot, prepare_fresh_report, write_private_log};

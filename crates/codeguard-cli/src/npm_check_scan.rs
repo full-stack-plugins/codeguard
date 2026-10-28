@@ -4,7 +4,7 @@ use std::{collections::BTreeMap, path::Path, time::Instant};
 
 /// 在任务执行前验证显式npm参数，不自动继承凭据或安装工具。
 pub(crate) fn validate_options(options: &BTreeMap<String, String>) -> Result<(), String> {
-    #[cfg(unix)]
+    #[cfg(any(unix, windows))]
     {
         let mut argv = vec!["typescript".into(), ".".into()];
         for (key, value) in options {
@@ -14,7 +14,7 @@ pub(crate) fn validate_options(options: &BTreeMap<String, String>) -> Result<(),
             .map(|_| ())
             .map_err(str::to_owned)
     }
-    #[cfg(not(unix))]
+    #[cfg(not(any(unix, windows)))]
     {
         let _ = options;
         Err("npm原生执行尚不支持此平台".into())
@@ -30,7 +30,7 @@ pub(crate) fn run(
     deadline: Instant,
 ) -> Value {
     let mut result = json!({"build_root":build,"feedback":null,"observation":null,"backlog_status":"not_connected"});
-    #[cfg(unix)]
+    #[cfg(any(unix, windows))]
     {
         use sha2::{Digest, Sha256};
         let manifest = root.join(build).join("package.json");
@@ -95,7 +95,7 @@ pub(crate) fn run(
         }
         result["observation"] = observation.unwrap_or(Value::Null);
     }
-    #[cfg(not(unix))]
+    #[cfg(not(any(unix, windows)))]
     {
         let _ = (root, manifest_sha256, options, deadline);
     }

@@ -1,19 +1,19 @@
 //! ESLint 前置失败的脱敏环境任务；普通文件不具批准或关闭权威。
-#[cfg(unix)]
+#[cfg(any(unix, windows))]
 use crate::{
     eslint_lint_arguments::EslintLintArguments, workspace_refresh::read_workspace_baseline,
 };
-#[cfg(unix)]
+#[cfg(any(unix, windows))]
 use codeguard_runtime::read_bounded_regular_file;
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
-#[cfg(unix)]
+#[cfg(any(unix, windows))]
 use std::{
     path::Path,
     time::{SystemTime, UNIX_EPOCH},
 };
 
-#[cfg(unix)]
+#[cfg(any(unix, windows))]
 pub(crate) fn prepare(
     root: &Path,
     args: &EslintLintArguments,
@@ -34,7 +34,7 @@ pub(crate) fn prepare(
     let relative = source
         .strip_prefix(root)
         .ok()
-        .and_then(Path::to_str)
+        .and_then(portable_relative)
         .filter(|p| safe_path(p))
         .ok_or("source_outside_workspace")?;
     if !source
@@ -52,7 +52,7 @@ pub(crate) fn prepare(
     let bytes = read_bounded_regular_file(&source, 16 * 1024 * 1024)
         .map_err(|_| "eslint_source_unavailable")?;
     // 按源码目标限定未核验上下文，不能把不同模块的前置失败合并并误称已恢复。
-    let fingerprint = fingerprint(workspace, relative);
+    let fingerprint = fingerprint(workspace, &relative);
     let nanos = SystemTime::now()
         .duration_since(UNIX_EPOCH)
         .map_err(|_| "clock_unavailable")?
@@ -66,7 +66,7 @@ pub(crate) fn prepare(
         "affected_paths":[relative],"source_sha256":format!("{:x}",Sha256::digest(bytes))}),
     )
 }
-#[cfg(all(unix, feature = "wasm-precheck"))]
+#[cfg(all(any(unix, windows), feature = "wasm-precheck"))]
 pub(crate) fn prepare_with_syntax(
     root: &Path,
     args: &EslintLintArguments,
@@ -223,7 +223,7 @@ fn safe_path(path: &str) -> bool {
             .all(|s| !matches!(s, "" | "." | "..") && !s.chars().any(char::is_control))
 }
 
-#[cfg(unix)]
+#[cfg(any(unix, windows))]
 pub(crate) fn guidance(root: &Path, fact: &Value) -> Value {
     let fallback = json!({"disposition":"verification_required","step":"ESLint准备证据或当前范围无法核对；先复扫原工具，不修改无关源码"});
     let Some(scope) = fact["scope"].as_str() else {
@@ -380,4 +380,33 @@ pub(crate) fn guidance(root: &Path, fact: &Value) -> Value {
         guidance["evidence_authority"] = json!("local_unverified_suspected");
     }
     guidance
+}
+
+// Serialize path components explicitly: replacing backslashes on Unix would
+// silently reinterpret a valid literal filename as another filesystem path.
+fn portable_relative(path: &Path) -> Option<String> {
+    path.components()
+        .map(|part| match part {
+            std::path::Component::Normal(name) => name.to_str(),
+            _ => None,
+        })
+        .collect::<Option<Vec<_>>>()
+        .map(|parts| parts.join("/"))
+}
+
+#[cfg(test)]
+mod platform_path_tests {
+    use super::*;
+    #[test]
+    fn nested_native_path_has_portable_scope_without_reinterpreting_names() {
+        assert_eq!(
+            portable_relative(&Path::new("src").join("app.js")).as_deref(),
+            Some("src/app.js")
+        );
+        assert_eq!(portable_relative(Path::new("../outside.js")), None);
+        #[cfg(unix)]
+        assert!(!safe_path(
+            &portable_relative(Path::new("src\\app.js")).unwrap()
+        ));
+    }
 }

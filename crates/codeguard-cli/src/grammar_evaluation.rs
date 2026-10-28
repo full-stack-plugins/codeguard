@@ -109,10 +109,10 @@ fn valid_id(id: &str) -> bool {
             .all(|b| b.is_ascii_alphanumeric() || matches!(b, b'_' | b'-'))
 }
 
-#[cfg(all(feature = "wasm-precheck", unix))]
+#[cfg(all(feature = "wasm-precheck", any(unix, windows)))]
 pub use replay::replay_corpus;
 
-#[cfg(all(feature = "wasm-precheck", unix))]
+#[cfg(all(feature = "wasm-precheck", any(unix, windows)))]
 mod replay {
     use super::{MANIFEST, classify_probe, digest, validate_corpus};
     use crate::syntax_worker_runner::run_syntax_worker_candidate;

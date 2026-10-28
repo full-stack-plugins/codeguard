@@ -73,12 +73,12 @@ pub(crate) fn descriptors() -> Vec<CommandDescriptor> {
             tracking_id: Some(r#"C07"#),
             command: r#"doctor"#,
             examples: examples("doctor"),
-            support: if cfg!(unix) {
+            support: if cfg!(any(unix, windows)) {
                 r#"partial"#
             } else {
                 "unavailable_build"
             },
-            executable: cfg!(unix),
+            executable: cfg!(any(unix, windows)),
             operation_kind: r#"check"#,
             usage: r#"doctor [path] [--ruff-tool ABS_PATH] [--timeout DURATION] [--format human|json]"#,
             scope: r#"配置及显式Ruff版本的局部诊断"#,
@@ -154,12 +154,12 @@ pub(crate) fn descriptors() -> Vec<CommandDescriptor> {
             tracking_id: Some(r#"C14"#),
             command: r#"lint"#,
             examples: examples("lint"),
-            support: if cfg!(unix) {
+            support: if cfg!(any(unix, windows)) {
                 r#"partial"#
             } else {
                 "unavailable_build"
             },
-            executable: cfg!(unix),
+            executable: cfg!(any(unix, windows)),
             operation_kind: r#"check"#,
             usage: r#"lint <java|python|typescript|zig|swift|kotlin|erlang|go|rust|ruby|shell> TARGET [--format human|json]"#,
             scope: r#"语言专用参数和固定工具范围不同；完整项目lint未验收"#,
@@ -181,12 +181,12 @@ pub(crate) fn descriptors() -> Vec<CommandDescriptor> {
             tracking_id: Some(r#"C15"#),
             command: r#"comments"#,
             examples: examples("comments"),
-            support: if cfg!(unix) {
+            support: if cfg!(any(unix, windows)) {
                 r#"partial"#
             } else {
                 "unavailable_build"
             },
-            executable: cfg!(unix),
+            executable: cfg!(any(unix, windows)),
             operation_kind: r#"check"#,
             usage: r#"comments rust [path] [--cargo-tool ABS_PATH] [--timeout DURATION] [--format human|json]"#,
             scope: r#"Rust库文档探针；完整文档政策与闭环尚缺"#,
@@ -196,12 +196,12 @@ pub(crate) fn descriptors() -> Vec<CommandDescriptor> {
             tracking_id: Some(r#"C16"#),
             command: r#"cve"#,
             examples: examples("cve"),
-            support: if cfg!(unix) {
+            support: if cfg!(any(unix, windows)) {
                 r#"partial"#
             } else {
                 "unavailable_build"
             },
-            executable: cfg!(unix),
+            executable: cfg!(any(unix, windows)),
             operation_kind: r#"check"#,
             usage: r#"cve <rust|python|typescript> [path] [--format human|json]"#,
             scope: r#"原生审计需语言专用工具参数；时效和全覆盖未验收"#,
@@ -222,12 +222,12 @@ pub(crate) fn descriptors() -> Vec<CommandDescriptor> {
             tracking_id: Some(r#"C18"#),
             command: r#"build"#,
             examples: examples("build"),
-            support: if cfg!(unix) {
+            support: if cfg!(any(unix, windows)) {
                 r#"partial"#
             } else {
                 "unavailable_build"
             },
-            executable: cfg!(unix),
+            executable: cfg!(any(unix, windows)),
             operation_kind: r#"check"#,
             usage: r#"build rust [path] [--cargo-tool ABS_PATH] [--timeout DURATION] [--format human|json]"#,
             scope: r#"原生局部类型检查；不执行全部构建或测试义务"#,
@@ -237,12 +237,12 @@ pub(crate) fn descriptors() -> Vec<CommandDescriptor> {
             tracking_id: Some(r#"C19"#),
             command: r#"check"#,
             examples: examples("check"),
-            support: if cfg!(unix) {
+            support: if cfg!(any(unix, windows)) {
                 r#"partial"#
             } else {
                 "unavailable_build"
             },
-            executable: cfg!(unix),
+            executable: cfg!(any(unix, windows)),
             operation_kind: r#"check"#,
             usage: r#"check <all|LANGUAGE_ID> [path] [--timeout DURATION] [--jobs N] [--format human|json|sarif] [--output PATH]"#,
             scope: r#"支持57个规范ID的选择；仅已接入节点执行，其它义务保持gap"#,
@@ -252,12 +252,12 @@ pub(crate) fn descriptors() -> Vec<CommandDescriptor> {
             tracking_id: Some(r#"C20"#),
             command: r#"gate pre-commit"#,
             examples: examples("gate pre-commit"),
-            support: if cfg!(unix) {
+            support: if cfg!(any(unix, windows)) {
                 r#"partial"#
             } else {
                 "unavailable_build"
             },
-            executable: cfg!(unix),
+            executable: cfg!(any(unix, windows)),
             operation_kind: r#"check"#,
             usage: r#"gate pre-commit [path] [--git-tool ABS_PATH] [--format human|json]"#,
             scope: r#"实际index的局部敏感内容观察，不签发完整门禁"#,
@@ -333,12 +333,12 @@ pub(crate) fn descriptors() -> Vec<CommandDescriptor> {
             tracking_id: Some(r#"C27"#),
             command: r#"task claim"#,
             examples: examples("task claim"),
-            support: if cfg!(unix) {
+            support: if cfg!(any(unix, windows)) {
                 r#"partial"#
             } else {
                 "unavailable_build"
             },
-            executable: cfg!(unix),
+            executable: cfg!(any(unix, windows)),
             operation_kind: r#"management"#,
             usage: r#"task claim ID [path] --owner ID [--format human|json]"#,
             scope: r#"Unix工作台限定租约，不授予代码修改或关闭权威"#,
@@ -348,12 +348,12 @@ pub(crate) fn descriptors() -> Vec<CommandDescriptor> {
             tracking_id: Some(r#"C28"#),
             command: r#"task heartbeat"#,
             examples: examples("task heartbeat"),
-            support: if cfg!(unix) {
+            support: if cfg!(any(unix, windows)) {
                 r#"partial"#
             } else {
                 "unavailable_build"
             },
-            executable: cfg!(unix),
+            executable: cfg!(any(unix, windows)),
             operation_kind: r#"management"#,
             usage: r#"task heartbeat ID [path] --owner ID --lease-token TOKEN [--format human|json]"#,
             scope: r#"既有租约续期；冲突保持可见"#,
@@ -363,12 +363,12 @@ pub(crate) fn descriptors() -> Vec<CommandDescriptor> {
             tracking_id: Some(r#"C29"#),
             command: r#"task release"#,
             examples: examples("task release"),
-            support: if cfg!(unix) {
+            support: if cfg!(any(unix, windows)) {
                 r#"partial"#
             } else {
                 "unavailable_build"
             },
-            executable: cfg!(unix),
+            executable: cfg!(any(unix, windows)),
             operation_kind: r#"management"#,
             usage: r#"task release ID [path] --owner ID --lease-token TOKEN [--format human|json]"#,
             scope: r#"释放租约，保留问题与历史"#,
@@ -378,12 +378,12 @@ pub(crate) fn descriptors() -> Vec<CommandDescriptor> {
             tracking_id: Some(r#"C30"#),
             command: r#"task attempt start"#,
             examples: examples("task attempt start"),
-            support: if cfg!(unix) {
+            support: if cfg!(any(unix, windows)) {
                 r#"partial"#
             } else {
                 "unavailable_build"
             },
-            executable: cfg!(unix),
+            executable: cfg!(any(unix, windows)),
             operation_kind: r#"management"#,
             usage: r#"task attempt start ID [path] --owner ID --lease-token TOKEN --action-id ID [--format human|json]"#,
             scope: r#"记录有界尝试，不等于修复成功"#,
@@ -393,12 +393,12 @@ pub(crate) fn descriptors() -> Vec<CommandDescriptor> {
             tracking_id: Some(r#"C31"#),
             command: r#"task attempt finish"#,
             examples: examples("task attempt finish"),
-            support: if cfg!(unix) {
+            support: if cfg!(any(unix, windows)) {
                 r#"partial"#
             } else {
                 "unavailable_build"
             },
-            executable: cfg!(unix),
+            executable: cfg!(any(unix, windows)),
             operation_kind: r#"management"#,
             usage: r#"task attempt finish ID [path] --owner ID --lease-token TOKEN --attempt-id ID --outcome OUTCOME --note-code CODE [--format human|json]"#,
             scope: r#"保留失败/无进展和尝试父链"#,
@@ -419,12 +419,12 @@ pub(crate) fn descriptors() -> Vec<CommandDescriptor> {
             tracking_id: Some(r#"C33"#),
             command: r#"task verify"#,
             examples: examples("task verify"),
-            support: if cfg!(unix) {
+            support: if cfg!(any(unix, windows)) {
                 r#"partial"#
             } else {
                 "unavailable_build"
             },
-            executable: cfg!(unix),
+            executable: cfg!(any(unix, windows)),
             operation_kind: r#"check"#,
             usage: r#"task verify ID [path] [--owner ID --lease-token TOKEN] [LANGUAGE_TOOL_OPTIONS] [--timeout DURATION] [--format human|json]"#,
             scope: r#"已有任务原工具复检；CLI不自批关闭，可信关闭为宿主SDK限定能力"#,
@@ -504,12 +504,12 @@ pub(crate) fn descriptors() -> Vec<CommandDescriptor> {
             tracking_id: None,
             command: r#"hook execute"#,
             examples: examples("hook execute"),
-            support: if cfg!(unix) {
+            support: if cfg!(any(unix, windows)) {
                 r#"partial"#
             } else {
                 "unavailable_build"
             },
-            executable: cfg!(unix),
+            executable: cfg!(any(unix, windows)),
             operation_kind: r#"host"#,
             usage: r#"hook execute PATH [--timeout DURATION] [--format=json] [TOOL_OPTIONS]"#,
             scope: r#"stdin局部事件执行；不代表真实宿主或完整交付"#,
@@ -519,12 +519,12 @@ pub(crate) fn descriptors() -> Vec<CommandDescriptor> {
             tracking_id: None,
             command: r#"hook claude"#,
             examples: examples("hook claude"),
-            support: if cfg!(unix) {
+            support: if cfg!(any(unix, windows)) {
                 r#"partial"#
             } else {
                 "unavailable_build"
             },
-            executable: cfg!(unix),
+            executable: cfg!(any(unix, windows)),
             operation_kind: r#"host"#,
             usage: r#"hook claude <session-start|user-prompt-submit|post-tool-use|post-tool-use-failure|stop> PATH [--timeout DURATION] [--format=json]"#,
             scope: r#"Claude事件桥接；实际安装宿主验收独立"#,

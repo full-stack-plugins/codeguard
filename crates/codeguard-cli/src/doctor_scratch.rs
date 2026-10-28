@@ -1,5 +1,4 @@
 //! Doctor 临时私有运行区，不写项目。
-use std::os::unix::fs::DirBuilderExt;
 use std::{
     fs,
     path::{Path, PathBuf},
@@ -21,7 +20,7 @@ impl DoctorScratch {
             std::process::id(),
             NEXT_DIRECTORY.fetch_add(1, Ordering::Relaxed)
         ));
-        fs::DirBuilder::new().mode(0o700).create(&path).ok()?;
+        crate::platform_fs::create_private_dir(&path).ok()?;
         Some(Self(path))
     }
     /// 返回运行区路径。
@@ -39,7 +38,6 @@ impl Drop for DoctorScratch {
 mod tests {
     use super::DoctorScratch;
     use std::collections::BTreeSet;
-    use std::os::unix::fs::PermissionsExt;
     use std::sync::{Arc, Barrier};
 
     #[test]
@@ -65,10 +63,11 @@ mod tests {
             .collect::<BTreeSet<_>>();
         assert_eq!(paths.len(), 8);
         assert!(paths.iter().all(|path| path.is_dir()));
-        assert!(paths.iter().all(|path| {
-            std::fs::metadata(path)
-                .is_ok_and(|metadata| metadata.permissions().mode() & 0o777 == 0o700)
-        }));
+        assert!(
+            paths.iter().all(|path| {
+                crate::platform_fs::verify_private_permissions(path, 0o700).is_ok()
+            })
+        );
         drop(scratches);
         assert!(paths.iter().all(|path| !path.exists()));
     }

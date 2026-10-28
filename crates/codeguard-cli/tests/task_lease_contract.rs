@@ -1,5 +1,3 @@
-#![cfg(unix)]
-
 use codeguard_runtime::TaskFileLock;
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
@@ -873,6 +871,7 @@ fn expired_lease_can_be_reclaimed_without_reusing_the_old_token() {
     assert_eq!(project.run("heartbeat", "agent-a", Some(old_token)).0, 3);
 }
 
+#[cfg(unix)]
 #[test]
 fn missing_task_and_symlinked_lease_state_fail_without_claiming() {
     let project = Project::new();
@@ -906,7 +905,7 @@ fn missing_task_and_symlinked_lease_state_fail_without_claiming() {
 fn held_lock_returns_incomplete_without_waiting_for_the_owner() {
     let project = Project::new();
     let locks = project.root.join(".codeguard/state/task_locks");
-    fs::create_dir(&locks).unwrap();
+    codeguard_runtime::platform_fs::create_private_dir(&locks).unwrap();
     let _held = TaskFileLock::acquire(&locks.join(format!("{}.lock", project.task_id))).unwrap();
     let (exit, report) = project.run("claim", "agent-b", None);
     assert_eq!(exit, 3);
@@ -1091,4 +1090,33 @@ fn projection_recovery_keeps_live_lease_attempt_and_budget_unchanged() {
         p.run("release", "projection-owner", Some(token)).1["reason"],
         "attempt_still_open"
     );
+}
+
+#[cfg(windows)]
+#[test]
+fn missing_task_and_hardlinked_lease_state_fail_without_claiming_windows() {
+    let project = Project::new();
+    let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args([
+            "task",
+            "claim",
+            &format!("CG-{}", "b".repeat(32)),
+            project.root.to_str().unwrap(),
+            "--owner",
+            "agent-a",
+            "--format=json",
+        ])
+        .output()
+        .unwrap();
+    assert_eq!(output.status.code(), Some(3));
+    assert!(!project.root.join(".codeguard/state/task_locks").exists());
+    let leases = project.root.join(".codeguard/state/leases");
+    codeguard_runtime::platform_fs::create_private_dir(&leases).unwrap();
+    let outside = project.root.join("protected.txt");
+    fs::write(&outside, "do not change").unwrap();
+    fs::hard_link(&outside, leases.join(format!("{}.json", project.task_id))).unwrap();
+    let (exit, report) = project.run("claim", "agent-a", None);
+    assert_eq!(exit, 3);
+    assert_eq!(report["reason"], "lease_invalid");
+    assert_eq!(fs::read_to_string(outside).unwrap(), "do not change");
 }

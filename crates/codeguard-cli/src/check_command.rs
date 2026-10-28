@@ -231,7 +231,7 @@ pub fn run(args: &[String]) -> ExitCode {
     };
     let mut historical_npm_scope_error = None;
     let mut recorded_npm_scope_error = None;
-    if parsed.selection.includes_node() && cfg!(unix) {
+    if parsed.selection.includes_node() && cfg!(any(unix, windows)) {
         let mut scopes = BTreeMap::new();
         for entry in discovery
             .checker_configurations

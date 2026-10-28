@@ -10,7 +10,6 @@ use sha2::{Digest, Sha256};
 use std::collections::BTreeMap;
 use std::ffi::OsString;
 use std::fs;
-use std::os::unix::fs::PermissionsExt;
 use std::path::PathBuf;
 use std::process::ExitCode;
 use std::sync::atomic::AtomicBool;
@@ -242,9 +241,7 @@ pub(crate) fn observe(args: &Args, deadline: Instant, cancelled: &AtomicBool) ->
         return with_reason(report, "private_workspace_unavailable");
     }
     let evidence_dir = scratch.0.join("evidence");
-    if fs::create_dir(&evidence_dir).is_err()
-        || fs::set_permissions(&evidence_dir, fs::Permissions::from_mode(0o700)).is_err()
-    {
+    if crate::platform_fs::create_private_dir(&evidence_dir).is_err() {
         return with_reason(report, "private_workspace_unavailable");
     }
     let mut env = BTreeMap::new();
@@ -427,10 +424,6 @@ fn private_scratch() -> Result<Scratch, &'static str> {
         .map_err(|_| "clock_unavailable")?
         .as_nanos();
     let path = temp.join(format!("codeguard-p3c-{}-{nonce}", std::process::id()));
-    fs::create_dir(&path).map_err(|_| "scratch_create_failed")?;
-    if fs::set_permissions(&path, fs::Permissions::from_mode(0o700)).is_err() {
-        let _ = fs::remove_dir(&path);
-        return Err("scratch_permission_failed");
-    }
+    crate::platform_fs::create_private_dir(&path).map_err(|_| "scratch_create_failed")?;
     Ok(Scratch(path))
 }

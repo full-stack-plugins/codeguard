@@ -171,6 +171,7 @@ dependencies = [
  "sha1",
  "sha2",
  "tokio",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -198,6 +199,7 @@ dependencies = [
  "tokio-util",
  "tree-sitter",
  "tree-sitter-language",
+ "windows-sys 0.61.2",
  "zip",
 ]
 

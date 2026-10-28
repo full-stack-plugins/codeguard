@@ -75,31 +75,34 @@ pub use package_bytes::read_verified_package;
 
 mod approval_signature;
 pub use approval_signature::verify_approval_signature;
-#[cfg(unix)]
+#[cfg(any(unix, windows))]
 mod git_ancestry;
-#[cfg(unix)]
+#[cfg(any(unix, windows))]
 pub use git_ancestry::observe_git_ancestry;
 
 #[cfg(unix)]
 use std::os::unix::fs::OpenOptionsExt;
 
-#[cfg(unix)]
+#[cfg(any(unix, windows))]
 mod interrupt;
 mod native_observation;
-#[cfg(unix)]
+pub mod platform_fs;
+#[cfg(any(unix, windows))]
 mod private_log;
 mod process_runner;
 mod process_spec;
 mod source_snapshot;
-#[cfg(unix)]
+#[cfg(any(unix, windows))]
 mod task_file_lock;
 mod task_scheduler;
 mod termination;
+#[cfg(windows)]
+pub(crate) mod windows_path;
 
-#[cfg(unix)]
+#[cfg(any(unix, windows))]
 pub use interrupt::install_sigint_cancellation;
 pub use native_observation::NativeObservation;
-#[cfg(unix)]
+#[cfg(any(unix, windows))]
 pub use private_log::{
     FreshReportSlot, ProcessEvidenceFailure, ProcessEvidenceFailureKind, ReportEvidenceFailure,
     ReportEvidenceFailureKind, ReportedProcessOutcome, prepare_fresh_report, run_process_recorded,
@@ -107,20 +110,20 @@ pub use private_log::{
 };
 pub use process_runner::{ProcessOutcome, run_process, run_process_with_address_space_limit};
 pub use process_spec::ProcessSpec;
-#[cfg(unix)]
+#[cfg(any(unix, windows))]
 mod native_version_request;
-#[cfg(unix)]
+#[cfg(any(unix, windows))]
 pub use native_version_request::NativeVersionRequest;
-#[cfg(unix)]
+#[cfg(any(unix, windows))]
 mod native_version_observation;
-#[cfg(unix)]
+#[cfg(any(unix, windows))]
 pub use native_version_observation::NativeVersionObservation;
-#[cfg(unix)]
+#[cfg(any(unix, windows))]
 mod native_version_probe;
-#[cfg(unix)]
+#[cfg(any(unix, windows))]
 pub use native_version_probe::observe_native_version;
 pub use source_snapshot::SourceSnapshot;
-#[cfg(unix)]
+#[cfg(any(unix, windows))]
 pub use task_file_lock::TaskFileLock;
 pub use task_scheduler::{SchedulerError, TaskExecution, TaskOutcome, run_task_graph};
 pub use termination::Termination;
@@ -128,11 +131,11 @@ pub use termination::Termination;
 /// 查询本进程是否收到 Ctrl-C；未安装处理器的平台保持 false。
 #[must_use]
 pub fn sigint_cancellation_requested() -> bool {
-    #[cfg(unix)]
+    #[cfg(any(unix, windows))]
     {
         interrupt::sigint_cancelled()
     }
-    #[cfg(not(unix))]
+    #[cfg(not(any(unix, windows)))]
     {
         false
     }
@@ -146,7 +149,9 @@ pub fn read_bounded_regular_file(path: &Path, max_bytes: u64) -> io::Result<Vec<
         // 非阻塞打开后再核对类型，FIFO 无写端时也不得卡住配置/清单检查。
         .custom_flags(libc::O_NOFOLLOW | libc::O_NONBLOCK | libc::O_CLOEXEC)
         .open(path)?;
-    #[cfg(not(unix))]
+    #[cfg(windows)]
+    let file = platform_fs::secure_read(path)?;
+    #[cfg(not(any(unix, windows)))]
     let file = fs::File::open(path)?;
     let metadata = file.metadata()?;
     if !metadata.file_type().is_file() || metadata.len() > max_bytes {

@@ -33,9 +33,9 @@ pub fn observe_git_ancestry(
         let mut env = BTreeMap::new();
         for (key, value) in [
             ("GIT_CONFIG_NOSYSTEM", "1"),
-            ("GIT_CONFIG_GLOBAL", "/dev/null"),
+            ("GIT_CONFIG_GLOBAL", null_device()),
             ("GIT_NO_REPLACE_OBJECTS", "1"),
-            ("GIT_GRAFT_FILE", "/dev/null"),
+            ("GIT_GRAFT_FILE", null_device()),
             ("GIT_NO_LAZY_FETCH", "1"),
             ("GIT_TERMINAL_PROMPT", "0"),
             ("LC_ALL", "C"),
@@ -109,4 +109,15 @@ fn valid_oid(value: &str) -> bool {
         && value
             .bytes()
             .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
+}
+
+fn null_device() -> &'static str {
+    #[cfg(windows)]
+    {
+        "NUL"
+    }
+    #[cfg(not(windows))]
+    {
+        "/dev/null"
+    }
 }

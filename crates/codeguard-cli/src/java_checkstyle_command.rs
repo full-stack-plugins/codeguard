@@ -6,7 +6,6 @@ use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 use std::collections::BTreeMap;
 use std::fs;
-use std::os::unix::fs::PermissionsExt;
 use std::path::PathBuf;
 use std::process::ExitCode;
 use std::sync::atomic::AtomicBool;
@@ -187,10 +186,8 @@ pub(crate) fn observe(
         .map_err(|_| "clock_unavailable")?
         .as_nanos();
     let root = temp.join(format!("cg-checkstyle-cli-{}-{nanos}", std::process::id()));
-    fs::create_dir(&root).map_err(|_| "private_workspace_unavailable")?;
+    crate::platform_fs::create_private_dir(&root).map_err(|_| "private_workspace_unavailable")?;
     let scratch = Scratch(root);
-    fs::set_permissions(&scratch.0, fs::Permissions::from_mode(0o700))
-        .map_err(|_| "private_workspace_unavailable")?;
     let copied_source = scratch
         .0
         .join(source.file_name().ok_or("source_unavailable")?);

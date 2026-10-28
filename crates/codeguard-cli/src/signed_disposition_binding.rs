@@ -6,7 +6,7 @@ use crate::{
     ApprovalTrustKey, ApprovalVerificationContext, BoundFalsePositiveDisposition,
     verify_signed_approval,
 };
-#[cfg(unix)]
+#[cfg(any(unix, windows))]
 use crate::{
     GitApprovalBaselineContext, SignedPriorApprovalInput,
     verify_and_bind_replacement_chain_with_git,
@@ -50,7 +50,7 @@ pub fn bind_signed_false_positive_preview(
 /// 先核对完整签名与 Git 替代链，再生成当前条目的非授权预览。
 ///
 /// 历史时刻、公钥、仓库及工具来源仍由宿主认证；历史到期不缩短当前合法条目期限。
-#[cfg(unix)]
+#[cfg(any(unix, windows))]
 #[allow(clippy::too_many_arguments)]
 pub fn bind_signed_false_positive_replacement_preview(
     candidate_bytes: &[u8],

@@ -3,7 +3,7 @@ use serde_json::Value;
 use std::{collections::BTreeMap, path::Path, time::Instant};
 
 /// 按持久任务构建根复检；只允许明确的原生上下文，不接受任务文本指令。
-#[cfg(unix)]
+#[cfg(any(unix, windows))]
 pub(crate) fn run(
     root: &Path,
     brief: &Value,
@@ -34,7 +34,7 @@ pub(crate) fn run(
     crate::npm_audit_command::observe_for_task(root, &args, deadline)
 }
 
-#[cfg(not(unix))]
+#[cfg(not(any(unix, windows)))]
 pub(crate) fn run(
     _root: &Path,
     _brief: &Value,

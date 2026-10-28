@@ -14,7 +14,6 @@ use sha2::{Digest, Sha256};
 use std::collections::{BTreeMap, BTreeSet};
 use std::ffi::OsString;
 use std::fs;
-use std::os::unix::fs::DirBuilderExt;
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
@@ -862,13 +861,10 @@ fn private_scratch() -> Option<Scratch> {
         "codeguard-go-lint-{}-{stamp}-{sequence}",
         std::process::id()
     ));
-    fs::DirBuilder::new().mode(0o700).create(&path).ok()?;
+    crate::platform_fs::create_private_dir(&path).ok()?;
     let scratch = Scratch(path);
     for name in ["cache", "gopath", "tmp"] {
-        fs::DirBuilder::new()
-            .mode(0o700)
-            .create(scratch.0.join(name))
-            .ok()?;
+        crate::platform_fs::create_private_dir(&scratch.0.join(name)).ok()?;
     }
     Some(scratch)
 }

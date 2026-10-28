@@ -1,17 +1,17 @@
 //! ESLint 稳定任务原工具复检；局部观察不能关闭任务或批准策略。
-#[cfg(unix)]
+#[cfg(any(unix, windows))]
 use codeguard_runtime::read_bounded_regular_file;
 use serde_json::{Value, json};
-#[cfg(unix)]
+#[cfg(any(unix, windows))]
 use sha2::{Digest, Sha256};
-#[cfg(unix)]
+#[cfg(any(unix, windows))]
 use std::{
     collections::BTreeMap,
     path::Path,
     time::{Instant, SystemTime, UNIX_EPOCH},
 };
 
-#[cfg(unix)]
+#[cfg(any(unix, windows))]
 pub(crate) fn run(
     root: &Path,
     brief: &Value,

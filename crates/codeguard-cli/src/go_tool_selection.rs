@@ -1,8 +1,5 @@
 use serde_json::{Value, json};
-use std::{
-    os::unix::fs::PermissionsExt,
-    path::{Path, PathBuf},
-};
+use std::path::{Path, PathBuf};
 
 /// 本轮 Go 原生工具选择；显式无效工具保留，不静默改用 PATH。
 pub(crate) enum GoToolSelection {
@@ -28,12 +25,13 @@ impl GoToolSelection {
                 if !directory.is_absolute() {
                     continue;
                 }
-                let Ok(executable) = directory.join("go").canonicalize() else {
+                let Ok(executable) = directory
+                    .join(crate::tool_platform::native_tool_name("go"))
+                    .canonicalize()
+                else {
                     continue;
                 };
-                if std::fs::metadata(&executable).is_ok_and(|metadata| {
-                    metadata.is_file() && metadata.permissions().mode() & 0o111 != 0
-                }) {
+                if crate::platform_fs::is_executable(&executable) {
                     return Self::Path(executable);
                 }
             }

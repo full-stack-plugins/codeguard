@@ -3,7 +3,6 @@ use codeguard_runtime::SourceSnapshot;
 use std::{
     collections::BTreeSet,
     fs, io,
-    os::unix::fs::MetadataExt,
     path::{Path, PathBuf},
 };
 
@@ -30,7 +29,7 @@ impl RustLintInputs {
                 "项目根不是普通目录",
             ));
         }
-        let root_identity = (metadata.dev(), metadata.ino());
+        let root_identity = crate::platform_fs::file_identity(root)?;
         let mut paths: BTreeSet<PathBuf> = sources.iter().map(PathBuf::from).collect();
         paths.insert(PathBuf::from("Cargo.toml"));
         let mut absent = Vec::new();
@@ -78,7 +77,9 @@ impl RustLintInputs {
     /// 核对根身份、全部已捕获输入和可选文件不存在状态；错误视为未完成。
     pub(crate) fn unchanged(&self, root: &Path) -> bool {
         fs::symlink_metadata(root).is_ok_and(|metadata| {
-            metadata.file_type().is_dir() && (metadata.dev(), metadata.ino()) == self.root_identity
+            metadata.file_type().is_dir()
+                && crate::platform_fs::file_identity(root)
+                    .is_ok_and(|identity| identity == self.root_identity)
         }) && self
             .snapshot
             .verify_source_unchanged()

@@ -5,7 +5,6 @@ use sha2::{Digest, Sha256};
 use std::{
     collections::{BTreeMap, BTreeSet},
     ffi::OsString,
-    os::unix::fs::PermissionsExt,
     path::{Path, PathBuf},
     sync::atomic::AtomicBool,
     time::Instant,
@@ -29,10 +28,13 @@ fn companion(tool: &Path) -> Result<(PathBuf, PathBuf, String), ()> {
     if !tool.is_absolute() {
         return Err(());
     }
-    let requested = tool.parent().ok_or(())?.join("gofmt");
+    let requested = tool
+        .parent()
+        .ok_or(())?
+        .join(crate::tool_platform::native_tool_name("gofmt"));
     let canonical = requested.canonicalize().map_err(|_| ())?;
     let metadata = std::fs::metadata(&canonical).map_err(|_| ())?;
-    if !metadata.is_file() || metadata.permissions().mode() & 0o111 == 0 {
+    if !metadata.is_file() || !crate::platform_fs::is_executable(&canonical) {
         return Err(());
     }
     let bytes = read_bounded_regular_file(&canonical, ARTIFACT_BUDGET).map_err(|_| ())?;

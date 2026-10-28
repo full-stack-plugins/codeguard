@@ -3,7 +3,6 @@
 use std::collections::BTreeMap;
 use std::ffi::OsString;
 use std::fs;
-use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::{Instant, SystemTime, UNIX_EPOCH};
@@ -114,8 +113,7 @@ pub(crate) fn observe(request: &Request<'_>) -> Value {
     let evidence = scratch.0.join("evidence");
     if snapshot.materialize_new(&project).is_err()
         || fs::write(project.join("settings.xml"), SETTINGS).is_err()
-        || fs::create_dir(&evidence).is_err()
-        || fs::set_permissions(&evidence, fs::Permissions::from_mode(0o700)).is_err()
+        || crate::platform_fs::create_private_dir(&evidence).is_err()
     {
         return reason(report, "private_workspace_unavailable");
     }
@@ -335,9 +333,7 @@ fn private_scratch() -> Result<Scratch, &'static str> {
         "codeguard-maven-dependency-{}-{nonce}",
         std::process::id()
     ));
-    fs::create_dir(&path).map_err(|_| "scratch_create_failed")?;
-    fs::set_permissions(&path, fs::Permissions::from_mode(0o700))
-        .map_err(|_| "scratch_permission_failed")?;
+    crate::platform_fs::create_private_dir(&path).map_err(|_| "scratch_create_failed")?;
     Ok(Scratch(path))
 }
 

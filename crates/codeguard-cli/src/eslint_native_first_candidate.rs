@@ -5,7 +5,6 @@ use codeguard_core::ObservedPathKind;
 use codeguard_runtime::read_bounded_regular_file;
 use std::{
     io::ErrorKind,
-    os::unix::fs::PermissionsExt,
     path::{Path, PathBuf},
 };
 
@@ -122,7 +121,7 @@ pub(crate) fn node_on_path() -> Option<PathBuf> {
         if !directory.is_absolute() {
             continue;
         }
-        let node = directory.join("node");
+        let node = directory.join(crate::tool_platform::native_tool_name("node"));
         let Ok(node) = node.canonicalize() else {
             continue;
         };
@@ -130,7 +129,7 @@ pub(crate) fn node_on_path() -> Option<PathBuf> {
             continue;
         };
         if metadata.is_file()
-            && metadata.permissions().mode() & 0o111 != 0
+            && crate::platform_fs::is_executable(&node)
             && read_bounded_regular_file(&node, 128 * 1024 * 1024).is_ok()
         {
             return Some(node);

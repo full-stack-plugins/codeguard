@@ -1,8 +1,9 @@
 //! 持久修复尝试：受租约保护，记录观察变化；成功结束仍需原检查器复检。
 
+use crate::platform_fs;
 use std::collections::BTreeMap;
 use std::fs;
-use std::os::unix::fs::MetadataExt;
+use std::io::Read;
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -626,10 +627,16 @@ fn verified_rechecks(
 
 fn bounded_regular(path: &Path, limit: u64) -> Result<Vec<u8>, &'static str> {
     let metadata = fs::symlink_metadata(path).map_err(|_| "verification_evidence_unavailable")?;
-    if !metadata.file_type().is_file() || metadata.nlink() != 1 || metadata.len() > limit {
+    if !metadata.file_type().is_file() || !platform_fs::single_link(path) || metadata.len() > limit
+    {
         return Err("verification_evidence_invalid");
     }
-    let bytes = fs::read(path).map_err(|_| "verification_evidence_unavailable")?;
+    let mut bytes = Vec::new();
+    platform_fs::secure_read(path)
+        .map_err(|_| "verification_evidence_unavailable")?
+        .take(limit.saturating_add(1))
+        .read_to_end(&mut bytes)
+        .map_err(|_| "verification_evidence_unavailable")?;
     if bytes.len() as u64 > limit {
         return Err("verification_evidence_invalid");
     }
@@ -718,12 +725,17 @@ fn read_ledger(events: &Path, id: &str) -> Result<AttemptLedger, &'static str> {
         let (attempt_id, kind) = parse_event_name(&name).ok_or("attempt_event_invalid")?;
         let metadata = fs::symlink_metadata(entry.path()).map_err(|_| "attempt_event_invalid")?;
         if !metadata.file_type().is_file()
-            || metadata.nlink() != 1
+            || !platform_fs::single_link(&entry.path())
             || metadata.len() > MAX_EVENT_BYTES
         {
             return Err("attempt_event_invalid");
         }
-        let bytes = fs::read(entry.path()).map_err(|_| "attempt_event_unreadable")?;
+        let mut bytes = Vec::new();
+        platform_fs::secure_read(&entry.path())
+            .map_err(|_| "attempt_event_unreadable")?
+            .take(MAX_EVENT_BYTES.saturating_add(1))
+            .read_to_end(&mut bytes)
+            .map_err(|_| "attempt_event_unreadable")?;
         if bytes.len() as u64 > MAX_EVENT_BYTES {
             return Err("attempt_event_invalid");
         }
@@ -875,7 +887,7 @@ fn input_digest(root: &Path, brief: &Value) -> Result<String, &'static str> {
             Ok(metadata)
                 if metadata.file_type().is_file()
                     && metadata.len() <= MAX_SOURCE_BYTES
-                    && metadata.nlink() == 1 =>
+                    && platform_fs::single_link(&target) =>
             {
                 input.extend_from_slice(
                     digest(&fs::read(target).map_err(|_| "attempt_input_unreadable")?).as_bytes(),

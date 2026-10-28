@@ -23,7 +23,7 @@ pub fn run_checkstyle_probe(
     if let Some(reason) = stopped(req, cancelled) {
         return incomplete(reason, None);
     }
-    if !cfg!(unix)
+    if !cfg!(any(unix, windows))
         || req.expected_version != "10.21.4"
         || req.run_id.is_empty()
         || req.run_id.len() > 64

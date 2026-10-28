@@ -1,8 +1,5 @@
 use serde_json::{Value, json};
-use std::{
-    os::unix::fs::PermissionsExt,
-    path::{Path, PathBuf},
-};
+use std::path::{Path, PathBuf};
 
 /// 一次性选择 Ruby 语法入口；来源：OpenSpec 原生优先与禁止故障换工具契约。
 pub(crate) enum RubyToolSelection {
@@ -24,10 +21,8 @@ impl RubyToolSelection {
                 let Ok(directory) = directory.canonicalize() else {
                     continue;
                 };
-                let entry = directory.join("ruby");
-                if std::fs::metadata(&entry)
-                    .is_ok_and(|m| m.is_file() && m.permissions().mode() & 0o111 != 0)
-                {
+                let entry = directory.join(crate::tool_platform::native_tool_name("ruby"));
+                if crate::platform_fs::is_executable(&entry) {
                     return Self::Path(entry);
                 }
             }

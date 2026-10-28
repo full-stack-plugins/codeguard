@@ -9,7 +9,7 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 fn main() -> ExitCode {
-    #[cfg(unix)]
+    #[cfg(any(unix, windows))]
     if let Err(error) = codeguard_runtime::install_sigint_cancellation() {
         eprintln!("无法登记 Ctrl-C 取消：{error}");
         return ExitCode::from(4);
@@ -35,17 +35,17 @@ fn main() -> ExitCode {
         [command, operation, rest @ ..] if command == "grammar" && operation == "probe" => {
             codeguard_cli::grammar_probe_command::run(rest)
         }
-        #[cfg(unix)]
+        #[cfg(any(unix, windows))]
         [command, rest @ ..] if command == "doctor" => codeguard_cli::doctor_command::run(rest),
         [command, rest @ ..] if command == "plan" => codeguard_cli::plan_command::run(rest),
         [command, operation, rest @ ..] if command == "hook" && operation == "plan" => {
             codeguard_cli::hook_plan_command::run(rest)
         }
-        #[cfg(unix)]
+        #[cfg(any(unix, windows))]
         [command, operation, rest @ ..] if command == "hook" && operation == "execute" => {
             codeguard_cli::hook_execute_command::run(rest)
         }
-        #[cfg(unix)]
+        #[cfg(any(unix, windows))]
         [command, operation, rest @ ..] if command == "hook" && operation == "claude" => {
             codeguard_cli::claude_hook_command::run(rest)
         }
@@ -53,25 +53,25 @@ fn main() -> ExitCode {
         [command, rest @ ..] if command == "__syntax-worker" => {
             codeguard_cli::syntax_worker_command::run(rest)
         }
-        #[cfg(unix)]
+        #[cfg(any(unix, windows))]
         [command, language, rest @ ..] if command == "comments" && language == "rust" => {
             codeguard_cli::rust_comments_command::run(rest)
         }
-        #[cfg(unix)]
+        #[cfg(any(unix, windows))]
         [command, language, rest @ ..] if command == "build" && language == "rust" => {
             codeguard_cli::rust_build_command::run(rest)
         }
-        #[cfg(unix)]
+        #[cfg(any(unix, windows))]
         [command, rest @ ..] if command == "check" => codeguard_cli::check_command::run(rest),
-        #[cfg(unix)]
+        #[cfg(any(unix, windows))]
         [command, language, rest @ ..] if command == "cve" && language == "rust" => {
             codeguard_cli::cargo_audit_command::run(rest)
         }
-        #[cfg(unix)]
+        #[cfg(any(unix, windows))]
         [command, language, rest @ ..] if command == "cve" && language == "python" => {
             codeguard_cli::python_cve_command::run(rest)
         }
-        #[cfg(unix)]
+        #[cfg(any(unix, windows))]
         [command, rest @ ..] if command == "cve" => codeguard_cli::npm_audit_command::run(rest),
         [command, operation, rest @ ..] if command == "rules" && operation == "list" => {
             codeguard_cli::rules_list_command::run(rest)
@@ -87,13 +87,13 @@ fn main() -> ExitCode {
         {
             codeguard_cli::workspace_view_command::run_show(&rest[1..])
         }
-        #[cfg(unix)]
+        #[cfg(any(unix, windows))]
         [command, rest @ ..]
             if command == "task" && rest.first().is_some_and(|part| part == "attempt") =>
         {
             codeguard_cli::task_attempt_command::run(rest)
         }
-        #[cfg(unix)]
+        #[cfg(any(unix, windows))]
         [command, rest @ ..]
             if command == "task"
                 && matches!(
@@ -104,7 +104,7 @@ fn main() -> ExitCode {
             codeguard_cli::task_lease_command::run(rest)
         }
         [command, rest @ ..] if command == "task" => codeguard_cli::task_verify_command::run(rest),
-        #[cfg(unix)]
+        #[cfg(any(unix, windows))]
         [command, rest @ ..] if command == "lint" => {
             if rest.first().is_some_and(|language| language == "java") {
                 codeguard_cli::java_lint_dispatch::run(&rest[1..])
@@ -133,7 +133,7 @@ fn main() -> ExitCode {
                 codeguard_cli::python_lint_command::run(rest)
             }
         }
-        #[cfg(unix)]
+        #[cfg(any(unix, windows))]
         [command, rest @ ..] if command == "gate" => {
             codeguard_cli::git_index_safety_command::run(rest)
         }

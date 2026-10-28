@@ -1,8 +1,8 @@
 //! 本地任务租约：跨进程互斥只协调同一工作区，不授予质量策略或交付权威。
 
-use std::fs::{self, File, OpenOptions};
+use crate::platform_fs;
+use std::fs::{self};
 use std::io::{Read, Write};
-use std::os::unix::fs::{MetadataExt, OpenOptionsExt};
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -376,10 +376,13 @@ fn parse_args(args: &[String]) -> Result<Args, String> {
 }
 
 pub(crate) fn ensure_directory(path: &Path) -> Result<(), &'static str> {
-    if fs::create_dir(path).is_err() && !real_directory(path) {
+    if platform_fs::create_private_dir(path).is_err() && !real_directory(path) {
         return Err("lease_directory_unavailable");
     }
     if real_directory(path) {
+        #[cfg(windows)]
+        platform_fs::verify_private_permissions(path, 0o700)
+            .map_err(|_| "lease_directory_unavailable")?;
         Ok(())
     } else {
         Err("lease_directory_unavailable")
@@ -388,6 +391,7 @@ pub(crate) fn ensure_directory(path: &Path) -> Result<(), &'static str> {
 
 pub(crate) fn real_directory(path: &Path) -> bool {
     fs::symlink_metadata(path).is_ok_and(|metadata| metadata.file_type().is_dir())
+        && platform_fs::file_identity(path).is_ok()
 }
 
 pub(crate) fn read_lease(path: &Path) -> Result<Option<Lease>, &'static str> {
@@ -396,10 +400,18 @@ pub(crate) fn read_lease(path: &Path) -> Result<Option<Lease>, &'static str> {
         Err(error) if error.kind() == std::io::ErrorKind::NotFound => return Ok(None),
         Err(_) => return Err("lease_unreadable"),
     };
-    if !metadata.file_type().is_file() || metadata.len() > 4096 || metadata.nlink() != 1 {
+    if !metadata.file_type().is_file() || metadata.len() > 4096 || !platform_fs::single_link(path) {
         return Err("lease_invalid");
     }
-    let bytes = fs::read(path).map_err(|_| "lease_unreadable")?;
+    let mut bytes = Vec::new();
+    platform_fs::secure_read(path)
+        .map_err(|_| "lease_unreadable")?
+        .take(4097)
+        .read_to_end(&mut bytes)
+        .map_err(|_| "lease_unreadable")?;
+    if bytes.len() > 4096 {
+        return Err("lease_invalid");
+    }
     let lease: Lease = serde_json::from_slice(&bytes).map_err(|_| "lease_invalid")?;
     if lease.schema_version != "0.1.0"
         || !valid_task_id(&lease.task_id)
@@ -417,7 +429,7 @@ pub(crate) fn read_lease(path: &Path) -> Result<Option<Lease>, &'static str> {
 fn write_lease(path: &Path, lease: &Lease, state: &Path) -> Result<(), &'static str> {
     if path.exists() {
         let metadata = fs::symlink_metadata(path).map_err(|_| "lease_invalid")?;
-        if !metadata.file_type().is_file() || metadata.nlink() != 1 {
+        if !metadata.file_type().is_file() || !platform_fs::single_link(path) {
             return Err("lease_invalid");
         }
     }
@@ -429,18 +441,12 @@ fn write_lease(path: &Path, lease: &Lease, state: &Path) -> Result<(), &'static 
         &suffix[..16]
     ));
     let result = (|| {
-        let mut file = OpenOptions::new()
-            .write(true)
-            .create_new(true)
-            .mode(0o600)
-            .open(&temp)
-            .map_err(|_| "lease_staging_unavailable")?;
+        let mut file =
+            platform_fs::secure_create_new(&temp).map_err(|_| "lease_staging_unavailable")?;
         file.write_all(&bytes).map_err(|_| "lease_write_failed")?;
         file.sync_all().map_err(|_| "lease_sync_failed")?;
-        fs::rename(&temp, path).map_err(|_| "lease_replace_failed")?;
-        File::open(path.parent().ok_or("lease_parent_missing")?)
-            .and_then(|dir| dir.sync_all())
-            .map_err(|_| "lease_directory_sync_failed")
+        drop(file);
+        platform_fs::atomic_replace(&temp, path).map_err(|_| "lease_replace_failed")
     })();
     let _ = fs::remove_file(&temp);
     result
@@ -448,8 +454,7 @@ fn write_lease(path: &Path, lease: &Lease, state: &Path) -> Result<(), &'static 
 
 pub(crate) fn random_token() -> Result<String, &'static str> {
     let mut bytes = [0_u8; 32];
-    File::open("/dev/urandom")
-        .and_then(|mut file| file.read_exact(&mut bytes))
+    ring::rand::SecureRandom::fill(&ring::rand::SystemRandom::new(), &mut bytes)
         .map_err(|_| "token_entropy_unavailable")?;
     Ok(bytes.iter().map(|byte| format!("{byte:02x}")).collect())
 }

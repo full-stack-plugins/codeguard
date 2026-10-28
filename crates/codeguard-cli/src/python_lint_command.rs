@@ -18,7 +18,6 @@ use serde_json::Value;
 use sha2::{Digest, Sha256};
 use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
-use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 use std::sync::atomic::AtomicBool;
@@ -684,8 +683,7 @@ fn run_id() -> String {
 fn create_scratch(run_id: &str) -> std::io::Result<PrivateScratch> {
     let root = std::env::temp_dir().canonicalize()?;
     let path = root.join(format!("codeguard-{run_id}"));
-    fs::create_dir(&path)?;
-    fs::set_permissions(&path, fs::Permissions::from_mode(0o700))?;
+    crate::platform_fs::create_private_dir(&path)?;
     Ok(PrivateScratch(path))
 }
 
