@@ -181,10 +181,13 @@ fn open_relative(
     let mut status_block = IO_STATUS_BLOCK::default();
     // SAFETY: bounded UTF-16 leaf, live parent handle, initialized NT structs.
     // The synchronous non-alert handle is required by std File's blocking I/O.
+    // Request FILE_READ_ATTRIBUTES for the mandatory post-open identity/reparse
+    // query, even when the caller only requests WRITE_DAC/READ_CONTROL or write
+    // data. Native NtCreateFile does not add that right on the caller's behalf.
     let status = unsafe {
         NtCreateFile(
             &mut result,
-            access | SYNCHRONIZE,
+            access | SYNCHRONIZE | FILE_READ_ATTRIBUTES,
             &attributes,
             &mut status_block,
             ptr::null(),
@@ -224,4 +227,67 @@ pub(crate) fn wide(path: &Path) -> io::Result<Vec<u16>> {
 }
 fn invalid(message: &'static str) -> io::Error {
     io::Error::new(io::ErrorKind::InvalidInput, message)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::io::Write;
+    use windows_sys::{
+        Wdk::Storage::FileSystem::{FILE_CREATE, FILE_NON_DIRECTORY_FILE},
+        Win32::Foundation::GENERIC_WRITE,
+    };
+
+    #[test]
+    fn acl_only_and_write_only_child_requests_still_support_required_identity_query() {
+        let root = std::env::temp_dir().join(format!(
+            "cg-nt-query-rights-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        crate::platform_fs::create_private_dir(&root).unwrap();
+        let directory = PinnedDirectory::open(&root).unwrap();
+        // This access request is used by private ACL verification. The backend
+        // must also obtain its own metadata-query right; the caller needn't know
+        // implementation-specific post-open identity validation requirements.
+        let parent = PinnedDirectory::open(root.parent().unwrap()).unwrap();
+        let acl_handle = parent
+            .open_child(
+                root.file_name().unwrap(),
+                READ_CONTROL,
+                FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+                FILE_OPEN,
+                FILE_DIRECTORY_FILE,
+                ptr::null_mut(),
+            )
+            .unwrap();
+        assert_ne!(
+            file_info(acl_handle.as_raw_handle())
+                .unwrap()
+                .dwFileAttributes
+                & FILE_ATTRIBUTE_DIRECTORY,
+            0
+        );
+        let mut file = directory
+            .open_child(
+                OsStr::new("new.bin"),
+                GENERIC_WRITE,
+                FILE_SHARE_READ | FILE_SHARE_DELETE,
+                FILE_CREATE,
+                FILE_NON_DIRECTORY_FILE,
+                ptr::null_mut(),
+            )
+            .unwrap();
+        file.write_all(b"checked metadata rights").unwrap();
+        file.sync_all().unwrap();
+        assert_eq!(file_info(file.as_raw_handle()).unwrap().nNumberOfLinks, 1);
+        drop(file);
+        drop(acl_handle);
+        drop(parent);
+        drop(directory);
+        std::fs::remove_dir_all(root).unwrap();
+    }
 }

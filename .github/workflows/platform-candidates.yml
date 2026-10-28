@@ -118,10 +118,16 @@ jobs:
         run: python scripts/candidate-test.py filesystem-contract cargo test --locked -p codeguard-runtime --test platform_fs_contract
       - name: Require native CLI adapter path contracts
         if: ${{ !cancelled() && steps.native_build.outcome == 'success' }}
-        run: python scripts/candidate-test.py cli-platform-contract cargo test --locked -p codeguard-cli --features wasm-precheck --test platform_adapter_contract --test task_lease_contract
+        run: python scripts/candidate-test.py cli-platform-contract cargo test --locked -p codeguard-cli --features wasm-precheck --test platform_adapter_contract
+      - name: Require native task lease and attempt contracts
+        if: ${{ !cancelled() && steps.native_build.outcome == 'success' }}
+        run: python scripts/candidate-test.py cli-lease-contract cargo test --locked -p codeguard-cli --features wasm-precheck --test task_lease_contract
       - name: Require Windows process cleanup and handle contracts
         if: ${{ !cancelled() && steps.native_build.outcome == 'success' && runner.os == 'Windows' }}
         run: python scripts/candidate-test.py windows-process cargo test --locked -p codeguard-runtime --test process_windows_contract
+      - name: Require Windows metadata access contracts
+        if: ${{ !cancelled() && steps.native_build.outcome == 'success' && runner.os == 'Windows' }}
+        run: python scripts/candidate-test.py windows-metadata cargo test --locked -p codeguard-runtime --lib windows_path::tests
       - name: Require Windows private log contracts
         if: ${{ !cancelled() && steps.native_build.outcome == 'success' && runner.os == 'Windows' }}
         run: python scripts/candidate-test.py windows-private-log cargo test --locked -p codeguard-runtime --test private_log_windows_contract
