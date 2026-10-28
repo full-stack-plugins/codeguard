@@ -223,3 +223,20 @@ fn mutation_of_open_directory_into_junction_cannot_redirect_report() {
     drop(slot);
     fs::remove_dir(&root.0).unwrap(); // remove junction, never traverse its target
 }
+
+#[test]
+fn atomic_publication_supports_short_and_multibyte_names_without_clobbering() {
+    let root = Root::new();
+    for name in ["x", "ab", "日志-🛡.log", "a-longer-evidence-record-name.log"] {
+        let path =
+            write_private_log(&root.0, name, &outcome()).expect("publish exact UTF-16 leaf name");
+        assert_eq!(path.file_name().unwrap(), std::ffi::OsStr::new(name));
+        let original = fs::read(&path).unwrap();
+        assert!(original.starts_with(b"CGLOG1\0"));
+        assert!(
+            write_private_log(&root.0, name, &outcome()).is_err(),
+            "must not overwrite {name}"
+        );
+        assert_eq!(fs::read(&path).unwrap(), original);
+    }
+}

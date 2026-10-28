@@ -56,6 +56,9 @@ jobs:
         run: python tests/candidate_diagnostics_test.py
       - name: Verify private packaging contracts
         run: python scripts/candidate-test.py package-contract node --test tests/npm_pack_windows.test.mjs tests/npm_license_checkout.test.mjs
+      - name: Preflight Windows filesystem contracts before expensive WASM build
+        if: runner.os == 'Windows'
+        run: python scripts/candidate-test.py windows-filesystem-preflight cargo test --locked -p codeguard-runtime --test platform_fs_contract --test private_log_windows_contract
       - name: Build native candidate with WASM feature
         id: native_build
         shell: python

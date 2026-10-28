@@ -416,7 +416,9 @@ mod windows {
         }
         let name = wide(target_name)?;
         let bytes = (name.len() - 1) * 2;
-        let size = std::mem::offset_of!(FILE_RENAME_INFO, FileName) + bytes;
+        // Keep a complete fixed header plus the variable UTF-16 name. Keep
+        // the trailing NUL in allocated storage while FileNameLength excludes it.
+        let size = std::mem::size_of::<FILE_RENAME_INFO>() + name.len() * 2;
         let mut buffer =
             vec![0usize; (size + std::mem::size_of::<usize>() - 1) / std::mem::size_of::<usize>()];
         unsafe {
@@ -424,11 +426,7 @@ mod windows {
             (*rename).Anonymous.ReplaceIfExists = replace;
             (*rename).RootDirectory = target_parent.handle();
             (*rename).FileNameLength = bytes as u32;
-            ptr::copy_nonoverlapping(
-                name.as_ptr(),
-                (*rename).FileName.as_mut_ptr(),
-                name.len() - 1,
-            );
+            ptr::copy_nonoverlapping(name.as_ptr(), (*rename).FileName.as_mut_ptr(), name.len());
             if SetFileInformationByHandle(
                 source.as_raw_handle(),
                 FileRenameInfo,

@@ -53,19 +53,23 @@ fn lock_exclusion_release_and_hardlink_rejection() {
 }
 #[test]
 fn replacement_changes_identity_and_bytes() {
-    let t = Temp::new();
-    let p = t.0.join("state");
-    let q = t.0.join("staging");
-    drop(fs::secure_create_new(&p).unwrap());
-    let old = fs::file_identity(&p).unwrap();
-    let mut f = fs::secure_create_new(&q).unwrap();
-    f.write_all(b"new").unwrap();
-    f.sync_all().unwrap();
-    drop(f);
-    fs::atomic_replace(&q, &p).unwrap();
-    assert_ne!(old, fs::file_identity(&p).unwrap());
-    assert_eq!(std::fs::read(&p).unwrap(), b"new");
-    fs::verify_private_permissions(&p, 0o600).unwrap();
+    // A one-character name exercises minimum native header size; Unicode makes
+    // the byte-count contract distinct from UTF-8 and character counts.
+    for name in ["x", "state", "状态 with spaces.json"] {
+        let t = Temp::new();
+        let p = t.0.join(name);
+        let q = t.0.join("staging");
+        drop(fs::secure_create_new(&p).unwrap());
+        let old = fs::file_identity(&p).unwrap();
+        let mut f = fs::secure_create_new(&q).unwrap();
+        f.write_all(b"new").unwrap();
+        f.sync_all().unwrap();
+        drop(f);
+        fs::atomic_replace(&q, &p).unwrap();
+        assert_ne!(old, fs::file_identity(&p).unwrap());
+        assert_eq!(std::fs::read(&p).unwrap(), b"new");
+        fs::verify_private_permissions(&p, 0o600).unwrap();
+    }
 }
 #[test]
 fn lock_child_fixture() {
