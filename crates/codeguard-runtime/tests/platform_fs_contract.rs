@@ -1,12 +1,14 @@
 //! Native platform security primitives. Runs unchanged on Windows and Unix.
 use codeguard_runtime::{TaskFileLock, platform_fs as fs};
 use std::{io::Write, path::PathBuf};
+static NEXT_TEMP: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
 struct Temp(PathBuf);
 impl Temp {
     fn new() -> Self {
         let p = std::env::temp_dir().join(format!(
-            "cg-platform-{}-{}",
+            "cg-platform-{}-{}-{}",
             std::process::id(),
+            NEXT_TEMP.fetch_add(1, std::sync::atomic::Ordering::Relaxed),
             std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
                 .unwrap()

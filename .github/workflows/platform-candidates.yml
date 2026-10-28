@@ -55,7 +55,7 @@ jobs:
       - name: Verify diagnostic encoding
         run: python tests/candidate_diagnostics_test.py
       - name: Verify private packaging contracts
-        run: node --test tests/npm_pack_windows.test.mjs tests/npm_license_checkout.test.mjs
+        run: python scripts/candidate-test.py package-contract node --test tests/npm_pack_windows.test.mjs tests/npm_license_checkout.test.mjs
       - name: Build native candidate with WASM feature
         id: native_build
         shell: python
@@ -121,7 +121,10 @@ jobs:
         run: python scripts/candidate-test.py cli-platform-contract cargo test --locked -p codeguard-cli --features wasm-precheck --test platform_adapter_contract --test task_lease_contract
       - name: Require Windows process cleanup and handle contracts
         if: ${{ !cancelled() && steps.native_build.outcome == 'success' && runner.os == 'Windows' }}
-        run: python scripts/candidate-test.py windows-process-log cargo test --locked -p codeguard-runtime --test process_windows_contract --test private_log_windows_contract
+        run: python scripts/candidate-test.py windows-process cargo test --locked -p codeguard-runtime --test process_windows_contract
+      - name: Require Windows private log contracts
+        if: ${{ !cancelled() && steps.native_build.outcome == 'success' && runner.os == 'Windows' }}
+        run: python scripts/candidate-test.py windows-private-log cargo test --locked -p codeguard-runtime --test private_log_windows_contract
       - name: Require Windows console cancellation contract
         if: ${{ !cancelled() && steps.native_build.outcome == 'success' && runner.os == 'Windows' }}
         run: python scripts/candidate-test.py windows-console cargo test --locked -p codeguard-runtime --lib interrupt::windows_tests -- --test-threads=1

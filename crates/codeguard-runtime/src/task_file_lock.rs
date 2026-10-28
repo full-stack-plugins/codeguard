@@ -1,6 +1,8 @@
 //! 同机进程间的本地文件锁；状态解释与租约权限仍由应用服务负责。
 
-use std::fs::{File, OpenOptions};
+use std::fs::File;
+#[cfg(unix)]
+use std::fs::OpenOptions;
 use std::io;
 #[cfg(unix)]
 use std::os::fd::AsRawFd;
@@ -47,8 +49,12 @@ impl TaskFileLock {
     /// of this protocol opens the same file with sharing denied; process exit
     /// closes the handle and releases exclusion, including crash recovery.
     pub fn acquire(path: &Path) -> io::Result<Self> {
-        use std::os::windows::{fs::OpenOptionsExt, io::AsRawHandle};
+        use std::os::windows::io::AsRawHandle;
         use windows_sys::Win32::Storage::FileSystem::*;
+        use windows_sys::{
+            Wdk::Storage::FileSystem::{FILE_NON_DIRECTORY_FILE, FILE_OPEN},
+            Win32::Foundation::{GENERIC_READ, GENERIC_WRITE},
+        };
         let parent = crate::windows_path::PinnedDirectory::open(
             path.parent()
                 .ok_or_else(|| io::Error::other("lock parent required"))?,
@@ -58,12 +64,15 @@ impl TaskFileLock {
             Err(error) if error.kind() == io::ErrorKind::AlreadyExists => {}
             Err(error) => return Err(error),
         }
-        let file = OpenOptions::new()
-            .read(true)
-            .write(true)
-            .share_mode(0)
-            .custom_flags(FILE_FLAG_OPEN_REPARSE_POINT)
-            .open(path)?;
+        let file = parent.open_child(
+            path.file_name()
+                .ok_or_else(|| io::Error::other("lock leaf required"))?,
+            GENERIC_READ | GENERIC_WRITE,
+            0,
+            FILE_OPEN,
+            FILE_NON_DIRECTORY_FILE,
+            std::ptr::null_mut(),
+        )?;
         let mut info = unsafe { std::mem::zeroed() };
         if unsafe { GetFileInformationByHandle(file.as_raw_handle(), &mut info) } == 0 {
             return Err(io::Error::last_os_error());

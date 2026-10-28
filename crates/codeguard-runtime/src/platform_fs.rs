@@ -81,13 +81,14 @@ pub use windows::*;
 #[cfg(windows)]
 mod windows {
     use super::*;
+    use crate::windows_path::PinnedDirectory;
     use std::{
         ffi::OsStr,
-        os::windows::{
-            ffi::OsStrExt,
-            io::{AsRawHandle, FromRawHandle},
-        },
+        os::windows::{ffi::OsStrExt, io::AsRawHandle},
         ptr,
+    };
+    use windows_sys::Wdk::Storage::FileSystem::{
+        FILE_CREATE, FILE_DIRECTORY_FILE, FILE_NON_DIRECTORY_FILE, FILE_OPEN, FILE_WRITE_THROUGH,
     };
     use windows_sys::Win32::{
         Foundation::*,
@@ -177,24 +178,20 @@ mod windows {
                 .ok_or_else(|| io::Error::other("parent required"))?,
         )
     }
+    fn leaf(path: &Path) -> io::Result<&OsStr> {
+        path.file_name()
+            .ok_or_else(|| io::Error::other("ordinary file name required"))
+    }
     fn open(path: &Path, access: u32) -> io::Result<File> {
-        let _parent = pin_parent(path)?;
-        let name = wide(path.as_os_str())?;
-        let handle = unsafe {
-            CreateFileW(
-                name.as_ptr(),
-                access,
-                FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-                ptr::null(),
-                OPEN_EXISTING,
-                FILE_FLAG_OPEN_REPARSE_POINT | FILE_FLAG_BACKUP_SEMANTICS,
-                ptr::null_mut(),
-            )
-        };
-        if handle == INVALID_HANDLE_VALUE {
-            return Err(io::Error::last_os_error());
-        }
-        let file = unsafe { File::from_raw_handle(handle) };
+        let parent = pin_parent(path)?;
+        let file = parent.open_child(
+            leaf(path)?,
+            access,
+            FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+            FILE_OPEN,
+            0,
+            ptr::null_mut(),
+        )?;
         info(&file)?;
         Ok(file)
     }
@@ -292,43 +289,30 @@ mod windows {
         Ok(())
     }
     pub fn create_private_dir(path: &Path) -> io::Result<()> {
-        let _parent = pin_parent(path)?;
+        let parent = pin_parent(path)?;
         let descriptor = private_descriptor()?;
-        let name = wide(path.as_os_str())?;
-        let attributes = SECURITY_ATTRIBUTES {
-            nLength: std::mem::size_of::<SECURITY_ATTRIBUTES>() as u32,
-            lpSecurityDescriptor: descriptor.0,
-            bInheritHandle: 0,
-        };
-        if unsafe { CreateDirectoryW(name.as_ptr(), &attributes) } == 0 {
-            return Err(io::Error::last_os_error());
-        }
+        let file = parent.open_child(
+            leaf(path)?,
+            FILE_LIST_DIRECTORY | FILE_READ_ATTRIBUTES,
+            FILE_SHARE_READ | FILE_SHARE_WRITE,
+            FILE_CREATE,
+            FILE_DIRECTORY_FILE,
+            descriptor.0,
+        )?;
+        drop(file);
         Ok(())
     }
     pub fn secure_create_new(path: &Path) -> io::Result<File> {
-        let _parent = pin_parent(path)?;
+        let parent = pin_parent(path)?;
         let descriptor = private_descriptor()?;
-        let name = wide(path.as_os_str())?;
-        let attributes = SECURITY_ATTRIBUTES {
-            nLength: std::mem::size_of::<SECURITY_ATTRIBUTES>() as u32,
-            lpSecurityDescriptor: descriptor.0,
-            bInheritHandle: 0,
-        };
-        let handle = unsafe {
-            CreateFileW(
-                name.as_ptr(),
-                GENERIC_WRITE,
-                FILE_SHARE_READ | FILE_SHARE_DELETE,
-                &attributes,
-                CREATE_NEW,
-                FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OPEN_REPARSE_POINT,
-                ptr::null_mut(),
-            )
-        };
-        if handle == INVALID_HANDLE_VALUE {
-            return Err(io::Error::last_os_error());
-        }
-        Ok(unsafe { File::from_raw_handle(handle) })
+        parent.open_child(
+            leaf(path)?,
+            GENERIC_WRITE,
+            FILE_SHARE_READ | FILE_SHARE_DELETE,
+            FILE_CREATE,
+            FILE_NON_DIRECTORY_FILE,
+            descriptor.0,
+        )
     }
     pub fn file_identity(path: &Path) -> io::Result<(u64, u64)> {
         let file = open(path, FILE_READ_ATTRIBUTES)?;
@@ -354,25 +338,17 @@ mod windows {
                 .is_ok_and(|i| i.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY == 0)
     }
     pub fn secure_read(path: &Path) -> io::Result<File> {
-        let _parent = pin_parent(path)?;
-        let name = wide(path.as_os_str())?;
-        let handle = unsafe {
-            CreateFileW(
-                name.as_ptr(),
-                GENERIC_READ,
-                FILE_SHARE_READ,
-                ptr::null(),
-                OPEN_EXISTING,
-                FILE_FLAG_OPEN_REPARSE_POINT,
-                ptr::null_mut(),
-            )
-        };
-        if handle == INVALID_HANDLE_VALUE {
-            return Err(io::Error::last_os_error());
-        }
-        let file = unsafe { File::from_raw_handle(handle) };
+        let parent = pin_parent(path)?;
+        let file = parent.open_child(
+            leaf(path)?,
+            GENERIC_READ,
+            FILE_SHARE_READ,
+            FILE_OPEN,
+            FILE_NON_DIRECTORY_FILE,
+            ptr::null_mut(),
+        )?;
         let i = info(&file)?;
-        if i.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY != 0 || i.nNumberOfLinks != 1 {
+        if i.nNumberOfLinks != 1 {
             return Err(io::Error::other("not a single-link regular file"));
         }
         Ok(file)
@@ -384,41 +360,69 @@ mod windows {
         open(path, GENERIC_WRITE)?.sync_all()
     }
     pub fn atomic_replace(from: &Path, to: &Path) -> io::Result<()> {
-        let _source_parent = pin_parent(from)?;
-        let _target_parent = pin_parent(to)?;
-        let source_name = wide(from.as_os_str())?;
-        // Rename the validated open source, not a subsequently resolved name.
-        let handle = unsafe {
-            CreateFileW(
-                source_name.as_ptr(),
-                DELETE | GENERIC_WRITE,
-                FILE_SHARE_READ,
-                ptr::null(),
-                OPEN_EXISTING,
-                FILE_FLAG_OPEN_REPARSE_POINT | FILE_FLAG_WRITE_THROUGH,
-                ptr::null_mut(),
-            )
-        };
-        if handle == INVALID_HANDLE_VALUE {
-            return Err(io::Error::last_os_error());
-        }
-        let source = unsafe { File::from_raw_handle(handle) };
+        let source_parent = pin_parent(from)?;
+        let target_parent = PinnedDirectory::open_with_access(
+            to.parent()
+                .ok_or_else(|| io::Error::other("target parent required"))?,
+            FILE_ADD_FILE,
+        )?;
+        let source = source_parent.open_child(
+            leaf(from)?,
+            DELETE | GENERIC_WRITE,
+            FILE_SHARE_READ,
+            FILE_OPEN,
+            FILE_NON_DIRECTORY_FILE | FILE_WRITE_THROUGH,
+            ptr::null_mut(),
+        )?;
         let i = info(&source)?;
-        if i.nNumberOfLinks != 1 || i.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY != 0 {
+        if i.nNumberOfLinks != 1 {
             return Err(io::Error::other("invalid replacement source"));
         }
-        if to.try_exists()? && !single_link(to) {
-            return Err(io::Error::other("invalid replacement target"));
+        // Check the existing destination through the pinned parent. The rename
+        // replaces that directory entry; it never follows a destination link.
+        match target_parent.open_child(
+            leaf(to)?,
+            FILE_READ_ATTRIBUTES,
+            FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+            FILE_OPEN,
+            FILE_NON_DIRECTORY_FILE,
+            ptr::null_mut(),
+        ) {
+            Ok(existing) => {
+                if info(&existing)?.nNumberOfLinks != 1 {
+                    return Err(io::Error::other("invalid replacement target"));
+                }
+            }
+            Err(e) if e.kind() == io::ErrorKind::NotFound => {}
+            Err(e) => return Err(e),
         }
-        let name = wide(to.as_os_str())?;
+        rename_bound(&source, &target_parent, leaf(to)?, true)?;
+        source.sync_all()
+    }
+    pub(crate) fn rename_bound(
+        source: &File,
+        target_parent: &PinnedDirectory,
+        target_name: &OsStr,
+        replace: bool,
+    ) -> io::Result<()> {
+        if std::path::Path::new(target_name).components().count() != 1
+            || !matches!(
+                std::path::Path::new(target_name).components().next(),
+                Some(std::path::Component::Normal(_))
+            )
+            || target_name.to_string_lossy().contains(':')
+        {
+            return Err(io::Error::other("ordinary relative rename name required"));
+        }
+        let name = wide(target_name)?;
         let bytes = (name.len() - 1) * 2;
         let size = std::mem::offset_of!(FILE_RENAME_INFO, FileName) + bytes;
         let mut buffer =
             vec![0usize; (size + std::mem::size_of::<usize>() - 1) / std::mem::size_of::<usize>()];
         unsafe {
             let rename = buffer.as_mut_ptr().cast::<FILE_RENAME_INFO>();
-            (*rename).Anonymous.ReplaceIfExists = true;
-            (*rename).RootDirectory = ptr::null_mut();
+            (*rename).Anonymous.ReplaceIfExists = replace;
+            (*rename).RootDirectory = target_parent.handle();
             (*rename).FileNameLength = bytes as u32;
             ptr::copy_nonoverlapping(
                 name.as_ptr(),
@@ -435,6 +439,6 @@ mod windows {
                 return Err(io::Error::last_os_error());
             }
         }
-        source.sync_all()
+        Ok(())
     }
 }

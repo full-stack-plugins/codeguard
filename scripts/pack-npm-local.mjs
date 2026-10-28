@@ -35,6 +35,30 @@ export function npmCommand({platform = process.platform, nodeExecutable = proces
   throw new Error('Installed npm-cli.js unavailable; refusing implicit npm.cmd shell execution');
 }
 
+
+// A failed bundled-inventory probe may have no JSON report (e.g. an immutable
+// source hash mismatch). Keep the actual reason visible without dumping output.
+export function inventoryFailureSummary(result, report, expected) {
+  const bounded = (value, bytes) => typeof value === 'string'
+    ? Buffer.from(value, 'utf8').subarray(0, bytes).toString('utf8') : null;
+  const assets = Array.isArray(report?.assets) ? report.assets : [];
+  const digest = value => typeof value === 'string' && /^[a-f0-9]{64}$/.test(value) ? value : null;
+  return {
+    exit_status: result.status ?? null,
+    signal: bounded(result.signal, 32),
+    spawn_error: bounded(result.error?.code, 32),
+    stderr: bounded(result.stderr, 256),
+    stdout_bytes: typeof result.stdout === 'string' ? Buffer.byteLength(result.stdout, 'utf8') : 0,
+    report_type: bounded(report?.report_type, 64),
+    candidate_count: Number.isSafeInteger(report?.candidate_count) ? report.candidate_count : null,
+    asset_count: assets.length,
+    released_count: Number.isSafeInteger(report?.released_count) ? report.released_count : null,
+    delivery_decision: bounded(report?.delivery_decision, 32),
+    mismatches: assets.filter(asset => !expected.has(asset?.language) || expected.get(asset?.language) !== asset?.candidate_wasm_sha256)
+      .slice(0,4).map(asset => ({language:bounded(asset?.language,32),expected:digest(expected.get(asset?.language)),actual:digest(asset?.candidate_wasm_sha256)})),
+  };
+}
+
 function main() {
 const host = `${process.platform}-${process.arch}`;
 const expectedTarget = packageTarget(host);
@@ -127,7 +151,7 @@ if (requireWasm) {
       new Set(report.assets.map(asset => asset.language)).size !== 32 ||
       report.released_count !== 0 || report.delivery_decision !== 'not_evaluated' ||
       report.assets.some(asset => !expected.has(asset.language) || expected.get(asset.language) !== asset.candidate_wasm_sha256)) {
-    throw new Error('WASM capability probe failed: 32 pinned asset identities are not present');
+    throw new Error(`WASM capability probe failed: 32 pinned asset identities are not present; ${JSON.stringify(inventoryFailureSummary(inventory, report, expected))}`);
   }
   const probeDir = realpathSync(mkdtempSync(path.join(os.tmpdir(), 'codeguard-wasm-pack-probe-')));
   try {

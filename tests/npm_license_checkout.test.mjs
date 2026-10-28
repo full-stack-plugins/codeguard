@@ -37,3 +37,31 @@ test('Windows autocrlf checkout preserves every manifest-pinned license byte', (
     }
   } finally { rmSync(scratch,{recursive:true,force:true}); }
 });
+
+test('Windows autocrlf preserves source patches checked by grammar asset verification', () => {
+  const patches = new Map([
+    ['vbnet/source.patch','33963ebe3ba60929fb58d90efd54f206f98a54ea13ae325d784732c828b7b93a'],
+    ['cobol/source.patch','04fe11a51243ddf7d31e0b6378068c725a51463534218c43c7021761c69701e5'],
+  ]);
+  const scratch = mkdtempSync(path.join(os.tmpdir(), 'codeguard-patch-checkout-'));
+  const git = args => execFileSync('git', args, {cwd:scratch,stdio:['ignore','pipe','pipe']});
+  try {
+    git(['init','--quiet']);
+    git(['config','core.autocrlf','false']);
+    writeFileSync(path.join(scratch,'.gitattributes'),readFileSync(path.join(root,'.gitattributes')));
+    for (const [name, expected] of patches) {
+      const blob = execFileSync('git',['show',`HEAD:grammars/${name}`],{cwd:root});
+      assert.equal(createHash('sha256').update(blob).digest('hex'),expected);
+      const target = path.join(scratch,'grammars',name);
+      mkdirSync(path.dirname(target),{recursive:true});
+      writeFileSync(target,blob);
+    }
+    git(['add','--','.gitattributes','grammars']);
+    for (const name of patches.keys()) rmSync(path.join(scratch,'grammars',name));
+    git(['config','core.autocrlf','true']);
+    git(['checkout-index','--force','--all']);
+    for (const [name,expected] of patches) {
+      assert.equal(createHash('sha256').update(readFileSync(path.join(scratch,'grammars',name))).digest('hex'),expected,name);
+    }
+  } finally { rmSync(scratch,{recursive:true,force:true}); }
+});

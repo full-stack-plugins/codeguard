@@ -78,16 +78,8 @@ fn fresh_report_rejects_old_files_and_hardlinks_and_pins_root() {
     let slot = prepare_fresh_report(&root.0, "report.json", 32).unwrap();
     let moved = root.0.with_extension("moved");
     assert!(fs::rename(&root.0, &moved).is_err());
-    use std::os::windows::fs::OpenOptionsExt;
-    use windows_sys::Win32::Storage::FileSystem::FILE_FLAG_BACKUP_SEMANTICS;
-    assert!(
-        fs::OpenOptions::new()
-            .write(true)
-            .custom_flags(FILE_FLAG_BACKUP_SEMANTICS)
-            .open(&root.0)
-            .is_err(),
-        "pinned directory must refuse write handles used for reparse mutation"
-    );
+    // Ordinary child namespace operations need directory write sharing.
+    // Actual metadata mutation/redirect safety is tested separately below.
     fs::hard_link(root.0.join("old.json"), root.0.join("report.json")).unwrap();
     assert!(slot.read().is_err());
     drop(slot);
@@ -148,4 +140,86 @@ fn rejects_public_dacl_before_creating_any_evidence() {
     assert!(write_private_log(&root.0, "run.log", &outcome()).is_err());
     assert!(prepare_fresh_report(&root.0, "report.json", 16).is_err());
     assert_eq!(fs::read_dir(&root.0).unwrap().count(), 0);
+}
+
+#[test]
+fn mutation_of_open_directory_into_junction_cannot_redirect_report() {
+    use std::os::windows::{ffi::OsStrExt, fs::OpenOptionsExt, io::AsRawHandle};
+    use windows_sys::Win32::{
+        Storage::FileSystem::{FILE_FLAG_BACKUP_SEMANTICS, FILE_FLAG_OPEN_REPARSE_POINT},
+        System::IO::DeviceIoControl,
+    };
+    let root = Root::new();
+    let outside = Root::new();
+    fs::write(
+        outside.0.join("report.json"),
+        b"outside evidence must never be accepted",
+    )
+    .unwrap();
+    let slot = prepare_fresh_report(&root.0, "report.json", 128).unwrap();
+    let writable = fs::OpenOptions::new()
+        .write(true)
+        .custom_flags(FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OPEN_REPARSE_POINT)
+        .open(&root.0)
+        .unwrap();
+    let target = outside.0.canonicalize().unwrap();
+    let target = target.to_string_lossy();
+    let target = target.strip_prefix(r"\\?\").unwrap_or(&target);
+    let substitute = format!(r"\??\{}", target);
+    let substitute: Vec<u16> = std::ffi::OsStr::new(&substitute).encode_wide().collect();
+    let printable: Vec<u16> = std::ffi::OsStr::new(target).encode_wide().collect();
+    // REPARSE_DATA_BUFFER MountPointReparseBuffer, documented NTFS junction form.
+    let data_len = 8 + (substitute.len() + printable.len() + 2) * 2;
+    let mut buffer = Vec::new();
+    buffer.extend_from_slice(&0xA0000003u32.to_le_bytes()); // IO_REPARSE_TAG_MOUNT_POINT
+    buffer.extend_from_slice(&(data_len as u16).to_le_bytes());
+    buffer.extend_from_slice(&0u16.to_le_bytes());
+    for field in [
+        0u16,
+        (substitute.len() * 2) as u16,
+        ((substitute.len() + 1) * 2) as u16,
+        (printable.len() * 2) as u16,
+    ] {
+        buffer.extend_from_slice(&field.to_le_bytes());
+    }
+    for character in substitute
+        .into_iter()
+        .chain([0])
+        .chain(printable)
+        .chain([0])
+    {
+        buffer.extend_from_slice(&character.to_le_bytes());
+    }
+    let mut returned = 0;
+    let ok = unsafe {
+        DeviceIoControl(
+            writable.as_raw_handle(),
+            0x000900A4,
+            buffer.as_ptr().cast(),
+            buffer.len() as u32,
+            std::ptr::null_mut(),
+            0,
+            &mut returned,
+            std::ptr::null_mut(),
+        )
+    }; // FSCTL_SET_REPARSE_POINT
+    assert_ne!(
+        ok,
+        0,
+        "fixture must perform actual metadata mutation without enabling privileges: {}",
+        std::io::Error::last_os_error()
+    );
+    assert!(
+        slot.read().is_err(),
+        "mutated root must not read target evidence"
+    );
+    assert!(write_private_log(&root.0, "redirect.log", &outcome()).is_err());
+    assert!(!outside.0.join("redirect.log").exists());
+    assert_eq!(
+        fs::read(outside.0.join("report.json")).unwrap(),
+        b"outside evidence must never be accepted"
+    );
+    drop(writable);
+    drop(slot);
+    fs::remove_dir(&root.0).unwrap(); // remove junction, never traverse its target
 }

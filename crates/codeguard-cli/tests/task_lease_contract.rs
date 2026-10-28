@@ -106,10 +106,16 @@ impl Project {
             .args(args)
             .output()
             .unwrap();
-        (
-            output.status.code().unwrap(),
-            serde_json::from_slice(&output.stdout).unwrap(),
-        )
+        let report: Value = serde_json::from_slice(&output.stdout).unwrap();
+        if output.status.code() != Some(0) {
+            eprintln!(
+                "lease operation={operation} owner={owner} status={:?} report={} stderr={}",
+                output.status.code(),
+                report,
+                String::from_utf8_lossy(&output.stderr)
+            );
+        }
+        (output.status.code().unwrap(), report)
     }
 
     fn attempt(&self, operation: &str, owner: &str, token: &str, extra: &[&str]) -> (i32, Value) {
