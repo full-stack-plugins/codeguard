@@ -53,7 +53,28 @@ jobs:
           cmake --version
           node -p 'JSON.stringify({platform:process.platform,arch:process.arch})'
       - name: Build native candidate with WASM feature
-        run: cargo build --locked -p codeguard-cli --features wasm-precheck
+        shell: python
+        run: |
+          import pathlib, subprocess, sys
+          evidence = pathlib.Path("candidate-evidence")
+          evidence.mkdir(exist_ok=True)
+          with (evidence / "build.log").open("wb") as log:
+              result = subprocess.run(
+                  ["cargo", "build", "--locked", "-p", "codeguard-cli", "--features", "wasm-precheck"],
+                  stdout=log, stderr=subprocess.STDOUT, check=False)
+          print("Native build log saved to candidate-evidence/build.log")
+          if result.returncode != 0:
+              # At most 2 KiB of original log bytes, then at most 40 lines.
+              # UTF-8 replacement and workflow escaping keep the annotation
+              # below 8 KiB. No environment dump or separate log URL access.
+              with (evidence / "build.log").open("rb") as log:
+                  log.seek(0, 2)
+                  log.seek(max(0, log.tell() - 2048))
+                  tail = log.read().decode("utf-8", errors="replace")
+              diagnostic = "\n".join(tail.splitlines()[-40:])
+              diagnostic = diagnostic.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
+              print("::error title=Native candidate build failed::" + diagnostic)
+          sys.exit(result.returncode)
       - name: Verify version CLI contract on actual runner
         run: cargo test --locked -p codeguard-cli --features wasm-precheck --test version_cli
       - name: Record binary identity without claiming functional acceptance
